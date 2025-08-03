@@ -46,8 +46,7 @@ html {
 
 body {
 	width: 100vw;
-  //TODO: max-width 확인 필요
-	max-width: 440px;
+	max-width: 375px;
 	overflow-x: hidden;
 	background-color: white;
 	color: black;
