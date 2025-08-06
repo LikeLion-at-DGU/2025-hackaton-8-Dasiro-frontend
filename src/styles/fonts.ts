@@ -4,16 +4,38 @@ import { css } from "styled-components";
 const fontGenerator = (
   weight: number,
   size: string,
-  // lineHeight: string,
-  fontFamily?: string
+  lineHeight?: string
 ) => css`
   font-weight: ${weight};
   font-size: ${size};
-
-  font-family: ${fontFamily ? `${fontFamily}` : ""};
+  line-height: ${lineHeight};
+  font-family: "suite";
 `;
 
 export const fonts = {
-  // 예시
-  title_b_30: fontGenerator(600, "30px", "nad"),
+  titleExtra22: fontGenerator(800, "22px"),
+  titleBold22: fontGenerator(700, "22px"),
+  titleExtra20: fontGenerator(800, "20px"),
+  titleBold20: fontGenerator(700, "20px"),
+  titleSemiB20: fontGenerator(600, "20px"),
+
+  subExtra16: fontGenerator(800, "16px"),
+  subBold16: fontGenerator(700, "16px"),
+  subSemi16: fontGenerator(600, "16px"),
+  subMedium16: fontGenerator(500, "16px"),
+
+  bodyExtra14: fontGenerator(800, "14px"),
+  bodyBold14: fontGenerator(700, "14px"),
+  bodySemiB14: fontGenerator(600, "14px", "25px"),
+  bodyMedium14: fontGenerator(500, "14px"),
+
+  capExtra12: fontGenerator(800, "12px"),
+  capBold12: fontGenerator(700, "12px"),
+  capSemi12: fontGenerator(600, "12px"),
+  capMedium12: fontGenerator(500, "12px"),
+
+  capExtra10: fontGenerator(800, "10px"),
+  capBold10: fontGenerator(700, "10px"),
+  capSemi10: fontGenerator(600, "10px"),
+  capMedium10: fontGenerator(500, "10px"),
 };
