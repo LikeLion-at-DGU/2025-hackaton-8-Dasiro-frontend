@@ -1,4 +1,4 @@
-const SateRoutePage = () => {
+const SafeRoutePage = () => {
   return (
     <div style={{ padding: "40px", fontSize: "24px", fontWeight: "bold" }}>
       안전루트 페이지입니다~
@@ -6,4 +6,4 @@ const SateRoutePage = () => {
   );
 };
 
-export default SateRoutePage;
+export default SafeRoutePage;
