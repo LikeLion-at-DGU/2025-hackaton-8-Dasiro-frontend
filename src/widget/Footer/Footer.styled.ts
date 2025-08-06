@@ -17,13 +17,13 @@ export const Wrapper = styled.footer`
   box-shadow: 0 -6px 14px 0 rgba(47, 47, 47, 0.06);
 `;
 
-export const NavItem = styled.button<{ active: boolean }>`
+export const NavItem = styled.button<{ $active: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  color: ${({ active, theme }) => (active ? theme.colors.orange01 : "#888")};
+  color: ${({ $active, theme }) => ($active ? theme.colors.orange01 : "#888")};
   ${fonts.capMedium12};
   cursor: pointer;
 

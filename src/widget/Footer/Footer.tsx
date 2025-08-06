@@ -61,7 +61,7 @@ const Footer = () => {
         return (
           <S.NavItem
             key={tab.key}
-            active={isActive}
+            $active={isActive}
             onClick={() => {
               setActiveTab(tab.key as TabKey);
               navigate(routeMap[tab.key as TabKey]);
