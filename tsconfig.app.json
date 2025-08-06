@@ -28,9 +28,9 @@
     "paths": {
       "@routes/*": ["src/routes/*"],
       "@pages/*": ["src/pages/*"],
-      "@layouts/*": ["src/layouts/*"],
+      "@layouts/*": ["src/shared/layouts/*"],
       "@apis/*": ["src/apis/*"],
-      "@styles/*": ["src/styles/*"]
+      "@styles/*": ["src/shared/styles/*"]
     }
   },
   "include": ["src"]
