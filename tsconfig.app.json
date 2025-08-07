@@ -26,11 +26,13 @@
     /* paths */
     "baseUrl": ".",
     "paths": {
-      "@routes/*": ["src/routes/*"],
+      "@app/*": ["src/app/*"],
+      "@entities/*": ["src/entities/*"],
+      "@features/*": ["src/features/*"],
       "@pages/*": ["src/pages/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@apis/*": ["src/apis/*"],
-      "@styles/*": ["src/styles/*"]
+      "@shared/*": ["src/shared/*"],
+      "@images/*": ["src/shared/assets/*"],
+      "@widget/*": ["src/widget/*"]
     }
   },
   "include": ["src"]
