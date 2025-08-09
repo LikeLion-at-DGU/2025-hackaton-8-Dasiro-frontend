@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as S from "./DestinationSearch.styles";
 import { geocodeAddress } from "@shared/lib/geocodeAddress";
 import { addRecent, clearRecents, getRecents } from "../lib/recentSearch";
+import { createPortal } from "react-dom";
 
 export type Place = {
   place_name: string;
@@ -17,7 +18,8 @@ type Props = {
   onOpen?: () => void;
   onClose?: () => void;
   onRequestPick?: (label: string) => void;
-  storageKey?: string; // 최근 검색 저장 키
+  storageKey?: string;
+  anchorEl?: HTMLElement | null;
 };
 
 export default function DestinationSearch({
@@ -28,18 +30,20 @@ export default function DestinationSearch({
   onClose,
   onRequestPick,
   storageKey = "safe-route:recent-dest",
+  anchorEl,
 }: Props) {
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Place[]>([]);
   const [visible, setVisible] = useState(open);
-
   const [recents, setRecents] = useState(() => getRecents(storageKey));
   const [isFocused, setIsFocused] = useState(false);
-
   const timer = useRef<number | null>(null);
   const [sdkReady, setSdkReady] = useState(
     !!(window as any).kakao?.maps?.services?.Places
   );
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [floatingStyle, setFloatingStyle] = useState<React.CSSProperties>({});
 
   // SDK 준비 대기
   useEffect(() => {
@@ -53,7 +57,7 @@ export default function DestinationSearch({
     return () => clearInterval(t);
   }, [sdkReady]);
 
-  // open 변경 시 표시/초기화
+  // open 토글
   useEffect(() => {
     if (!open) {
       setVisible(false);
@@ -88,7 +92,6 @@ export default function DestinationSearch({
   }, [q, visible, sdkReady, storageKey]);
 
   const handleSelect = (p: Place) => {
-    // 최근 저장
     addRecent(storageKey, {
       place_name: p.place_name,
       address_name: p.address_name,
@@ -115,16 +118,14 @@ export default function DestinationSearch({
 
     const hit = await geocodeAddress(typed).catch(() => null);
     if (hit) {
-      const p: Place = {
+      handleSelect({
         place_name: typed,
         address_name: typed,
         x: String(hit.lng),
         y: String(hit.lat),
-      };
-      handleSelect(p); //
+      });
       return;
     }
-
     onRequestPick?.(typed);
     handleClose();
   };
@@ -133,87 +134,150 @@ export default function DestinationSearch({
 
   const showRecents = isFocused && !q.trim() && recents.length > 0;
 
+  const recalc = () => {
+    if (!anchorEl || !inputRef.current) return;
+    const cardRect = anchorEl.getBoundingClientRect();
+    const inputRect = inputRef.current.getBoundingClientRect();
+    setFloatingStyle({
+      position: "fixed",
+      left: cardRect.left,
+      width: cardRect.width,
+      top: inputRect.bottom + 6,
+      zIndex: 1000,
+    });
+  };
+
+  useEffect(() => {
+    if (isFocused && anchorEl && inputRef.current) recalc();
+  }, [isFocused, anchorEl]);
+
+  useEffect(() => {
+    if (!isFocused) return;
+    const onWin = () => recalc();
+    window.addEventListener("resize", onWin);
+    window.addEventListener("scroll", onWin, true);
+    return () => {
+      window.removeEventListener("resize", onWin);
+      window.removeEventListener("scroll", onWin, true);
+    };
+  }, [isFocused]);
+
   return (
-    <S.Wrap>
-      <S.InputRow>
-        <S.Input
-          value={q}
-          onFocus={() => {
-            setIsFocused(true);
-            onOpen?.();
-          }}
-          onBlur={() => {
-            setTimeout(() => setIsFocused(false), 120);
-          }}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder={placeholder}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") handleClose();
-            if (e.key === "Enter" && results.length === 0) {
-              e.preventDefault();
-              tryUseTyped();
-            }
-          }}
-        />
-        {showRecents && (
-          <S.ClearBtn
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => {
-              clearRecents(storageKey);
-              setRecents([]);
+    <>
+      <S.Wrap>
+        <S.InputRow>
+          <S.Input
+            ref={inputRef}
+            value={q}
+            onFocus={() => {
+              setIsFocused(true);
+              onOpen?.();
+              recalc();
             }}
-            aria-label="최근 검색 비우기"
-            title="최근 검색 비우기"
+            onBlur={() => {
+              setTimeout(() => setIsFocused(false), 120);
+            }}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder={placeholder}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") handleClose();
+              if (e.key === "Enter" && results.length === 0) {
+                e.preventDefault();
+                tryUseTyped();
+              }
+            }}
           />
+          {showRecents && (
+            <S.ClearBtn
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                clearRecents(storageKey);
+                setRecents([]);
+              }}
+              aria-label="최근 검색 비우기"
+              title="최근 검색 비우기"
+            />
+          )}
+        </S.InputRow>
+      </S.Wrap>
+
+      {isFocused &&
+        (results.length > 0 ||
+          showRecents ||
+          (q.trim() && results.length === 0)) &&
+        createPortal(
+          <div style={floatingStyle} onMouseDown={(e) => e.preventDefault()}>
+            {results.length > 0 && (
+              <S.List>
+                {results.map((p) => (
+                  <li key={`${p.x},${p.y}`}>
+                    <S.ItemButton onClick={() => handleSelect(p)}>
+                      <S.ItemTop>
+                        <S.ItemIcon>
+                          <img
+                            src="src/shared/assets/icons/location-pin.png"
+                            alt="위치 아이콘"
+                            width={12}
+                            height={16}
+                          />
+                        </S.ItemIcon>
+                        <S.ItemTitle>{p.place_name}</S.ItemTitle>
+                      </S.ItemTop>
+                      <S.ItemSub>{p.address_name}</S.ItemSub>
+                    </S.ItemButton>
+                  </li>
+                ))}
+              </S.List>
+            )}
+
+            {showRecents && (
+              <>
+                <S.List>
+                  <S.RecentsHeader>최근 검색</S.RecentsHeader>
+                  {recents.map((r) => (
+                    <li key={`${r.x},${r.y},${r.ts}`}>
+                      <S.ItemButton
+                        onClick={() =>
+                          handleSelect({
+                            place_name: r.place_name,
+                            address_name: r.address_name,
+                            x: r.x,
+                            y: r.y,
+                          })
+                        }
+                      >
+                        <S.ItemTop>
+                          <S.ItemIcon>
+                            <img
+                              src="src/shared/assets/icons/location-pin.png"
+                              alt="최근 검색 아이콘"
+                              width={12}
+                              height={16}
+                            />
+                          </S.ItemIcon>
+
+                          <S.ItemTitle>{r.place_name}</S.ItemTitle>
+                        </S.ItemTop>
+                        <S.ItemSub>{r.address_name}</S.ItemSub>
+                      </S.ItemButton>
+                    </li>
+                  ))}
+                </S.List>
+              </>
+            )}
+
+            {q.trim() && results.length === 0 && (
+              <S.List>
+                <li>
+                  <S.ItemButton onClick={tryUseTyped}>
+                    <S.ItemTitle>“{q.trim()}” 위치 직접 지정</S.ItemTitle>
+                  </S.ItemButton>
+                </li>
+              </S.List>
+            )}
+          </div>,
+          document.body
         )}
-      </S.InputRow>
-
-      {/* 검색 결과 */}
-      {isFocused && results.length > 0 && (
-        <S.List onMouseDown={(e) => e.preventDefault()}>
-          <S.RecentsHeader>최근 검색</S.RecentsHeader>
-          {results.map((p) => (
-            <li key={`${p.x},${p.y}`}>
-              <S.ItemButton onClick={() => handleSelect(p)}>
-                <S.ItemTitle>{p.place_name}</S.ItemTitle>
-                <S.ItemSub>{p.address_name}</S.ItemSub>
-              </S.ItemButton>
-            </li>
-          ))}
-        </S.List>
-      )}
-
-      {showRecents && (
-        <S.List onMouseDown={(e) => e.preventDefault()}>
-          {recents.map((r) => (
-            <li key={`${r.x},${r.y},${r.ts}`}>
-              <S.ItemButton
-                onClick={() =>
-                  handleSelect({
-                    place_name: r.place_name,
-                    address_name: r.address_name,
-                    x: r.x,
-                    y: r.y,
-                  })
-                }
-              >
-                <S.ItemTitle>{r.place_name}</S.ItemTitle>
-                <S.ItemSub>{r.address_name}</S.ItemSub>
-              </S.ItemButton>
-            </li>
-          ))}
-        </S.List>
-      )}
-
-      {q.trim() && results.length === 0 && (
-        <S.List>
-          <li>
-            <S.ItemButton onClick={tryUseTyped}>
-              <S.ItemTitle>“{q.trim()}” 위치 직접 지정</S.ItemTitle>
-            </S.ItemButton>
-          </li>
-        </S.List>
-      )}
-    </S.Wrap>
+    </>
   );
 }

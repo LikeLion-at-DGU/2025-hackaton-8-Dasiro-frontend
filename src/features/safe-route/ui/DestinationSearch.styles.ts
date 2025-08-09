@@ -36,7 +36,6 @@ export const RecentsHeader = styled.div`
   font-size: 12px;
   font-weight: 600;
   color: #888;
-  border: 10px solid red;
   width: 100%;
 `;
 
@@ -65,20 +64,35 @@ export const ItemButton = styled.button`
   background: transparent;
   cursor: pointer;
   border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+`;
 
-  &:hover {
-    background: #f8fafc;
+export const ItemTop = styled.div`
+  display: flex;
+  flex: row;
+`;
+
+export const ItemIcon = styled.div`
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+
+  img {
+    display: block;
   }
 `;
 
 export const ItemTitle = styled.div`
   font-weight: 600;
-  font-size: 14px;
+  ${fonts.bodySemiB14}
   color: #111827;
 `;
 
 export const ItemSub = styled.div`
-  font-size: 12px;
   color: #6b7280;
-  margin-top: 2px;
+  ${fonts.capMedium12}
+  margin-left: 20px;
 `;
