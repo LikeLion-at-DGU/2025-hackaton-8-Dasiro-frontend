@@ -18,6 +18,7 @@ export const Overlay = styled.div`
 `;
 
 export const Card = styled.div`
+  position: relative; /* ← 스와프 버튼 absolute 기준 */
   pointer-events: auto;
   border-radius: 10px;
   background: ${({ theme }) => theme.colors.black07};
@@ -25,6 +26,36 @@ export const Card = styled.div`
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   padding: 15px;
   box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+  padding-left: 48px;
+`;
+
+export const SwapHandle = styled.button`
+  position: absolute;
+  left: 12px; /* 카드 안쪽 왼쪽 */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.black03};
+  cursor: pointer;
+  border-radius: 8px;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+  &:active {
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
 `;
 
 export const Row = styled.div`
@@ -63,6 +94,7 @@ export const FlexContent = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 `;
 
 export const MyLocationText = styled.div`
@@ -70,6 +102,10 @@ export const MyLocationText = styled.div`
   ${fonts.bodySemiB14};
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 `;
 
 export const OpenPill = styled.button`
@@ -80,6 +116,10 @@ export const OpenPill = styled.button`
   background: ${({ theme }) => theme.colors.black07};
   color: ${({ theme }) => theme.colors.black03};
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 `;
 
 export const CloseButton = styled.button`

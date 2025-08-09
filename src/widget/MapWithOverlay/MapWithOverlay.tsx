@@ -21,6 +21,14 @@ export default function MapWithOverlay() {
     [useMyLocation]
   );
 
+  const swapRoute = () => {
+    if (!origin && !dest) return;
+    setUseMyLocation(false);
+    setOrigin(dest);
+    setDest(origin);
+    setActive((a) => (a === "origin" ? "dest" : a === "dest" ? "origin" : a));
+  };
+
   return (
     <S.Wrap>
       <SafeRouteMap
@@ -32,6 +40,9 @@ export default function MapWithOverlay() {
 
       <S.Overlay>
         <S.Card ref={cardRef}>
+          <S.SwapHandle onClick={swapRoute} aria-label="출발지/도착지 바꾸기">
+            <img src="src/shared/assets/icons/switch.png" />
+          </S.SwapHandle>
           {/* 출발지 */}
           <S.Row>
             <S.Dot $center />
