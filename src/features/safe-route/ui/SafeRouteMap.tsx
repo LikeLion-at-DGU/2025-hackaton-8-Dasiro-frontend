@@ -196,12 +196,12 @@ export default function SafeRouteMap({
 
     // 현재 위치 점 스타일링
     const el = document.createElement("div");
-    el.style.width = "15px";
-    el.style.height = "15px";
+    el.style.width = "20px";
+    el.style.height = "20px";
     el.style.borderRadius = "50%";
-    el.style.background = "#FF3B30";
-    el.style.boxShadow = "0 0 0 5px rgba(255,59,48,0.25)";
-    el.style.border = "2px solid #fff";
+    el.style.background = "#FF7765";
+    el.style.boxShadow = "0 0 0 5px rgba(255, 119, 101, 0.30)";
+    el.style.border = "4px solid #fff6f0";
 
     if (!myLocOverlayRef.current) {
       myLocOverlayRef.current = new kakao.maps.CustomOverlay({
