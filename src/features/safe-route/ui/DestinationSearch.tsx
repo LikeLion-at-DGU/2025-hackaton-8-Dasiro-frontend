@@ -1,3 +1,5 @@
+// 목적지 검색
+
 import { useEffect, useRef, useState } from "react";
 
 type Place = { place_name: string; x: string; y: string; address_name: string };

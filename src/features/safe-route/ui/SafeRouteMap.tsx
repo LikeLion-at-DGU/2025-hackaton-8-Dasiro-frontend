@@ -1,47 +1,92 @@
-// 지도 띄우기 -> 이벤트 받기 -> 경로 그리기
-
 import { loadKakaoMaps } from "@shared/lib/loadKakaoMaps";
+
 import { useEffect, useRef } from "react";
 import { fitToCoords } from "../lib/fitBounds";
+import { getNowLocation } from "@shared/lib/getLocation";
 
 export default function SafeRouteMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
+  const myMarkerRef = useRef<any>(null);
   const lineRef = useRef<any>(null);
 
   useEffect(() => {
-    let map: any;
+    let isMounted = true;
 
-    loadKakaoMaps(import.meta.env.VITE_KAKAO_JS_KEY).then(() => {
+    const handleDestSelected = (e: Event) => {
+      if (!mapRef.current) return;
       const kakao = window.kakao;
-      map = new kakao.maps.Map(containerRef.current, {
-        center: new kakao.maps.LatLng(37.5665, 126.978),
-        level: 4,
-      });
-      mapRef.current = map;
+      const { x, y } = (e as CustomEvent).detail;
+      const dest = new kakao.maps.LatLng(Number(y), Number(x));
 
-      window.addEventListener("dest:selected", (e: any) => {
+      const origin = myMarkerRef.current
+        ? myMarkerRef.current.getPosition()
+        : mapRef.current.getCenter();
+
+      drawLine([
+        { lat: origin.getLat(), lng: origin.getLng() },
+        { lat: dest.getLat(), lng: dest.getLng() },
+      ]);
+
+      fitToCoords(mapRef.current, [
+        { lat: origin.getLat(), lng: origin.getLng() },
+        { lat: dest.getLat(), lng: dest.getLng() },
+      ]);
+    };
+
+    loadKakaoMaps(import.meta.env.VITE_KAKAO_JS_KEY)
+      .then(async () => {
+        if (!isMounted) return;
         const kakao = window.kakao;
-        const dest = new kakao.maps.LatLng(
-          Number(e.detail.y),
-          Number(e.detail.x)
+
+        // 1) 맵 생성 (기본 센터: 서울 시청)
+        const map = new kakao.maps.Map(containerRef.current, {
+          center: new kakao.maps.LatLng(37.5665, 126.978),
+          level: 4,
+        });
+        mapRef.current = map;
+
+        // 2) 현재 위치
+        try {
+          const pos = await getNowLocation({
+            enableHighAccuracy: true,
+            timeout: 6000,
+          });
+          if (!isMounted) return;
+          const here = new kakao.maps.LatLng(
+            pos.coords.latitude,
+            pos.coords.longitude
+          );
+
+          // 마커 생성/업데이트
+          if (!myMarkerRef.current) {
+            myMarkerRef.current = new kakao.maps.Marker({
+              map,
+              position: here,
+            });
+          } else {
+            myMarkerRef.current.setPosition(here);
+          }
+
+          map.setCenter(here);
+        } catch (e) {
+          console.warn("현재 위치 에러", e);
+        }
+
+        window.addEventListener(
+          "dest:selected",
+          handleDestSelected as EventListener
         );
-        const center = mapRef.current.getCenter();
-        const origin = new kakao.maps.LatLng(center.getLat(), center.getLng());
+      })
+      .catch((e) => console.error("Kakao SDK 로드 실패:", e));
 
-        drawLine([
-          { lat: origin.getLat(), lng: origin.getLng() },
-          { lat: dest.getLat(), lng: dest.getLng() },
-        ]);
-
-        fitToCoords(mapRef.current, [
-          { lat: origin.getLat(), lng: origin.getLng() },
-          { lat: dest.getLat(), lng: dest.getLng() },
-        ]);
-      });
-    });
-
-    return () => {};
+    return () => {
+      isMounted = false;
+      window.removeEventListener(
+        "dest:selected",
+        handleDestSelected as EventListener
+      );
+    };
   }, []);
 
   function drawLine(coords: { lat: number; lng: number }[]) {
