@@ -22,6 +22,24 @@ export const Input = styled.input`
   }
 `;
 
+export const ClearBtn = styled.button`
+  margin-left: 8px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+`;
+
+export const RecentsHeader = styled.div`
+  margin: 8px 2px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  border: 10px solid red;
+  width: 100%;
+`;
+
 export const List = styled.ul`
   position: absolute;
   left: 0;

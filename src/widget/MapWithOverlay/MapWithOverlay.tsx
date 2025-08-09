@@ -9,7 +9,7 @@ export default function MapWithOverlay() {
   const [dest, setDest] = useState<Loc | undefined>(undefined);
   const [useMyLocation, setUseMyLocation] = useState(true);
   const [isOriginOpen, setIsOriginOpen] = useState(false);
-  const [isDestOpen, setIsDestOpen] = useState(true); // 처음엔 인풋 보이게
+  const [isDestOpen, setIsDestOpen] = useState(true);
   const handleMyLocation = useCallback(
     (p: Loc) => {
       if (useMyLocation) setOrigin(p);
@@ -39,11 +39,13 @@ export default function MapWithOverlay() {
                   onClick={() => {
                     setUseMyLocation(false);
                     setIsOriginOpen(true);
+                    setIsDestOpen(false);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       setUseMyLocation(false);
                       setIsOriginOpen(true);
+                      setIsDestOpen(false);
                     }
                   }}
                 >
@@ -53,19 +55,37 @@ export default function MapWithOverlay() {
                 <S.MyLocationText
                   role="button"
                   tabIndex={0}
-                  onClick={() => setIsOriginOpen(true)}
+                  onClick={() => {
+                    setIsOriginOpen(true);
+                    setIsDestOpen(false);
+                  }}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ")
+                    if (e.key === "Enter" || e.key === " ") {
                       setIsOriginOpen(true);
+                      setIsDestOpen(false);
+                    }
                   }}
                 >
                   {origin.address ??
                     `${origin.lat.toFixed(6)}, ${origin.lng.toFixed(6)}`}
                 </S.MyLocationText>
+              ) : !useMyLocation && !origin && !isOriginOpen ? (
+                // 출발지 없음 + 닫힘: 눌러서 열리는 Pill
+                <S.OpenPill
+                  onClick={() => {
+                    setIsOriginOpen(true);
+                    setIsDestOpen(false);
+                  }}
+                >
+                  출발지 입력
+                </S.OpenPill>
               ) : (
+                // 검색 컴포넌트
                 <S.SearchContainer>
                   <DestinationSearch
+                    storageKey="safe-route:recent-origin"
                     open={isOriginOpen}
+                    onOpen={() => setIsDestOpen(false)}
                     onClose={() => setIsOriginOpen(false)}
                     placeholder="출발지 입력"
                     onSelect={(p) => {
@@ -75,6 +95,7 @@ export default function MapWithOverlay() {
                         address: p.address_name ?? p.place_name,
                       });
                       setIsOriginOpen(false);
+                      setIsDestOpen(true);
                     }}
                   />
                 </S.SearchContainer>
@@ -87,16 +108,20 @@ export default function MapWithOverlay() {
                   setUseMyLocation(false);
                   setOrigin(undefined);
                   setIsOriginOpen(true);
+                  setIsDestOpen(false);
                 } else {
                   setOrigin(undefined);
                   setIsOriginOpen(true);
+                  setIsDestOpen(false);
                 }
               }}
             >
               ×
             </S.CloseButton>
           </S.Row>
+
           <S.Divider />
+
           {/* 도착지 줄 */}
           <S.SearchRow>
             <S.Dot $dest />
@@ -106,18 +131,25 @@ export default function MapWithOverlay() {
                   role="button"
                   tabIndex={0}
                   onClick={() => setIsDestOpen(true)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") setIsDestOpen(true);
-                  }}
+                  onKeyDown={(e) =>
+                    (e.key === "Enter" || e.key === " ") && setIsDestOpen(true)
+                  }
                 >
-                  도착지:{" "}
                   {dest.address ??
                     `${dest.lat.toFixed(6)}, ${dest.lng.toFixed(6)}`}
                 </S.MyLocationText>
+              ) : !dest && !isDestOpen ? (
+                // 도착지 없음 + 닫혀있음: 눌러서 열리는 Pill
+                <S.OpenPill onClick={() => setIsDestOpen(true)}>
+                  도착지 입력
+                </S.OpenPill>
               ) : (
+                // 실제 검색 컴포넌트
                 <S.SearchContainer>
                   <DestinationSearch
+                    storageKey="safe-route:recent-dest"
                     open={isDestOpen}
+                    onOpen={() => setIsOriginOpen(false)}
                     onClose={() => setIsDestOpen(false)}
                     placeholder="도착지 입력"
                     onSelect={(p) => {

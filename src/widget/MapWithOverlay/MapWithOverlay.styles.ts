@@ -72,6 +72,16 @@ export const MyLocationText = styled.div`
   user-select: none;
 `;
 
+export const OpenPill = styled.button`
+  flex: 1;
+  text-align: left;
+  ${fonts.bodySemiB14};
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.black07};
+  color: ${({ theme }) => theme.colors.black03};
+  cursor: pointer;
+`;
+
 export const CloseButton = styled.button`
   border: none;
   background: transparent;
