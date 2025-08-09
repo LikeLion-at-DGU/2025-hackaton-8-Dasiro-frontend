@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as S from "./DestinationSearch.styles";
 import { geocodeAddress } from "@features/safe-route/lib/geocodeAddress";
-import { addRecent, clearRecents, getRecents } from "../lib/recentSearch";
+import { addRecent, getRecents } from "../lib/recentSearch";
 import { createPortal } from "react-dom";
 
 export type Place = {
@@ -187,17 +187,6 @@ export default function DestinationSearch({
               }
             }}
           />
-          {showRecents && (
-            <S.ClearBtn
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                clearRecents(storageKey);
-                setRecents([]);
-              }}
-              aria-label="최근 검색 비우기"
-              title="최근 검색 비우기"
-            />
-          )}
         </S.InputRow>
       </S.Wrap>
 
@@ -236,44 +225,51 @@ export default function DestinationSearch({
                   <S.RecentsHeader>최근 검색</S.RecentsHeader>
                   {recents.map((r) => (
                     <li key={`${r.x},${r.y},${r.ts}`}>
-                      <S.ItemButton
-                        onClick={() =>
-                          handleSelect({
-                            place_name: r.place_name,
-                            address_name: r.address_name,
-                            x: r.x,
-                            y: r.y,
-                          })
-                        }
-                      >
-                        <S.ItemTop>
-                          <S.ItemIcon>
-                            <img
-                              src="src/shared/assets/icons/location-pin.png"
-                              alt="최근 검색 아이콘"
-                              width={12}
-                              height={16}
-                            />
-                          </S.ItemIcon>
+                      <S.ItemButton>
+                        <S.ItemContent
+                          onClick={() =>
+                            handleSelect({
+                              place_name: r.place_name,
+                              address_name: r.address_name,
+                              x: r.x,
+                              y: r.y,
+                            })
+                          }
+                        >
+                          <S.ItemTop>
+                            <S.ItemIcon>
+                              <img
+                                src="src/shared/assets/icons/location-pin.png"
+                                alt="최근 검색 아이콘"
+                                width={12}
+                                height={16}
+                              />
+                            </S.ItemIcon>
+                            <S.ItemTitle>{r.place_name}</S.ItemTitle>
+                          </S.ItemTop>
+                          <S.ItemSub>{r.address_name}</S.ItemSub>
+                        </S.ItemContent>
 
-                          <S.ItemTitle>{r.place_name}</S.ItemTitle>
-                        </S.ItemTop>
-                        <S.ItemSub>{r.address_name}</S.ItemSub>
+                        <S.RemoveBtn
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const updated = recents.filter(
+                              (item) => item.ts !== r.ts
+                            );
+                            localStorage.setItem(
+                              storageKey,
+                              JSON.stringify(updated)
+                            );
+                            setRecents(updated);
+                          }}
+                        >
+                          ×
+                        </S.RemoveBtn>
                       </S.ItemButton>
                     </li>
                   ))}
                 </S.List>
               </>
-            )}
-
-            {q.trim() && results.length === 0 && (
-              <S.List>
-                <li>
-                  <S.ItemButton onClick={tryUseTyped}>
-                    <S.ItemTitle>“{q.trim()}” 위치 직접 지정</S.ItemTitle>
-                  </S.ItemButton>
-                </li>
-              </S.List>
             )}
           </div>,
           document.body

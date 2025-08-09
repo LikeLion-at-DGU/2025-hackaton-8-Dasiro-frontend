@@ -56,7 +56,7 @@ export const List = styled.ul`
   z-index: 1000;
 `;
 
-export const ItemButton = styled.button`
+export const ItemButton = styled.div`
   width: 100%;
   text-align: left;
   padding: 10px 12px;
@@ -65,8 +65,22 @@ export const ItemButton = styled.button`
   cursor: pointer;
   border-radius: 10px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.2rem;
+`;
+
+export const ItemContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
+
+export const RemoveBtn = styled.button`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.black04};
 `;
 
 export const ItemTop = styled.div`
