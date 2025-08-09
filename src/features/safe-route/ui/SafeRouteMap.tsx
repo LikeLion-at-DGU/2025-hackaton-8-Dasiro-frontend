@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { loadKakaoMaps } from "@shared/lib/loadKakaoMaps";
-import { getNowLocation } from "@shared/lib/getLocation";
+import { getNowLocation } from "@features/safe-route/lib/getLocation";
 import { fitToCoords } from "../lib/fitBounds";
 import type { Loc } from "@shared/types/location";
 import { reverseGeocode } from "../lib/reverseGeocode";

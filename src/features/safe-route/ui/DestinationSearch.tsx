@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as S from "./DestinationSearch.styles";
-import { geocodeAddress } from "@shared/lib/geocodeAddress";
+import { geocodeAddress } from "@features/safe-route/lib/geocodeAddress";
 import { addRecent, clearRecents, getRecents } from "../lib/recentSearch";
 import { createPortal } from "react-dom";
 

@@ -102,7 +102,7 @@ export default function SearchField({
               setValue({
                 lat: +p.y,
                 lng: +p.x,
-                address: p.address_name ?? p.place_name,
+                address: p.place_name ?? p.address_name,
               });
               closeMe();
             }}
