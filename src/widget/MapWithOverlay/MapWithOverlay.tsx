@@ -8,6 +8,7 @@ import type { Loc } from "@shared/types/location";
 import RouteSummaryCard, {
   type TravelMode,
 } from "@widget/RouteSummaryCard/RouteSummaryCard";
+import RouteSummaryCardBottom from "@widget/RouteSummaryCard/RouteSummaryCardBottom";
 
 type ActiveField = "origin" | "dest" | null;
 
@@ -115,6 +116,7 @@ export default function MapWithOverlay() {
           onPrimaryAction={() => {}}
         />
       </S.BottomOverlay>
+      <RouteSummaryCardBottom />
     </S.Wrap>
   );
 }

@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import Footer from "src/widget/Footer/Footer";
+// import Footer from "src/widget/Footer/Footer";
 
 import styled from "styled-components";
 
@@ -7,7 +7,7 @@ const DefaultLayout = () => {
   return (
     <OutletWrapper>
       <Outlet />
-      <Footer />
+      {/* <Footer /> */}
     </OutletWrapper>
   );
 };
