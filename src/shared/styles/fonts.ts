@@ -9,7 +9,7 @@ const fontGenerator = (
   font-weight: ${weight};
   font-size: ${size};
   line-height: ${lineHeight};
-  font-family: "suite";
+  font-family: "suit";
 `;
 
 export const fonts = {
