@@ -25,7 +25,7 @@ const ButtonBase = styled.button`
   justify-content: center;
   gap: 10px;
   width: 100%;
-  padding: 6px 25px;
+  padding: 6px 23px;
   border-radius: 50px;
   background: ${({ theme }) => theme.colors.black07};
   color: ${({ theme }) => theme.colors.black03};
@@ -36,6 +36,10 @@ const ButtonBase = styled.button`
   &[aria-pressed="true"] {
     background: ${({ theme }) => theme.colors.orange01};
     color: ${({ theme }) => theme.colors.orange06};
+  }
+
+  @media (max-width: 320px) {
+    padding: 6px 15px;
   }
 `;
 
