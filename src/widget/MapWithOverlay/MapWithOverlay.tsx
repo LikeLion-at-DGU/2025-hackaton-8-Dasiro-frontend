@@ -9,8 +9,10 @@ import RouteSummaryCard, {
   type TravelMode,
 } from "@widget/RouteSummaryCard/RouteSummaryCard";
 import RouteSummaryCardBottom from "@widget/RouteSummaryCard/RouteSummaryCardBottom";
+import { useOutletContext } from "react-router-dom";
 
 type ActiveField = "origin" | "dest" | null;
+type LayoutContext = { setFooterHidden: (v: boolean) => void };
 
 export default function MapWithOverlay() {
   const [origin, setOrigin] = useState<Loc | undefined>(undefined);
@@ -21,6 +23,8 @@ export default function MapWithOverlay() {
   const [mode, setMode] = useState<TravelMode>("walk");
 
   const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const { setFooterHidden } = useOutletContext<LayoutContext>();
 
   const handleMyLocation = useCallback(
     (p: Loc) => {
@@ -50,6 +54,12 @@ export default function MapWithOverlay() {
   }, [origin, dest]);
 
   const isReady = Boolean(origin && dest);
+
+  useEffect(() => {
+    setFooterHidden(isReady);
+
+    return () => setFooterHidden(false);
+  }, [isReady, setFooterHidden]);
 
   return (
     <S.Wrap>
