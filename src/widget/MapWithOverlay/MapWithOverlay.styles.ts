@@ -119,6 +119,7 @@ export const MyLocationText = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+  color: ${({ theme }) => theme.colors.black01};
 `;
 
 export const OpenPill = styled.button`

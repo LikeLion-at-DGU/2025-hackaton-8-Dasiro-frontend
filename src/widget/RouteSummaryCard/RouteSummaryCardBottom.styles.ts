@@ -13,7 +13,7 @@ export const Container = styled.section`
   padding: 20px;
   gap: 1rem;
   border-radius: 13px;
-  width: 90%;
+  width: 95%;
   border: 1px solid ${({ theme }) => theme.colors.black05};
   background: ${({ theme }) => theme.colors.black07};
   z-index: 99;
