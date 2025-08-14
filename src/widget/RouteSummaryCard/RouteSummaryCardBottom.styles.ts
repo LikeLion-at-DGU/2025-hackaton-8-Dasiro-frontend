@@ -23,7 +23,7 @@ export const Container = styled.section`
 
 export const TopTextContainer = styled.section`
   display: flex;
-  gap: 1rem;
+  gap: 1.44rem;
 
   img {
     width: 40px;
