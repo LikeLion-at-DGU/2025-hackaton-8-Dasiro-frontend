@@ -280,14 +280,13 @@ export default function SafeRouteMap({
   return (
     <>
       <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
-      {!origin ||
-        (!dest && (
-          <FloatImg
-            src="/images/icons/mapFloating.png"
-            role="button"
-            onClick={onFloatClick}
-          />
-        ))}
+      {!(origin && dest) && (
+        <FloatImg
+          src="/images/icons/mapFloating.png"
+          role="button"
+          onClick={onFloatClick}
+        />
+      )}
     </>
   );
 }
