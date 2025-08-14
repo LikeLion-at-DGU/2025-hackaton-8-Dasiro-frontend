@@ -13,8 +13,21 @@ export const Overlay = styled.div`
   left: 16px;
   right: 16px;
   top: calc(env(safe-area-inset-top, 0px) + 12px);
-  z-index: 10;
+  z-index: 9;
   pointer-events: none;
+`;
+
+export const BottomOverlay = styled.div`
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  top: 130px;
+  z-index: 99; /* 지도/상단카드보다 위 */
+  pointer-events: none;
+  & > * {
+    pointer-events: auto; /* 카드만 클릭 가능 */
+  }
 `;
 
 export const Card = styled.div`

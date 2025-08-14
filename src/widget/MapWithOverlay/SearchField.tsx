@@ -18,6 +18,7 @@ type Props = {
   showCloseButton?: boolean;
   anchorEl?: HTMLElement | null;
   shouldClose?: boolean;
+  isActive?: boolean;
 };
 
 export default function SearchField({
