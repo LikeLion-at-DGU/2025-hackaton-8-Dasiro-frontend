@@ -1,6 +1,5 @@
 import { css } from "styled-components";
 
-//TODO: 플젝 디자인시스템 맞게 수정
 const fontGenerator = (
   weight: number,
   size: string,
