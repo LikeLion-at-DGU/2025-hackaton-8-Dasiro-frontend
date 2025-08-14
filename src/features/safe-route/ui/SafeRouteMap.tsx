@@ -157,6 +157,7 @@ export default function SafeRouteMap({
         });
       }
       fitToCoords(map, path);
+      map.setLevel(map.getLevel() + 1);
     } else if (lineRef.current) {
       lineRef.current.setMap(null);
       lineRef.current = null;

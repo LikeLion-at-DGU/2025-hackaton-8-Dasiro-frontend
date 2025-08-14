@@ -107,16 +107,19 @@ export default function MapWithOverlay() {
         </S.Card>
       </S.Overlay>
 
-      <S.BottomOverlay>
-        <RouteSummaryCard
-          open={isReady}
-          durationText={durationText}
-          mode={mode}
-          onModeChange={setMode}
-          onPrimaryAction={() => {}}
-        />
-      </S.BottomOverlay>
-      <RouteSummaryCardBottom />
+      {isReady && (
+        <>
+          <S.BottomOverlay>
+            <RouteSummaryCard
+              durationText={durationText}
+              mode={mode}
+              onModeChange={setMode}
+              onPrimaryAction={() => {}}
+            />
+          </S.BottomOverlay>
+          <RouteSummaryCardBottom />
+        </>
+      )}
     </S.Wrap>
   );
 }

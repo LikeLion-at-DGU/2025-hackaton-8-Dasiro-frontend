@@ -8,7 +8,6 @@ import UN_CAR from "/images/icons/un-car.svg";
 export type TravelMode = "walk" | "car";
 
 export interface RouteSummaryCardProps {
-  open?: boolean;
   durationText?: string;
   mode?: TravelMode;
   onModeChange?: (m: TravelMode) => void;
@@ -26,14 +25,11 @@ const MODE_META: Record<
 };
 
 export default function RouteSummaryCard({
-  open = true,
   durationText = "",
   mode = "walk",
   onModeChange,
   onPrimaryAction,
 }: RouteSummaryCardProps) {
-  if (!open) return null;
-
   const modes: TravelMode[] = ["walk", "car"];
 
   return (
