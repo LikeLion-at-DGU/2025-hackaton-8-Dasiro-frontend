@@ -5,9 +5,9 @@ import { loadKakaoMaps } from '@shared/lib/loadKakaoMaps';
 import { fetchSeoulGeoJson, type FC } from '@shared/lib/SeoulMap/SeoulGeoJson';
 import { renderSeoulMask } from '@shared/lib/SeoulMap/renderSeoulMask';
 import { renderDistrictPolygons } from '@shared/lib/SeoulMap/renderDistrictPolygons';
-import { riskPaletteV1, type RiskPalette } from '../RiskPalette';
-import { sampleRiskData, type DistrictRisk } from '../RiskData';
-import { createRiskColorResolver } from '../lib/resolveRiskColor';
+import { riskPaletteV1, type RiskPalette } from '../../constants/riskPalette';
+import { sampleRiskData, type DistrictRisk } from '../../constants/riskData';
+import { createRiskColorResolver } from '../../utils/resolveRiskColor';
 
 type Props = {
   appKey: string;

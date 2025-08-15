@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { type PositionProps } from "../types/ElementProps";
+import { type PositionProps } from "../../types/ui";
 
 const DESIGN_WIDTH = 375;
 const DESIGN_HEIGHT = 812; // 기준 디자인 높이

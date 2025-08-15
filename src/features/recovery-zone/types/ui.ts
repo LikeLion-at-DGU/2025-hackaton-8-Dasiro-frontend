@@ -23,6 +23,11 @@ export type PositionProps = {
   $left?: number;
 };
 
+export interface StatusBarProps {
+  $backgroundColor?: string;
+  $textColor?: string;
+}
+
 export interface HeaderProps {
   $backgroundColor?: string;
 }

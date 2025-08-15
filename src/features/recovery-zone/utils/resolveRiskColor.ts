@@ -1,5 +1,5 @@
-import { makeRiskIndex, type DistrictRisk } from '../RiskData';
-import { type RiskPalette, levelToColor, colorForScore } from '../RiskPalette';
+import { makeRiskIndex, type DistrictRisk } from '../constants/riskData';
+import { type RiskPalette, levelToColor, colorForScore } from '../constants/riskPalette';
 
 export function createRiskColorResolver(
   riskData: DistrictRisk[],

@@ -9,7 +9,7 @@ import type {
   FloatingButtonProps,
   CardProps,
   LegendProps
-} from "./ElementProps";
+} from "../../types/ui";
 
 const DESIGN_WIDTH = 375;
 const DESIGN_HEIGHT = 812; // 기준 디자인 높이

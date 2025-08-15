@@ -22,7 +22,6 @@ const StatusBar = () => {
       <span>09:41</span>
       <div style={{ display: "flex", gap: "4px" }}>
         <span>📶</span>
-        <span>📶</span>
         <span>🔋</span>
       </div>
     </Status>

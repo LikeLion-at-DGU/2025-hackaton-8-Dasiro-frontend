@@ -1,4 +1,4 @@
-import * as BasicElement from "@features/recovery-zone/types/BasicElement";
+import * as BasicElement from "../../components/UI/BasicElement";
 
 const BottomSheet = () => {
   return (
