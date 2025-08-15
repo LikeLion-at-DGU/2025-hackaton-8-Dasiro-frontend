@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FC, toHolePaths } from './SeoulGeoJson';
+import { type FC, toHolePaths } from './SeoulGeoJson';
 
 export function renderSeoulMask(kakao: any, map: any, gj: FC) {
   const holePaths = toHolePaths(kakao, gj);

@@ -1,11 +1,29 @@
-import { MapSeoulRisk } from '@features/recovery-zone';
+import { Wrapper } from "@features/recovery-zone/types/BasicElement";
+import {
+  BottomSheet,
+  MainContent,
+  BackgroundCircle,
+} from "@features/recovery-zone";
+import * as S from "@widget/MapWithOverlay/MapWithOverlay.styles";
+
+const BackgroundCirclePos = [
+  { top: 238, left: -127 },
+  { top: 70, left: 238 },
+  { top: 491, left: -67 },
+];
 
 const RecoveryPage = () => {
-  const appkey = import.meta.env.VITE_KAKAO_JS_KEY;
   return (
-    <div style={{ padding: '40px', fontSize: '24px', fontWeight: 'bold' }}>
-      <MapSeoulRisk appKey={appkey} />
-    </div>
+    <S.Wrap>
+      <Wrapper $gap={40} $ColumnDirection={true}>
+        <MainContent></MainContent>
+        {/* <BottomSheet></BottomSheet> */}
+      </Wrapper>
+
+      {BackgroundCirclePos.map((pos, idx) => (
+        <BackgroundCircle key={idx} $top={pos.top} $left={pos.left} />
+      ))}
+    </S.Wrap>
   );
 };
 

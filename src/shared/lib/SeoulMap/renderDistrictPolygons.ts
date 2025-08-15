@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FC, forEachRing, extractDistrictKey } from './SeoulGeoJson';
+import { type FC, forEachRing, extractDistrictKey } from './SeoulGeoJson';
 
 export interface DistrictColorResolver {
   (key: { name?: string; code?: string }): string;
