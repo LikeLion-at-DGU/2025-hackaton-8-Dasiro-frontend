@@ -1,10 +1,18 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as S from "./MapWithOverlay.styles";
 import SafeRouteMap from "@features/safe-route/ui/SafeRouteMap";
 import SearchField from "./SearchField";
+
 import type { Loc } from "@shared/types/location";
 
+import RouteSummaryCard, {
+  type TravelMode,
+} from "@widget/RouteSummaryCard/RouteSummaryCard";
+import RouteSummaryCardBottom from "@widget/RouteSummaryCard/RouteSummaryCardBottom";
+import { useOutletContext } from "react-router-dom";
+
 type ActiveField = "origin" | "dest" | null;
+type LayoutContext = { setFooterHidden: (v: boolean) => void };
 
 export default function MapWithOverlay() {
   const [origin, setOrigin] = useState<Loc | undefined>(undefined);
@@ -12,7 +20,11 @@ export default function MapWithOverlay() {
   const [useMyLocation, setUseMyLocation] = useState(true);
 
   const [active, setActive] = useState<ActiveField>("dest");
+  const [mode, setMode] = useState<TravelMode>("walk");
+
   const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const { setFooterHidden } = useOutletContext<LayoutContext>();
 
   const handleMyLocation = useCallback(
     (p: Loc) => {
@@ -29,6 +41,26 @@ export default function MapWithOverlay() {
     setActive((a) => (a === "origin" ? "dest" : a === "dest" ? "origin" : a));
   };
 
+  // TODO: 실제 경로 API 결과로 대체
+  const durationText = useMemo(() => {
+    if (!origin || !dest) return "";
+    return mode === "walk" ? "1시간 12분" : "24분";
+  }, [origin, dest, mode]);
+
+  useEffect(() => {
+    if (origin && !dest) {
+      setActive("dest");
+    }
+  }, [origin, dest]);
+
+  const isReady = Boolean(origin && dest);
+
+  useEffect(() => {
+    setFooterHidden(isReady);
+
+    return () => setFooterHidden(false);
+  }, [isReady, setFooterHidden]);
+
   return (
     <S.Wrap>
       <SafeRouteMap
@@ -37,12 +69,12 @@ export default function MapWithOverlay() {
         useMyLocation={useMyLocation}
         onMyLocation={handleMyLocation}
       />
-
       <S.Overlay>
         <S.Card ref={cardRef}>
           <S.SwapHandle onClick={swapRoute} aria-label="출발지/도착지 바꾸기">
             <img src="src/shared/assets/icons/switch.png" />
           </S.SwapHandle>
+
           {/* 출발지 */}
           <S.Row>
             <S.Dot $center />
@@ -61,6 +93,7 @@ export default function MapWithOverlay() {
               onOpenExclusive={() => setActive("origin")}
               shouldClose={active !== "origin"}
               showCloseButton
+              isActive={active === "origin"}
             />
           </S.Row>
 
@@ -78,10 +111,25 @@ export default function MapWithOverlay() {
               startOpen={true}
               onOpenExclusive={() => setActive("dest")}
               shouldClose={active !== "dest"}
+              isActive={active === "dest"}
             />
           </S.SearchRow>
         </S.Card>
       </S.Overlay>
+
+      {isReady && (
+        <>
+          <S.BottomOverlay>
+            <RouteSummaryCard
+              durationText={durationText}
+              mode={mode}
+              onModeChange={setMode}
+              onPrimaryAction={() => {}}
+            />
+          </S.BottomOverlay>
+          <RouteSummaryCardBottom />
+        </>
+      )}
     </S.Wrap>
   );
 }

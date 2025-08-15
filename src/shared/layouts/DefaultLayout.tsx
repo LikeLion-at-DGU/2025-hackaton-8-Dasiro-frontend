@@ -1,13 +1,19 @@
 import { Outlet } from "react-router-dom";
-import Footer from "src/widget/Footer/Footer";
-
 import styled from "styled-components";
+import { useState } from "react";
+import Footer from "@widget/Footer/Footer";
+
+type LayoutContext = {
+  setFooterHidden: (v: boolean) => void;
+};
 
 const DefaultLayout = () => {
+  const [footerHidden, setFooterHidden] = useState(false);
+
   return (
     <OutletWrapper>
-      <Outlet />
-      <Footer />
+      <Outlet context={{ setFooterHidden } satisfies LayoutContext} />
+      {!footerHidden && <Footer />}
     </OutletWrapper>
   );
 };

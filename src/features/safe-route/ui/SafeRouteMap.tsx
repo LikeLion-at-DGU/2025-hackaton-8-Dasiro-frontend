@@ -5,6 +5,8 @@ import { fitToCoords } from "../lib/fitBounds";
 import type { Loc } from "@shared/types/location";
 import { reverseGeocode } from "../lib/reverseGeocode";
 import markerIcon from "@shared/assets/icons/marker.png";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 type Props = {
   origin?: Loc;
@@ -157,6 +159,7 @@ export default function SafeRouteMap({
         });
       }
       fitToCoords(map, path);
+      map.setLevel(map.getLevel() + 1);
     } else if (lineRef.current) {
       lineRef.current.setMap(null);
       lineRef.current = null;
@@ -269,5 +272,31 @@ export default function SafeRouteMap({
     }
   }
 
-  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
+  const navigate = useNavigate();
+
+  //TODO: 추후 경로 수정 필요
+  const onFloatClick = () => navigate("/report");
+
+  return (
+    <>
+      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+      {!(origin && dest) && (
+        <FloatImg
+          src="/images/icons/mapFloating.png"
+          role="button"
+          onClick={onFloatClick}
+        />
+      )}
+    </>
+  );
 }
+const FloatImg = styled.img`
+  width: 3.5rem;
+  height: 3.5rem;
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  cursor: pointer;
+  z-index: 40;
+  pointer-events: auto;
+`;
