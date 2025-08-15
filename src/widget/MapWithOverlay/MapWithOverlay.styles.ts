@@ -13,12 +13,36 @@ export const Overlay = styled.div`
   left: 16px;
   right: 16px;
   top: calc(env(safe-area-inset-top, 0px) + 12px);
-  z-index: 10;
+  z-index: 9;
   pointer-events: none;
 `;
 
+export const FloatImg = styled.img`
+  width: 3rem;
+  height: 3rem;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  cursor: pointer;
+  z-index: 40;
+  pointer-events: auto;
+`;
+
+export const BottomOverlay = styled.div`
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  top: 130px;
+  z-index: 99;
+  pointer-events: none;
+  & > * {
+    pointer-events: auto;
+  }
+`;
+
 export const Card = styled.div`
-  position: relative; /* ← 스와프 버튼 absolute 기준 */
+  position: relative;
   pointer-events: auto;
   border-radius: 10px;
   background: ${({ theme }) => theme.colors.black07};
@@ -31,7 +55,7 @@ export const Card = styled.div`
 
 export const SwapHandle = styled.button`
   position: absolute;
-  left: 12px; /* 카드 안쪽 왼쪽 */
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   width: 28px;
@@ -106,6 +130,7 @@ export const MyLocationText = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+  color: ${({ theme }) => theme.colors.black01};
 `;
 
 export const OpenPill = styled.button`
