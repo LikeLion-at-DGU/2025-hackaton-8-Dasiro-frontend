@@ -1,62 +1,51 @@
-export interface DivFlexProps {
-  $ColumnDirection?: boolean;
-  $Width?: number;
+// Base Layout Props
+export interface FlexLayoutProps {
+  $columnDirection?: boolean;
+  $width?: number | string;
+  $alignItems?: string;
+  $justifyContent?: string;
 }
 
-interface PaddingSize {
-  ver: number;
-  hoz?: number;
-}
-
-interface MarginSize {
-  ver: number;
-  hoz?: number;
-}
-
-export interface WrapperProps extends DivFlexProps {
-  $padding?: PaddingSize | number;
+// Box Model Props
+export interface BoxModelProps {
+  $padding?: number | number[];
+  $margin?: number | number[];
   $gap?: number;
 }
 
-export type PositionProps = {
-  $top?: number;
-  $left?: number;
-};
-
-export interface StatusBarProps {
+// Visual Props
+export interface VisualProps {
   $backgroundColor?: string;
   $textColor?: string;
+  $borderRadius?: number | number[];
+  $border?: string;
+  $boxShadow?: string;
 }
 
-export interface HeaderProps {
-  $backgroundColor?: string;
+// Interactive Props
+export interface InteractiveProps {
+  $cursor?: string;
+  $hover?: boolean;
 }
 
-export interface MapContainerProps {
-  $height?: number;
-  $backgroundColor?: string;
-}
-
-export interface LegendProps {
-  $vertical?: boolean;
-}
-
-export interface BottomNavProps {
-  $backgroundColor?: string;
-  $borderTop?: string;
-}
-
-export interface FloatingButtonProps extends PositionProps {
+// Position Props
+export interface PositionProps {
+  $top?: number;
+  $left?: number;
   $bottom?: number;
   $right?: number;
-  $size?: number;
-  $backgroundColor?: string;
+  $position?: string;
+  $zIndex?: number;
 }
 
-export interface CardProps {
-  $backgroundColor?: string;
-  $borderRadius?: number;
-  $padding?: PaddingSize | number;
-  $shadow?: string;
-  $margin?: MarginSize | number;
-}
+// Combined Props for common patterns
+export interface FlexBoxModelProps extends FlexLayoutProps, BoxModelProps {}
+
+export interface ContainerProps extends FlexBoxModelProps, VisualProps {}
+
+export interface ButtonProps extends ContainerProps, InteractiveProps {}
+
+export interface CardProps extends ContainerProps {}
+
+export interface OverlayProps extends PositionProps, VisualProps {}
+

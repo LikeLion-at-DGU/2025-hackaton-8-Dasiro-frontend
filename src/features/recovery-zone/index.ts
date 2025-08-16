@@ -1,12 +1,14 @@
-export { default as MapSeoulRisk } from './components/MapBackground/MapSeoulRisk';
-export { default as MainContent } from './containers/MainContent/MainContent';
-export { default as BottomSheet } from './containers/BottomSheet/BottomSheet';
-export { BackgroundCircle } from './components/MapBackground/MapBackground';
+// UI Components (Styled Components)
+export * from "./ui";
 
-// Re-export components
-export { default as Card } from './components/Card/Card';
-export { default as NoticeCard } from './components/Card/NoticeCard';
-export { default as Header } from './components/Header/Header';
+// Container Components (Page Sections)
+export * from "./containers";
 
-// Re-export types
-export * from './types';
+// Widget Components (Reusable Components)
+export * from "./widgets";
+
+// Types
+export * from "./types";
+
+// Utils
+export * from "./utils";
