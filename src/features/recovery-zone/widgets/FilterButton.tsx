@@ -1,5 +1,5 @@
 import { BottomSheetElement } from "../ui";
-import buttonarrow from "@shared/assets/icons/buttonarrow.png";
+import buttonarrow from "/images/icons/buttonarrow.png";
 
 interface FilterButtonProps {
   label: string;

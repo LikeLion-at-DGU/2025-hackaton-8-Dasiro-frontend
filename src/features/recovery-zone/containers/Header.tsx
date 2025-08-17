@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { MainElement } from "../ui";
 import { LocationPickerMap } from "../widgets/LocationPickerMap";
-import logo from "@shared/assets/logo.png";
-import downarrow from "@shared/assets/icons/downarrow.png";
+import logo from "/images/logo.png";
+import downarrow from "/images/icons/downarrow.png";
 
 export const Header = () => {
   // 위치 설정 모달 열림/닫힘 상태

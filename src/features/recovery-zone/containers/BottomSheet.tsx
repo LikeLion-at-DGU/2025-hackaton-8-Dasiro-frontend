@@ -2,8 +2,8 @@
 import { useState, useRef, useEffect } from "react";
 import { BottomSheetElement } from "../ui";
 import { FilterButton, StoreCard } from "../widgets";
-import sheetbar from "@shared/assets/icons/sheetbar.png";
-import example from "@shared/assets/image351.png";
+import sheetbar from "/images/icons/sheetbar.png";
+import example from "/images/image351.png";
 
 // 필터 버튼 목록 - 복구현황 및 업종별 필터링 기능
 const FILTER_BUTTONS = [

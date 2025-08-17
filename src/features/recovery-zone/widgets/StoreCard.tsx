@@ -1,5 +1,5 @@
 import { BottomSheetElement } from "../ui";
-import coupon from "@shared/assets/icons/coupon.png";
+import coupon from "/images/icons/coupon.png";
 
 interface StoreCardProps {
   image: string;

@@ -6,7 +6,7 @@ export const BottomSheetWrapper = style(BasicElement.Container).attrs(() => ({
     $columnDirection: true,
     $padding: 20,
     $borderRadius: [30, 30, 0, 0],
-    $backgroundColor: '#f8f9fa'
+    $backgroundColor: '#ffffff'
 }))`
     box-shadow: 4px 0 12px 0 rgba(0, 0, 0, 0.05);
     position: absolute;

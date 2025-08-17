@@ -2,7 +2,6 @@ import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { useState } from "react";
 import Footer from "@widget/Footer/Footer";
-import StatusBar from "@widget/StatusBar/StatusBar"
 
 type LayoutContext = {
   setFooterHidden: (v: boolean) => void;
@@ -13,7 +12,6 @@ const DefaultLayout = () => {
 
   return (
     <OutletWrapper>
-      <StatusBar />
       <Outlet context={{ setFooterHidden } satisfies LayoutContext} />
       {!footerHidden && <Footer />}
     </OutletWrapper>
