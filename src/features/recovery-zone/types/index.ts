@@ -1,6 +1,4 @@
 export * from './ui';
-export * from './risk';
-export * from './card';
 
 // 복구 현황 타입
 export type RecoveryStatus = "복구중" | "임시복구" | "복구완료";

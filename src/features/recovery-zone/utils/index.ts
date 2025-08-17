@@ -1,1 +1,1 @@
-export * from "./resolveRiskColor";
+export * from "./recoveryColorResolver";

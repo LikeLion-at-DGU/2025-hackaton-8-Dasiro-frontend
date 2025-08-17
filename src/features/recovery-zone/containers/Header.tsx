@@ -1,3 +1,4 @@
+// Recovery Zone 헤더 컴포넌트 - 로고, 위치 설정, 공지사항을 포함
 import { useState } from "react";
 import { MainElement } from "../ui";
 import { LocationPickerMap } from "../widgets/LocationPickerMap";
@@ -5,12 +6,17 @@ import logo from "@shared/assets/logo.png";
 import downarrow from "@shared/assets/icons/downarrow.png";
 
 export const Header = () => {
+  // 위치 설정 모달 열림/닫힘 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // 사용자가 선택한 위치 정보 (위도, 경도, 주소)
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
     lng: number;
     address: string;
   } | null>(null);
+  
+  // 위치 허용 여부 상태 (허용 시 "현재 위치", 미허용 시 "위치 설정" 표시)
   const [isLocationAllowed, setIsLocationAllowed] = useState(false);
 
   // 컴포넌트 마운트 시 로그
