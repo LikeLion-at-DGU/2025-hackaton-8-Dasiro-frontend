@@ -167,25 +167,12 @@ export const BottomSheet = () => {
   }, [isDragging, height]);
 
   return (
-    <div
+    <BottomSheetElement.BottomSheetWrapper
       ref={bottomSheetRef}
-      id="bottomSheet"
       style={{ 
         height: `${height}vh`,
         maxHeight: '100vh',
-        transition: isDragging ? 'none' : 'height 0.3s ease',
-        background: '#f8f9fa',
-        boxShadow: '4px 0 12px 0 rgba(0, 0, 0, 0.05)',
-        borderRadius: '30px 30px 0 0',
-        padding: '20px',
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 10,
-        userSelect: 'none',
-        display: 'flex',
-        flexDirection: 'column'
+        transition: isDragging ? 'none' : 'height 0.3s ease'
       }}
     >
       <BottomSheetElement.BottomBar id="bottomBar">
@@ -230,6 +217,6 @@ export const BottomSheet = () => {
           </BottomSheetElement.BottomCardList>
         </BottomSheetElement.BottomInner>
       </BottomSheetElement.BottomBar>
-    </div>
+    </BottomSheetElement.BottomSheetWrapper>
   );
 };

@@ -1,6 +1,22 @@
 import * as BasicElement from "./BasicElement";
 import style from "styled-components";
 
+// BottomSheet 메인 컨테이너 - #bottomSheet 스타일을 BasicElement로 리팩토링
+export const BottomSheetWrapper = style(BasicElement.Container).attrs(() => ({
+    $columnDirection: true,
+    $padding: 20,
+    $borderRadius: [30, 30, 0, 0],
+    $backgroundColor: '#f8f9fa'
+}))`
+    box-shadow: 4px 0 12px 0 rgba(0, 0, 0, 0.05);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    user-select: none;
+`;
+
 export const BottomWrapper = style(BasicElement.Container).attrs(() => ({
     $columnDirection: true,
     $padding: 20,
