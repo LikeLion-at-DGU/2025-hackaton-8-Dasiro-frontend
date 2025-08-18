@@ -1,18 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as S from "./MapWithOverlay.styles";
 import SafeRouteMap from "@features/safe-route/ui/SafeRouteMap";
 import SearchField from "./SearchField";
-
-import type { Loc } from "@shared/types/location";
-
 import RouteSummaryCard, {
   type TravelMode,
 } from "@widget/RouteSummaryCard/RouteSummaryCard";
 import RouteSummaryCardBottom from "@widget/RouteSummaryCard/RouteSummaryCardBottom";
+import type { Loc } from "@shared/types/location";
+import type { RouteResult } from "@features/safe-route/types";
+import { getSafeRoutes } from "@features/safe-route/api/getSafeRoutes";
+import { formatDurationKR } from "@features/safe-route/lib/distance";
 import { useOutletContext } from "react-router-dom";
 
-type ActiveField = "origin" | "dest" | null;
 type LayoutContext = { setFooterHidden: (v: boolean) => void };
+
+type ActiveField = "origin" | "dest" | null;
 
 export default function MapWithOverlay() {
   const [origin, setOrigin] = useState<Loc | undefined>(undefined);
@@ -21,11 +23,24 @@ export default function MapWithOverlay() {
 
   const [active, setActive] = useState<ActiveField>("dest");
   const [mode, setMode] = useState<TravelMode>("walk");
+  const { setFooterHidden } = useOutletContext<LayoutContext>();
+
+  // 모드별 경로 캐시
+  const [routesByMode, setRoutesByMode] = useState<Partial<
+    Record<TravelMode, RouteResult>
+  > | null>(null);
+
+  // 현재 표시할 값
+  const [routePath, setRoutePath] = useState<
+    RouteResult["coords"] | undefined
+  >();
+  const [durationText, setDurationText] = useState("");
+  const [durationSec, setDurationSec] = useState<number | null>(null);
+  const [distanceM, setDistanceM] = useState<number | null>(null);
 
   const cardRef = useRef<HTMLDivElement | null>(null);
 
-  const { setFooterHidden } = useOutletContext<LayoutContext>();
-
+  // 내 위치 수신 시 origin 세팅
   const handleMyLocation = useCallback(
     (p: Loc) => {
       if (useMyLocation) setOrigin(p);
@@ -41,16 +56,48 @@ export default function MapWithOverlay() {
     setActive((a) => (a === "origin" ? "dest" : a === "dest" ? "origin" : a));
   };
 
-  // TODO: 실제 경로 API 결과로 대체
-  const durationText = useMemo(() => {
-    if (!origin || !dest) return "";
-    return mode === "walk" ? "1시간 12분" : "24분";
-  }, [origin, dest, mode]);
+  // origin/dest 바뀔 때 API 한 번 호출해서 두 모드 전부 받아오기
+  useEffect(() => {
+    let canceled = false;
+
+    (async () => {
+      if (!origin || !dest) {
+        setRoutesByMode(null);
+        setRoutePath(undefined);
+        setDurationText("");
+        setDurationSec(null);
+        setDistanceM(null);
+        return;
+      }
+
+      const res = await getSafeRoutes({
+        origin: { lat: origin.lat, lng: origin.lng },
+        destination: { lat: dest.lat, lng: dest.lng },
+      });
+
+      if (canceled) return;
+      setRoutesByMode(res);
+    })();
+
+    return () => {
+      canceled = true;
+    };
+  }, [origin, dest]);
+
+  // 선택 모드/새 경로 들어오면 표시값 갱신
+  useEffect(() => {
+    if (!routesByMode) return;
+    const current = routesByMode[mode] ?? routesByMode.walk ?? routesByMode.car;
+    if (!current) return;
+
+    setRoutePath(current.coords);
+    setDurationSec(current.durationSec);
+    setDistanceM(current.distanceM);
+    setDurationText(formatDurationKR(current.durationSec));
+  }, [mode, routesByMode]);
 
   useEffect(() => {
-    if (origin && !dest) {
-      setActive("dest");
-    }
+    if (origin && !dest) setActive("dest");
   }, [origin, dest]);
 
   const isReady = Boolean(origin && dest);
@@ -66,9 +113,11 @@ export default function MapWithOverlay() {
       <SafeRouteMap
         origin={origin}
         dest={dest}
+        routePath={routePath}
         useMyLocation={useMyLocation}
         onMyLocation={handleMyLocation}
       />
+
       <S.Overlay>
         <S.Card ref={cardRef}>
           <S.SwapHandle onClick={swapRoute} aria-label="출발지/도착지 바꾸기">
@@ -108,7 +157,7 @@ export default function MapWithOverlay() {
               setValue={setDest}
               placeholder="도착지 입력"
               storageKey="safe-route:recent-dest"
-              startOpen={true}
+              startOpen
               onOpenExclusive={() => setActive("dest")}
               shouldClose={active !== "dest"}
               isActive={active === "dest"}
@@ -127,7 +176,11 @@ export default function MapWithOverlay() {
               onPrimaryAction={() => {}}
             />
           </S.BottomOverlay>
-          <RouteSummaryCardBottom />
+
+          <RouteSummaryCardBottom
+            durationSec={durationSec ?? undefined}
+            distanceM={distanceM ?? undefined}
+          />
         </>
       )}
     </S.Wrap>
