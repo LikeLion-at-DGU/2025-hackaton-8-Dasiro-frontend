@@ -1,9 +1,7 @@
-const CitizenReportPage = () => {
-  return (
-    <div style={{ padding: "40px", fontSize: "24px", fontWeight: "bold" }}>
-      시민제보 페이지입니다~
-    </div>
-  );
+import Intro from "@features/citizen-report/ui/intro/Intro";
+
+const CitizenReport = () => {
+  return <Intro />;
 };
 
-export default CitizenReportPage;
+export default CitizenReport;
