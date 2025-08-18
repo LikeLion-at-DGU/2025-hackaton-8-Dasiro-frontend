@@ -23,7 +23,7 @@ const CitizenIntro = () => {
         <p className="title">땅땅이</p>
         <img src="/images/icons/close.svg" />
       </IntroHeader>
-      <DateBadge date="2025.07.27(일)" />
+      <DateBadge />
       <IntroContent>
         <BotIntro />
         <IntroBtn />

@@ -1,15 +1,19 @@
+import { formatDate } from "@features/citizen-report/utils/formatDate";
 import { fonts } from "@shared/styles/fonts";
 import styled from "styled-components";
 
-const DateBadge = ({ date }: { date: string }) => (
-  <DateContainerWrapper>
-    <DateContainer>{date}</DateContainer>
-  </DateContainerWrapper>
-);
+const DateBadge = () => {
+  const today = new Date();
+  const formattedDate = formatDate(today);
+
+  return (
+    <DateContainerWrapper>
+      <DateContainer>{formattedDate}</DateContainer>
+    </DateContainerWrapper>
+  );
+};
 
 export default DateBadge;
-
-// -------------- style --------------
 
 const DateContainerWrapper = styled.div`
   display: flex;
