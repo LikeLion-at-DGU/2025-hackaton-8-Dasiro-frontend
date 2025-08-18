@@ -1,14 +1,15 @@
 import styled from "styled-components";
-import BotIntro from "./BotIntro";
-import DateBadge from "./DateBadge";
-import IntroBtn from "./IntroBtn";
+
 import { fonts } from "@shared/styles/fonts";
 import { useOutletContext } from "react-router-dom";
 import { useEffect } from "react";
+import DateBadge from "@features/citizen-report/ui/intro/DateBadge";
+import BotIntro from "@features/citizen-report/ui/intro/BotIntro";
+import IntroBtn from "@features/citizen-report/ui/intro/IntroBtn";
 
 type LayoutContext = { setFooterHidden: (v: boolean) => void };
 
-const Intro = () => {
+const CitizenIntro = () => {
   const { setFooterHidden } = useOutletContext<LayoutContext>();
 
   useEffect(() => {
@@ -31,7 +32,7 @@ const Intro = () => {
   );
 };
 
-export default Intro;
+export default CitizenIntro;
 
 const IntroHeader = styled.div`
   display: flex;

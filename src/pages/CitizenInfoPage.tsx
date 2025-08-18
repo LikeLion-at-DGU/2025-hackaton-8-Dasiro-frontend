@@ -1,9 +1,9 @@
-const CitizenReport = () => {
+const CitizenInfo = () => {
   return (
     <div style={{ padding: "40px", fontSize: "24px", fontWeight: "bold" }}>
-      제보 페이지
+      정보 페이지
     </div>
   );
 };
 
-export default CitizenReport;
+export default CitizenInfo;
