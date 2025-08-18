@@ -167,7 +167,7 @@ export default function SafeRouteMap({
       }
 
       fitToCoords(map, points);
-      // map.setLevel(map.getLevel() + 1); // 필요 시 축소
+      map.setLevel(map.getLevel() + 1);
     } else if (lineRef.current) {
       lineRef.current.setMap(null);
       lineRef.current = null;
