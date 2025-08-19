@@ -3,10 +3,7 @@ import styled, { css } from "styled-components";
 import { fonts } from "@shared/styles/fonts";
 import type { ChatMessageType, ChatMessage } from "@shared/types/chat";
 
-type BubbleVariant = Extract<
-  ChatMessageType,
-  "bot" | "user" | "analysis" | "info"
->;
+type BubbleVariant = Extract<ChatMessageType, "bot" | "user">;
 
 export default function MessageBubble({ msg }: { msg: ChatMessage }) {
   if (msg.type === "image") {
@@ -90,18 +87,18 @@ const Bubble = styled.div<{ $variant: BubbleVariant }>`
           color: ${theme.colors.black07};
           border-bottom-left-radius: 20px;
         `;
-      case "analysis":
-        return css`
-          background: ${theme.colors.orange06};
-          color: ${theme.colors.black01};
-          border-left: 3px solid ${theme.colors.orange02};
-        `;
-      case "info":
-        return css`
-          background: ${theme.colors.orange06};
-          color: ${theme.colors.orange02};
-          border-left: 3px solid ${theme.colors.orange02};
-        `;
+      // case "analysis":
+      //   return css`
+      //     background: ${theme.colors.orange06};
+      //     color: ${theme.colors.black01};
+      //     border-left: 3px solid ${theme.colors.orange02};
+      //   `;
+      // case "info":
+      //   return css`
+      //     background: ${theme.colors.orange06};
+      //     color: ${theme.colors.orange02};
+      //     border-left: 3px solid ${theme.colors.orange02};
+      //   `;
       default:
         return css`
           background: ${theme.colors.orange06};

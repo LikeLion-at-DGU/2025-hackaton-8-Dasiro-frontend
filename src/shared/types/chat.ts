@@ -1,5 +1,5 @@
 // src/shared/types/chat.ts
-export type ChatMessageType = "bot" | "user" | "analysis" | "info" | "image";
+export type ChatMessageType = "bot" | "user" | "image";
 
 export type ChatMessage = {
   id: string;

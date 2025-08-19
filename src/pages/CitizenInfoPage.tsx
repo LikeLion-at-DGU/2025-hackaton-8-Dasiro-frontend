@@ -30,18 +30,18 @@ export default function CitizenInfoPage() {
   );
   useEffect(() => setMessages(initial), [initial]);
 
-  const onSend = (text: string) => {
-    if (!text) return;
-    setMessages((p) => [
-      ...p,
-      { id: crypto.randomUUID(), type: "user", text },
-      {
-        id: crypto.randomUUID(),
-        type: "analysis",
-        text: "▸ 신당동 싱크홀 위험 정보\n최근 6개월 내 지반 침하 사고가 2건 이상 보고된 지역으로, 지하시설 노후가 주요 원인으로 추정돼요.\n\n▸ 주의사항\n보도블럭 침하/물웅덩이 반복 시 즉시 신고해 주세요.",
-      },
-    ]);
-  };
+  // const onSend = (text: string) => {
+  //   if (!text) return;
+  //   setMessages((p) => [
+  //     ...p,
+  //     { id: crypto.randomUUID(), type: "user", text },
+  //     {
+  //       id: crypto.randomUUID(),
+  //       type: "analysis",
+  //       text: "▸ 신당동 싱크홀 위험 정보\n최근 6개월 내 지반 침하 사고가 2건 이상 보고된 지역으로, 지하시설 노후가 주요 원인으로 추정돼요.\n\n▸ 주의사항\n보도블럭 침하/물웅덩이 반복 시 즉시 신고해 주세요.",
+  //     },
+  //   ]);
+  // };
 
   return (
     <CitizenLayout

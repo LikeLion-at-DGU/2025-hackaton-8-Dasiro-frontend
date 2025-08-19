@@ -156,7 +156,7 @@ export default function CitizenReportPage() {
         append([
           {
             id: crypto.randomUUID(),
-            type: "analysis",
+            type: "bot",
             text:
               `▸ 분석결과\n해당 장소의 예상 위험도는 ${pct.toFixed(
                 1
@@ -168,7 +168,7 @@ export default function CitizenReportPage() {
         append([
           {
             id: crypto.randomUUID(),
-            type: "info",
+            type: "bot",
             text: "분석 요청 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.",
           },
         ]);
