@@ -11,7 +11,7 @@ export const DEFAULT_CAUTION_ITEMS = [
 type RegionProps = {
   variant: "region";
   title: string;
-  paragraphs: string[];
+  content: string;
 };
 
 type CautionsProps = {
@@ -24,22 +24,19 @@ type Props = RegionProps | CautionsProps;
 
 export default function InfoCard(props: Props) {
   if (props.variant === "region") {
-    const { title, paragraphs } = props;
+    const { title, content } = props;
     return (
       <Card>
         <TitleRow>
           <TitleText>{title}</TitleText>
         </TitleRow>
         <Divider />
-        <Body>
-          {paragraphs.map((p, i) => (
-            <P key={i}>{p}</P>
-          ))}
-        </Body>
+        <Content>{content}</Content>
       </Card>
     );
   }
 
+  // cautions
   const title = props.title ?? "주의사항";
   const items = props.items ?? DEFAULT_CAUTION_ITEMS;
 
@@ -52,7 +49,7 @@ export default function InfoCard(props: Props) {
       <List>
         {items.map((t, i) => (
           <Item key={i}>
-            <Check src="/images/icons/check.svg " />
+            <Check src="/images/icons/check.svg" alt="" />
             <ItemText>{t}</ItemText>
           </Item>
         ))}
@@ -66,7 +63,6 @@ const Card = styled.div`
   border-radius: 20px 20px 20px 0;
   padding: 0.94rem 1.25rem;
   color: ${({ theme }) => theme.colors.black01};
-  max-width: 95%;
 `;
 
 const TitleRow = styled.div`
@@ -88,12 +84,7 @@ const Divider = styled.hr`
   opacity: 0.5;
 `;
 
-const Body = styled.div`
-  display: grid;
-  gap: 0.75rem;
-`;
-
-const P = styled.p`
+const Content = styled.p`
   ${fonts.bodySemiB14};
   margin: 0;
   white-space: pre-line;

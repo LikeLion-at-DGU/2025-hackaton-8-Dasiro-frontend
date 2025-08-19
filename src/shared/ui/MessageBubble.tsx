@@ -43,7 +43,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
 
   // 지역정보 카드
   if (msg.type === "region_info") {
-    const { title, paragraphs } = msg.meta;
+    const { title, content } = msg.meta;
     return (
       <Row $side="left">
         <AvatarWrapper>
@@ -52,7 +52,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
           </Avatar>
           <p>땅땅이</p>
         </AvatarWrapper>
-        <InfoCard variant="region" title={title} paragraphs={paragraphs} />
+        <InfoCard variant="region" title={title} content={content} />
       </Row>
     );
   }

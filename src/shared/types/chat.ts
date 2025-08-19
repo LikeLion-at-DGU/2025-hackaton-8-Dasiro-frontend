@@ -10,7 +10,7 @@ export type ChatMessageType =
 
 export type RegionInfoMeta = {
   title: string;
-  paragraphs: string[];
+  content: string;
 };
 
 export type CautionsMeta = {
