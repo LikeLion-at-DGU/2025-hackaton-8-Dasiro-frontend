@@ -47,6 +47,11 @@ const Header = styled.div`
   padding: 0.625rem;
   margin-bottom: 0.81rem;
 
+  button {
+    display: flex;
+    align-items: center;
+  }
+
   .title {
     color: ${({ theme }) => theme.colors.black01};
     text-align: center;
