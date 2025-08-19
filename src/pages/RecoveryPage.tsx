@@ -2,11 +2,11 @@
 import * as S from "@widget/MapWithOverlay/MapWithOverlay.styles";
 import {
   MainElement,
-  Header,
   MapSection,
   BottomSheet,
   BackgroundCircles,
 } from "@features/recovery-zone";
+import { PageHeader, NoticeBar } from "@shared/components";
 
 const RecoveryPage = () => {
   return (
@@ -14,7 +14,11 @@ const RecoveryPage = () => {
       {/* 메인 콘텐츠 영역 - 헤더, 지도, 기타 UI 요소들을 포함 */}
       <MainElement.MainWrapper style={{ margin: "0 auto", marginTop: "3.4vh" }}>
         {/* 상단 헤더 - 로고, 위치 설정 버튼, 공지사항 포함 */}
-        <Header />
+        <PageHeader
+          showLocationSet
+          locationSetText="위치 설정"
+          noticeBar={<NoticeBar />}
+        />
         
         {/* 메인 콘텐츠 컨테이너 (현재 빈 상태) */}
         <MainElement.MainContent />

@@ -6,7 +6,8 @@ interface StoreCardProps {
   title: string;
   address: string;
   hasCoupon?: boolean;
-  onClick?: () => void;
+  cardClickHandler?: () => void;
+  couponClickHandler?: () => void;
 }
 
 export const StoreCard = ({ 
@@ -14,10 +15,16 @@ export const StoreCard = ({
   title, 
   address, 
   hasCoupon = false, 
-  onClick 
+  cardClickHandler,
+  couponClickHandler
 }: StoreCardProps) => {
+  const handleCouponClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    couponClickHandler?.();
+  };
+
   return (
-    <BottomSheetElement.BottomCard onClick={onClick} id="bottomCard">
+    <BottomSheetElement.BottomCard onClick={cardClickHandler} id="bottomCard">
       <BottomSheetElement.CardContent>
         <img src={image} alt={title} />
         <div className="cardInner">
@@ -26,7 +33,7 @@ export const StoreCard = ({
         </div>
       </BottomSheetElement.CardContent>
       {hasCoupon && (
-        <div className="couponBox">
+        <div className="couponBox" onClick={handleCouponClick}>
           <img src={coupon} alt="" className="coupon" />
           <span>쿠폰</span>
         </div>
