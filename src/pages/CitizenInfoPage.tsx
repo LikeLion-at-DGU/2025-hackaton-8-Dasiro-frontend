@@ -5,6 +5,7 @@ import MessageList from "@shared/ui/MessageList";
 import InputBar, { type SendPayload } from "@shared/ui/InputBar";
 import type { ChatMessage } from "@shared/types/chat";
 import { getRegionInfoByQuery } from "@entities/region/api";
+import { isThanks } from "@shared/utils/isThanks";
 
 type LayoutContext = { setFooterHidden: (v: boolean) => void };
 
@@ -38,9 +39,20 @@ export default function CitizenInfoPage() {
 
   const append = (items: ChatMessage[]) => setMessages((p) => [...p, ...items]);
 
+  const THANKS_REPLY =
+    "도움이 되었길 바라요! 다른 지역도 궁금하면 편하게 물어보세요.";
+
   const onSend = async ({ text }: SendPayload) => {
     const q = text?.trim();
     if (!q) return;
+
+    if (isThanks(q)) {
+      append([
+        { id: crypto.randomUUID(), type: "user", text: q },
+        { id: crypto.randomUUID(), type: "bot", text: THANKS_REPLY },
+      ]);
+      return;
+    }
 
     append([{ id: crypto.randomUUID(), type: "user", text: q }]);
 
