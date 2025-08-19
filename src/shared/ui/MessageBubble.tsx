@@ -74,9 +74,13 @@ const Avatar = styled.div`
 
 const Bubble = styled.div<{ $variant: BubbleVariant }>`
   ${fonts.bodyMedium14};
-  max-width: 76%;
+  max-width: 85%;
   padding: 0.94rem 1.25rem;
   border-radius: 20px 20px 0 0;
+  white-space: ${({ $variant }) =>
+    $variant === "bot" ? "pre-line" : "normal"};
+
+  overflow-wrap: anywhere;
 
   ${({ theme, $variant }) => {
     switch ($variant) {
