@@ -22,6 +22,7 @@ const TextWrapper = styled.div`
   margin-top: 2.5rem;
   gap: 1.88rem;
   margin-bottom: 1.56rem;
+  padding: 0 1rem;
 
   img {
     width: 5.3rem;

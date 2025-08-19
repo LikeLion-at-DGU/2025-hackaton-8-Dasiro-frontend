@@ -22,6 +22,7 @@ export default IntroBtn;
 const BtnWrapper = styled.section`
   display: flex;
   gap: 0.625rem;
+  padding: 0 1rem;
 `;
 
 const sharedPill = css`
