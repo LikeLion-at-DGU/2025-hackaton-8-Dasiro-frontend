@@ -1,4 +1,3 @@
-// src/shared/types/chat.ts
 export type RiskBucket = "low" | "mid" | "high";
 
 export type ChatMessageType =
@@ -16,7 +15,7 @@ export type RegionInfoMeta = {
 
 export type CautionsMeta = {
   title: string;
-  items: string[];
+  items?: string[];
 };
 
 export type ChatMessage =
@@ -33,4 +32,4 @@ export type ChatMessage =
       };
     }
   | { id: string; type: "region_info"; meta: RegionInfoMeta }
-  | { id: string; type: "cautions"; meta: CautionsMeta };
+  | { id: string; type: "cautions"; meta?: CautionsMeta };

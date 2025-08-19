@@ -1,9 +1,8 @@
 import styled, { css } from "styled-components";
 import { fonts } from "@shared/styles/fonts";
 import AnalysisMessage from "@shared/ui/AnalysisMessage";
-import RegionInfoMessage from "@shared/ui/RegionInfoMessage";
 import type { ChatMessage } from "@shared/types/chat";
-import CautionsMessage from "./CautionMessage";
+import InfoCard from "./Infocard";
 
 type BubbleVariant = "bot" | "user";
 
@@ -11,7 +10,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
   if (msg.type === "image") {
     if (!msg.images?.length) return null;
     return (
-      <Row $side="right">
+      <Row $side="right" $noAvatar>
         <Images>
           {msg.images.map((src, i) => (
             <Thumb key={i} src={src} alt={`img-${i}`} />
@@ -42,7 +41,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
     );
   }
 
-  // 지역 정보 카드
+  // 지역정보 카드
   if (msg.type === "region_info") {
     const { title, paragraphs } = msg.meta;
     return (
@@ -53,17 +52,16 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
           </Avatar>
           <p>땅땅이</p>
         </AvatarWrapper>
-        <RegionInfoMessage title={title} paragraphs={paragraphs} />
+        <InfoCard variant="region" title={title} paragraphs={paragraphs} />
       </Row>
     );
   }
 
   // 주의사항 카드
   if (msg.type === "cautions") {
-    const { title, items } = msg.meta;
     return (
-      <Row $side="left">
-        <CautionsMessage title={title} items={items} />
+      <Row $side="left" $noAvatar>
+        <InfoCard variant="cautions" />
       </Row>
     );
   }
@@ -87,11 +85,11 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
   );
 }
 
-const Row = styled.div<{ $side: "left" | "right" }>`
+const Row = styled.div<{ $side: "left" | "right"; $noAvatar?: boolean }>`
   display: flex;
   width: 100%;
   flex-direction: ${({ $side }) => ($side === "left" ? "column" : "row")};
-  gap: 0.94rem;
+  gap: ${({ $noAvatar }) => ($noAvatar ? "0.5rem" : "0.94rem")};
   justify-content: ${({ $side }) =>
     $side === "right" ? "flex-end" : "flex-start"};
   align-items: flex-start;
@@ -101,9 +99,11 @@ const AvatarWrapper = styled.div`
   display: flex;
   gap: 0.62rem;
   align-items: center;
+
   p {
     ${fonts.bodySemiB14};
     color: ${({ theme }) => theme.colors.black01};
+    margin: 0;
   }
 `;
 
@@ -114,6 +114,7 @@ const Avatar = styled.div`
   padding: 0.375rem;
   border-radius: 8px;
   background-color: ${({ theme }) => theme.colors.orange06};
+
   img {
     height: 28px;
   }
@@ -121,7 +122,7 @@ const Avatar = styled.div`
 
 const Bubble = styled.div<{ $variant: BubbleVariant }>`
   ${fonts.bodyMedium14};
-  max-width: 85%;
+  max-width: 90%;
   padding: 0.94rem 1.25rem;
   border-radius: 20px 20px 0 0;
   white-space: ${({ $variant }) =>
