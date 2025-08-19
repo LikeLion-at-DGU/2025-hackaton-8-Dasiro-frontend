@@ -1,4 +1,3 @@
-// src/shared/ui/InputBar.tsx
 import styled from "styled-components";
 import { fonts } from "@shared/styles/fonts";
 import { useEffect, useRef, useState } from "react";
@@ -35,7 +34,7 @@ export default function InputBar({
     const picked = Array.from(e.target.files ?? []);
     if (picked.length === 0) return;
 
-    // ✅ "처음부터" 4장 이상 선택한 경우: 바로 alert
+    // "처음부터" 4장 이상 선택한 경우: 바로 alert
     if (previews.length === 0 && picked.length > MAX_FILES) {
       alert(`이미지는 최대 ${MAX_FILES}장까지만 선택할 수 있어요.`);
     }
@@ -70,7 +69,6 @@ export default function InputBar({
 
   useEffect(() => {
     return () => previews.forEach((p) => URL.revokeObjectURL(p.url));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const doSend = () => {
@@ -101,7 +99,6 @@ export default function InputBar({
 
   return (
     <>
-      {/* 미리보기: InputBar 위에 표시 */}
       {previews.length > 0 && (
         <PreviewStrip>
           <ThumbRow>
@@ -127,7 +124,6 @@ export default function InputBar({
           doSend();
         }}
       >
-        {/* 숨김 파일 입력 */}
         <input
           ref={fileRef}
           type="file"

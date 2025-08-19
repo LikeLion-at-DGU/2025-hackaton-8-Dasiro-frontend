@@ -1,9 +1,9 @@
-// src/shared/ui/MessageBubble.tsx
 import styled, { css } from "styled-components";
 import { fonts } from "@shared/styles/fonts";
-import type { ChatMessageType, ChatMessage } from "@shared/types/chat";
+import AnalysisMessage from "@shared/ui/AnalysisMessage";
+import type { ChatMessage } from "@shared/types/chat";
 
-type BubbleVariant = Extract<ChatMessageType, "bot" | "user">;
+type BubbleVariant = "bot" | "user";
 
 export default function MessageBubble({ msg }: { msg: ChatMessage }) {
   if (msg.type === "image") {
@@ -19,8 +19,31 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
     );
   }
 
+  // 분석 결과 (전용 카드)
+  if (msg.type === "analysis") {
+    const { score, bucket, analysis, action } = msg.meta;
+    return (
+      <Row $side="left">
+        <AvatarWrapper>
+          {" "}
+          <Avatar>
+            <img src="/images/character/character3.png" alt="땅땅이" />
+          </Avatar>
+          <p>땅땅이</p>
+        </AvatarWrapper>
+        <AnalysisMessage
+          score={score}
+          bucket={bucket}
+          analysis={analysis}
+          action={action}
+        />
+      </Row>
+    );
+  }
+
+  // 일반 bot/user
   const side: "left" | "right" = msg.type === "user" ? "right" : "left";
-  const variant: BubbleVariant = msg.type;
+  const variant: BubbleVariant = msg.type === "user" ? "user" : "bot";
 
   return (
     <Row $side={side}>
@@ -76,37 +99,20 @@ const Bubble = styled.div<{ $variant: BubbleVariant }>`
   border-radius: 20px 20px 0 0;
   white-space: ${({ $variant }) =>
     $variant === "bot" ? "pre-line" : "normal"};
-
   overflow-wrap: anywhere;
 
-  ${({ theme, $variant }) => {
-    switch ($variant) {
-      case "user":
-        return css`
+  ${({ theme, $variant }) =>
+    $variant === "user"
+      ? css`
           background: ${theme.colors.orange01};
           color: ${theme.colors.black07};
           border-bottom-left-radius: 20px;
-        `;
-      // case "analysis":
-      //   return css`
-      //     background: ${theme.colors.orange06};
-      //     color: ${theme.colors.black01};
-      //     border-left: 3px solid ${theme.colors.orange02};
-      //   `;
-      // case "info":
-      //   return css`
-      //     background: ${theme.colors.orange06};
-      //     color: ${theme.colors.orange02};
-      //     border-left: 3px solid ${theme.colors.orange02};
-      //   `;
-      default:
-        return css`
+        `
+      : css`
           background: ${theme.colors.orange06};
           color: ${theme.colors.black01};
           border-bottom-right-radius: 20px;
-        `;
-    }
-  }}
+        `}
 `;
 
 const Images = styled.div`
@@ -115,6 +121,7 @@ const Images = styled.div`
   gap: 0.5rem;
   align-items: flex-end;
 `;
+
 const Thumb = styled.img`
   width: 140px;
   height: 140px;
