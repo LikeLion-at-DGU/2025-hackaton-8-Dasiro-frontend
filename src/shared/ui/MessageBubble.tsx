@@ -1,7 +1,9 @@
 import styled, { css } from "styled-components";
 import { fonts } from "@shared/styles/fonts";
 import AnalysisMessage from "@shared/ui/AnalysisMessage";
+import RegionInfoMessage from "@shared/ui/RegionInfoMessage";
 import type { ChatMessage } from "@shared/types/chat";
+import CautionsMessage from "./CautionMessage";
 
 type BubbleVariant = "bot" | "user";
 
@@ -19,13 +21,12 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
     );
   }
 
-  // 분석 결과 (전용 카드)
+  // 분석 카드
   if (msg.type === "analysis") {
     const { score, bucket, analysis, action } = msg.meta;
     return (
       <Row $side="left">
         <AvatarWrapper>
-          {" "}
           <Avatar>
             <img src="/images/character/character3.png" alt="땅땅이" />
           </Avatar>
@@ -37,6 +38,32 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
           analysis={analysis}
           action={action}
         />
+      </Row>
+    );
+  }
+
+  // 지역 정보 카드
+  if (msg.type === "region_info") {
+    const { title, paragraphs } = msg.meta;
+    return (
+      <Row $side="left">
+        <AvatarWrapper>
+          <Avatar>
+            <img src="/images/character/character3.png" alt="땅땅이" />
+          </Avatar>
+          <p>땅땅이</p>
+        </AvatarWrapper>
+        <RegionInfoMessage title={title} paragraphs={paragraphs} />
+      </Row>
+    );
+  }
+
+  // 주의사항 카드
+  if (msg.type === "cautions") {
+    const { title, items } = msg.meta;
+    return (
+      <Row $side="left">
+        <CautionsMessage title={title} items={items} />
       </Row>
     );
   }
