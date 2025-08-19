@@ -1,3 +1,4 @@
+// src/shared/ui/InputBar.tsx
 import styled from "styled-components";
 import { fonts } from "@shared/styles/fonts";
 import { useEffect, useRef, useState } from "react";
@@ -11,6 +12,8 @@ type Props = {
 
 type PreviewItem = { id: string; file: File; url: string };
 
+const MAX_FILES = 3;
+
 export default function InputBar({
   placeholder = "궁금한 사항을 입력해 주세요.",
   onSend,
@@ -19,19 +22,36 @@ export default function InputBar({
   const [previews, setPreviews] = useState<PreviewItem[]>([]);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
-  const openPicker = () => fileRef.current?.click();
+  const openPicker = () => {
+    if (previews.length >= MAX_FILES) {
+      // 이미 꽉 찬 상태에서 다시 열려고 하면 안내
+      alert(`이미지는 최대 ${MAX_FILES}장까지만 선택할 수 있어요.`);
+      return;
+    }
+    fileRef.current?.click();
+  };
 
   const handleFiles: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const picked = Array.from(e.target.files ?? []);
     if (picked.length === 0) return;
 
-    const items = picked.map((file) => ({
+    // ✅ "처음부터" 4장 이상 선택한 경우: 바로 alert
+    if (previews.length === 0 && picked.length > MAX_FILES) {
+      alert(`이미지는 최대 ${MAX_FILES}장까지만 선택할 수 있어요.`);
+    }
+
+    // 남은 칸만큼만 수용
+    const remaining = Math.max(0, MAX_FILES - previews.length);
+    const accepted = picked.slice(0, remaining);
+
+    const items = accepted.map((file) => ({
       id: crypto.randomUUID(),
       file,
       url: URL.createObjectURL(file),
     }));
     setPreviews((prev) => [...prev, ...items]);
 
+    // 같은 파일 재선택 가능하게 초기화
     e.currentTarget.value = "";
   };
 
@@ -50,11 +70,13 @@ export default function InputBar({
 
   useEffect(() => {
     return () => previews.forEach((p) => URL.revokeObjectURL(p.url));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const doSend = () => {
     const text = value.trim();
     const files = previews.map((p) => p.file);
+
     const hasText = text.length > 0;
     const hasFiles = files.length > 0;
 
@@ -62,7 +84,7 @@ export default function InputBar({
 
     onSend?.({
       text: hasText ? text : undefined,
-      files: hasFiles ? files : undefined,
+      files: hasFiles ? files.slice(0, MAX_FILES) : undefined, // 최종 가드
     });
 
     setValue("");
@@ -79,6 +101,7 @@ export default function InputBar({
 
   return (
     <>
+      {/* 미리보기: InputBar 위에 표시 */}
       {previews.length > 0 && (
         <PreviewStrip>
           <ThumbRow>
@@ -104,6 +127,7 @@ export default function InputBar({
           doSend();
         }}
       >
+        {/* 숨김 파일 입력 */}
         <input
           ref={fileRef}
           type="file"

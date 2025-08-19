@@ -1,12 +1,9 @@
-// src/entities/report/api/index.ts
-
 import instance from "@shared/lib/instance";
 
 export type CreateReportWithFilesResponse = {
   risk_percentage: number;
 };
 
-// files(binary) + text를 한 번에 보냄 (multipart/form-data)
 export async function createReportWithFiles({
   text,
   files,
