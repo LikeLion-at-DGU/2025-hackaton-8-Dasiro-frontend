@@ -18,6 +18,7 @@ export default DateBadge;
 const DateContainerWrapper = styled.div`
   display: flex;
   justify-content: center;
+  margin-bottom: 2.19rem;
 `;
 
 const DateContainer = styled.section`

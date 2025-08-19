@@ -1,13 +1,13 @@
 import styled from "styled-components";
 import { fonts } from "@shared/styles/fonts";
-import { useEffect, type PropsWithChildren } from "react";
+import { useEffect, type PropsWithChildren, type ReactNode } from "react";
 import { useOutletContext } from "react-router-dom";
 import DateBadge from "./DateBadge";
 
-type Props = PropsWithChildren<{ onClose?: () => void }>;
+type Props = PropsWithChildren<{ onClose?: () => void; footer?: ReactNode }>;
 type LayoutContext = { setFooterHidden: (v: boolean) => void };
 
-export default function CitizenLayout({ onClose, children }: Props) {
+export default function CitizenLayout({ onClose, children, footer }: Props) {
   const { setFooterHidden } = useOutletContext<LayoutContext>();
 
   useEffect(() => {
@@ -25,14 +25,17 @@ export default function CitizenLayout({ onClose, children }: Props) {
       </Header>
       <DateBadge />
       <CitizenLayoutWrapper>{children}</CitizenLayoutWrapper>
+      {footer && <Dock>{footer}</Dock>}
     </>
   );
 }
 
 const CitizenLayoutWrapper = styled.div`
   display: flex;
+  flex: 1;
+  min-height: 0;
   flex-direction: column;
-  padding: 0rem 2rem;
+  padding: 0 1rem;
 `;
 
 const Header = styled.div`
@@ -56,4 +59,15 @@ const Header = styled.div`
     position: absolute;
     right: 1rem;
   }
+`;
+
+const Dock = styled.div`
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+
+  background: #fff;
+  box-shadow: 0 -6px 14px 0 rgba(47, 47, 47, 0.04);
+
+  padding: 1rem 1.12rem calc(1rem + env(safe-area-inset-bottom));
 `;
