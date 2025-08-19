@@ -280,7 +280,7 @@ export default function SafeRouteMap({
   }
 
   const navigate = useNavigate();
-  const onFloatClick = () => navigate("/report");
+  const onFloatClick = () => navigate("/citizenIntro");
 
   return (
     <>
