@@ -1,8 +1,8 @@
-//제보 데이터 (제보 생성, 목록, 상세) 타입 정의
+export type CreateReportRequest = {
+  text: string;
+  image_url: string[];
+};
 
-// export interface Report {
-//   id: number;
-//   content: string;
-//   location: string;
-//   ...
-// }
+export type CreateReportResponse = {
+  risk_percentage: number;
+};
