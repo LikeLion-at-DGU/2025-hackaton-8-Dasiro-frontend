@@ -1,4 +1,4 @@
-import { formatDate } from "@features/citizen-report/utils/formatDate";
+import { formatDate } from "@shared/lib/formatDate";
 import { fonts } from "@shared/styles/fonts";
 import styled from "styled-components";
 
