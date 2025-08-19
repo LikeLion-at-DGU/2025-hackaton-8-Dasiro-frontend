@@ -177,7 +177,7 @@ export default function CitizenReportPage() {
   return (
     <CitizenLayout
       onClose={() => navigate(-1)}
-      footer={<InputBar onSend={onSend} />}
+      footer={<InputBar onSend={onSend} onPickImage={() => {}} />}
     >
       <MessageList messages={messages} autoScroll />
     </CitizenLayout>

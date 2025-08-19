@@ -7,6 +7,7 @@ export type SendPayload = { text?: string; files?: File[] };
 type Props = {
   placeholder?: string;
   onSend?: (payload: SendPayload) => void;
+  onPickImage?: () => void;
 };
 
 type PreviewItem = { id: string; file: File; url: string };
@@ -16,6 +17,7 @@ const MAX_FILES = 3;
 export default function InputBar({
   placeholder = "궁금한 사항을 입력해 주세요.",
   onSend,
+  onPickImage,
 }: Props) {
   const [value, setValue] = useState("");
   const [previews, setPreviews] = useState<PreviewItem[]>([]);
@@ -82,7 +84,7 @@ export default function InputBar({
 
     onSend?.({
       text: hasText ? text : undefined,
-      files: hasFiles ? files.slice(0, MAX_FILES) : undefined, // 최종 가드
+      files: hasFiles ? files.slice(0, MAX_FILES) : undefined,
     });
 
     setValue("");
@@ -134,9 +136,11 @@ export default function InputBar({
           style={{ display: "none" }}
         />
 
-        <IconBtn type="button" aria-label="사진 첨부" onClick={openPicker}>
-          <img src="/images/icons/camera.png" alt="" />
-        </IconBtn>
+        {onPickImage && (
+          <IconBtn type="button" aria-label="사진 첨부" onClick={openPicker}>
+            <img src="/images/icons/camera.png" alt="" />
+          </IconBtn>
+        )}
 
         <Input
           value={value}
