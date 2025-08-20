@@ -56,7 +56,7 @@ export const BottomSheet = () => {
       setHeight(newHeight);
     };
 
-    // 터치 이동 시 시트 높이 계산 및 업데이트 (모바일 지원)
+    // 터치 이동 시 시트 높이 계산 및 업데이트
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging) return;
       e.preventDefault();
@@ -100,6 +100,7 @@ export const BottomSheet = () => {
       style={{ 
         height: `${height}vh`,
         maxHeight: '100vh',
+        minHeight: '42.25vh',
         // 드래그 중에는 애니메이션 비활성화, 그 외에는 부드러운 전환 효과
         transition: isDragging ? 'none' : 'height 0.3s ease'
       }}
@@ -152,7 +153,6 @@ export const BottomSheet = () => {
               paddingBottom: '20px',
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
-              minHeight: '200px'
             }}
           >
             {STORE_CARDS.map((store) => (
