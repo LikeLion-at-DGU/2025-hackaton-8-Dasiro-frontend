@@ -1,7 +1,22 @@
 import { useState } from "react";
 import { MainElement } from "@features/recovery-zone/ui";
-import * as BasicElement from "@features/recovery-zone/ui/BasicElement";
+import * as BasicElement from "@shared/ui/BasicElement";
+import styled from "styled-components";
 import search from "/images/icons/search.png";
+
+const StyledContainer = styled(BasicElement.Container)`
+  background-color: ${({ theme }) => theme.colors.orange05};
+  input{
+    flex: 1;
+    border: none;
+    background-color: transparent;
+    outline: none;
+    font-size: 14px;
+  }
+  input::placeholder {
+    color: ${({ theme }) => theme.colors.orange03};
+  }
+`;
 
 interface SearchBarProps {
   placeholder?: string;
@@ -36,14 +51,13 @@ export const SearchBar = ({
   };
 
   return (
-    <BasicElement.Container
+    <StyledContainer
       className={`search-bar ${className}`}
-      $padding={[8, 16]}
-      $backgroundColor="#f8f9fa"
-      $borderRadius={8}
+      $padding={[8, 18]}
+      $borderRadius={20}
       $columnDirection={false}
       $alignItems="center"
-      $gap={8}
+      $gap={10}
     >
       <BasicElement.Button
         onClick={() => onSearch?.(searchValue)}
@@ -51,8 +65,13 @@ export const SearchBar = ({
         $backgroundColor="transparent"
         $border="none"
         $hover={true}
+        $width="fit-content"
       >
-        <img src={search} alt="검색 돋보기" style={{width: "15px", aspectRatio:"1/1"}}/>
+        <img
+          src={search}
+          alt="검색 돋보기"
+          style={{ width: "15px", aspectRatio: "1/1" }}
+        />
       </BasicElement.Button>
       <input
         type="text"
@@ -60,14 +79,7 @@ export const SearchBar = ({
         onChange={handleInputChange}
         onKeyPress={handleKeyPress}
         placeholder={placeholder}
-        style={{
-          flex: 1,
-          border: "none",
-          backgroundColor: "transparent",
-          outline: "none",
-          fontSize: "14px",
-        }}
       />
-    </BasicElement.Container>
+    </StyledContainer>
   );
 };

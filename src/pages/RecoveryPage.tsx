@@ -1,4 +1,5 @@
 // Recovery Zone 페이지 - 복구 상권 현황을 보여주는 메인 페이지
+import { useState } from "react";
 import * as S from "@widget/MapWithOverlay/MapWithOverlay.styles";
 import {
   MainElement,
@@ -9,6 +10,15 @@ import {
 import { PageHeader, NoticeBar } from "@shared/components";
 
 const RecoveryPage = () => {
+  const [selectedLocation, setSelectedLocation] = useState<{
+    lat: number;
+    lng: number;
+    address: string;
+  } | null>(null);
+
+  const handleLocationSelect = (location: { lat: number; lng: number; address: string }) => {
+    setSelectedLocation(location);
+  };
   return (
     <S.Wrap>
       {/* 메인 콘텐츠 영역 - 헤더, 지도, 기타 UI 요소들을 포함 */}
@@ -17,6 +27,7 @@ const RecoveryPage = () => {
         <PageHeader
           showLocationSet
           locationSetText="위치 설정"
+          onLocationSelect={handleLocationSelect}
           noticeBar={<NoticeBar />}
         />
         
@@ -24,7 +35,7 @@ const RecoveryPage = () => {
         <MainElement.MainContent />
         
         {/* 서울 지역 복구 현황 지도 - 구별 색상 표시 */}
-        <MapSection />
+        <MapSection selectedLocation={selectedLocation} />
       </MainElement.MainWrapper>
 
       {/* 하단 슬라이드 시트 - 필터 버튼과 상점 리스트 */}

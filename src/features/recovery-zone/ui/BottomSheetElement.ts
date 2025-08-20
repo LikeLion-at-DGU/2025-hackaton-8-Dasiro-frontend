@@ -1,4 +1,4 @@
-import * as BasicElement from "./BasicElement";
+import * as BasicElement from "../../../shared/ui/BasicElement";
 import style from "styled-components";
 
 // BottomSheet 메인 컨테이너 - #bottomSheet 스타일을 BasicElement로 리팩토링

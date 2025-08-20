@@ -3,11 +3,11 @@ import * as S from "@widget/MapWithOverlay/MapWithOverlay.styles";
 import { PageHeader, SearchBar } from "@shared/components";
 import {
   MainElement,
-  Header,
   MapSection,
   BottomSheet,
   BackgroundCircles,
 } from "@features/recovery-zone";
+import { SinkholeMainElement } from "@features/sinkhole-map";
 
 const SinkholePage = () => {
   const handleSearch = (query: string) => {
@@ -27,12 +27,11 @@ const SinkholePage = () => {
             />
           }
         />
-
+        
         {/* 메인 콘텐츠 컨테이너 (현재 빈 상태) */}
         <MainElement.MainContent />
-
-        {/* 서울 지역 복구 현황 지도 - 구별 색상 표시 */}
-        <MapSection />
+        {/* 서울 지역 싱크홀 위험도 지도 - 구별 색상 표시 */}
+        <MapSection colorMode="risk" />
       </MainElement.MainWrapper>
 
       {/* 하단 슬라이드 시트 - 필터 버튼과 상점 리스트 */}

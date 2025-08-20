@@ -36,13 +36,14 @@ export const LocationSetWithModal = ({
     address: string;
   }) => {
     setSelectedLocation(location);
-    onLocationSelect?.(location);
+    // 여기서는 내부 상태만 업데이트, 상위 전달은 "허용" 버튼에서
   };
 
   const handleLocationAllow = () => {
     if (selectedLocation) {
       console.log("위치 허용됨:", selectedLocation);
       setIsLocationAllowed(true);
+      onLocationSelect?.(selectedLocation); // 여기서 상위 컴포넌트로 위치 전달
     }
     setIsModalOpen(false);
   };

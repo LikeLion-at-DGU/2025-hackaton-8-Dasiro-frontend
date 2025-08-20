@@ -1,4 +1,4 @@
-import * as BasicElement from "./BasicElement";
+import * as BasicElement from "../../../shared/ui/BasicElement";
 import styled from "styled-components";
 
 const DESIGN_HEIGHT = 812;
