@@ -1,7 +1,22 @@
-// src/shared/types/chat.ts
 export type RiskBucket = "low" | "mid" | "high";
 
-export type ChatMessageType = "bot" | "user" | "image" | "analysis";
+export type ChatMessageType =
+  | "bot"
+  | "user"
+  | "image"
+  | "analysis"
+  | "region_info"
+  | "cautions";
+
+export type RegionInfoMeta = {
+  title: string;
+  content: string;
+};
+
+export type CautionsMeta = {
+  title: string;
+  items?: string[];
+};
 
 export type ChatMessage =
   | { id: string; type: "bot" | "user"; text: string }
@@ -12,7 +27,9 @@ export type ChatMessage =
       meta: {
         score: number;
         bucket: RiskBucket;
-        analysis: string; // 본문
-        action: string; // 본문
+        analysis: string;
+        action: string;
       };
-    };
+    }
+  | { id: string; type: "region_info"; meta: RegionInfoMeta }
+  | { id: string; type: "cautions"; meta?: CautionsMeta };

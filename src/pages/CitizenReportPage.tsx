@@ -6,6 +6,7 @@ import InputBar, { type SendPayload } from "@shared/ui/InputBar";
 import type { ChatMessage } from "@shared/types/chat";
 import { createReportWithFiles } from "@entities/report/api";
 import { clamp0to100, getAnalysisCopy } from "@features/utils/riskCopy";
+import { isThanks } from "@shared/utils/isThanks";
 
 type LayoutContext = { setFooterHidden: (v: boolean) => void };
 type AwaitingKind = "image" | "text" | null;
@@ -13,6 +14,8 @@ type AwaitingKind = "image" | "text" | null;
 export default function CitizenReportPage() {
   const navigate = useNavigate();
   const { setFooterHidden } = useOutletContext<LayoutContext>();
+  const THANKS_REPLY =
+    "도움이 되었길 바라요! 다른 지역도 궁금하면 편하게 물어보세요.";
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [awaiting, setAwaiting] = useState<AwaitingKind>(null);
@@ -86,6 +89,14 @@ export default function CitizenReportPage() {
     const hasText = !!text && text.trim().length > 0;
     const hasFiles = !!files && files.length > 0;
     if (!hasText && !hasFiles) return;
+
+    if (hasText && !hasFiles && isThanks(text)) {
+      append([
+        { id: crypto.randomUUID(), type: "user", text: text!.trim() },
+        { id: crypto.randomUUID(), type: "bot", text: THANKS_REPLY },
+      ]);
+      return;
+    }
 
     // 즉시 표시용 미리보기 URL
     const previewUrls = hasFiles
@@ -166,7 +177,7 @@ export default function CitizenReportPage() {
   return (
     <CitizenLayout
       onClose={() => navigate(-1)}
-      footer={<InputBar onSend={onSend} />}
+      footer={<InputBar onSend={onSend} onPickImage={() => {}} />}
     >
       <MessageList messages={messages} autoScroll />
     </CitizenLayout>
