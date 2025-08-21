@@ -79,7 +79,7 @@ export const Button = style(Container)<ButtonProps>`
   
   ${({ $hover }) => $hover && `
     &:hover {
-      opacity: 0.8;
+      opacity: 1;
     }
   `}
 `;

@@ -34,7 +34,7 @@ export const FilterButton = ({
   };
 
   return (
-    <BottomSheetElement.DropdownContainer id="dropdownContainer">
+    <BottomSheetElement.DropdownContainer className="dropdownContainer">
       <BottomSheetElement.BottomButton $isSelected={isSelected} $isDropdownOpen={isDropdownOpen} onClick={handleButtonClick}>
         <span>{selectedOption || label}</span>
         <img 
@@ -48,7 +48,7 @@ export const FilterButton = ({
       </BottomSheetElement.BottomButton>
       
       {isDropdownOpen && dropdownOptions && (
-        <BottomSheetElement.DropdownList id="dropdownList">
+        <BottomSheetElement.DropdownList className="dropdownList">
           {dropdownOptions.map((option, index) => (
             <BottomSheetElement.DropdownItem
               key={index}

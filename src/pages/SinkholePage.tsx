@@ -34,8 +34,8 @@ const SinkholePage = () => {
         <MapSection colorMode="risk" />
       </MainElement.MainWrapper>
 
-      {/* 하단 슬라이드 시트 - 필터 버튼과 상점 리스트 */}
-      <BottomSheet />
+      {/* 하단 슬라이드 시트 - 싱크홀 등급 버튼 */}
+      <BottomSheet isSinkholeMap={true} />
 
       {/* 배경 장식용 원형 요소들 */}
       <BackgroundCircles />

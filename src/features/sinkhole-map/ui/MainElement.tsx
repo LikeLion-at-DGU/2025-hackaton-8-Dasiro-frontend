@@ -2,9 +2,11 @@ import * as BasicElement from "@shared/ui/BasicElement";
 import style from "styled-components";
 import badge from "/images/icons/badge.png";
 import layer from "/images/icons/layer.png";
-import nolayer from "/images/icons/nolayer.png"
+import nolayer from "/images/icons/nolayer.png";
 
-export const SelectButton = style(BasicElement.Button).attrs<{ $isActive?: boolean }>(({ theme, $isActive }) => ({
+export const SelectButton = style(BasicElement.Button).attrs<{
+  $isActive?: boolean;
+}>(({ theme, $isActive }) => ({
   $width: "fit-content",
   $gap: 5,
   $columnDirection: false,
@@ -28,7 +30,7 @@ export const SinkholeButton = (
   onClick?: () => void
 ) => {
   const innerText = type === "badge" ? "부동산 안심존" : "전체";
-  const imageSrc = type === "badge" ? badge : (isActive ? layer : nolayer); // layer는 활성화 상태에 따라 결정
+  const imageSrc = type === "badge" ? badge : isActive ? layer : nolayer; // layer는 활성화 상태에 따라 결정
 
   return (
     <SelectButton data-type={type} $isActive={isActive} onClick={onClick}>

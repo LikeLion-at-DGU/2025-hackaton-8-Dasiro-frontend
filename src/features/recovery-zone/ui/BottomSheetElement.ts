@@ -25,7 +25,7 @@ export const BottomWrapper = style(BasicElement.Container).attrs(() => ({
     $boxShadow: '4px 0 12px 0 rgba(0, 0, 0, 0.05)'
 }))`
     background: ${({ theme }) => theme.colors.black08};
-    min-height: 42.3vh;
+    min-height: 36vh;
     position: relative;
     z-index: 10;
     user-select: none;
@@ -50,11 +50,14 @@ export const BottomInner = style(BasicElement.FlexBoxModel).attrs(() => ({
     position: relative;
 `;
 
-export const BottomButtonList = style(BasicElement.FlexBoxModel).attrs(() => ({
-    $gap: 13,
+export const BottomButtonList = style(BasicElement.FlexBoxModel).attrs<{
+    $isSinkholeMap?: boolean;
+    $isSearch?: boolean;
+}>(({ $isSinkholeMap }) => ({
+    $gap: $isSinkholeMap ? 15 : 13,
     $columnDirection: false,
-    $justifyContent: "flex-start"
-}))``;
+    $justifyContent: $isSinkholeMap ? "space-between" : "flex-start"
+}))`display: ${({ $isSearch }) => $isSearch ? "none" : "flex"};`;
 
 export const BottomCardList = style(BasicElement.FlexBoxModel).attrs(() => ({
     $gap: 18,
