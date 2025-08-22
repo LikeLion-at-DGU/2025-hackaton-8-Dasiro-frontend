@@ -4,7 +4,7 @@ import styled from "styled-components";
 const BotIntro = () => {
   return (
     <TextWrapper>
-      <img src="/images/character/character3.png" alt="땅땅이" />
+      <img src="/images/character/character2.png" alt="땅땅이" />
       <p>
         반가워요! <br />
         싱크홀 분석봇 땅땅이에요. <br />
