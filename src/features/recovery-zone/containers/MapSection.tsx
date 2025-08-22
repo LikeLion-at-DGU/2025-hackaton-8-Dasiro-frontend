@@ -4,9 +4,57 @@ import { loadKakaoMaps } from "@shared/lib/loadKakaoMaps";
 import { fetchSeoulGeoJson, type FC } from "@shared/lib/SeoulMap/SeoulGeoJson";
 import { renderSeoulMask } from "@shared/lib/SeoulMap/renderSeoulMask";
 import { renderDistrictPolygons } from "@shared/lib/SeoulMap/renderDistrictPolygons";
+import { createDasiroPin } from "@shared/components/LocationPin";
 import { getRecoveryColor } from "../utils/recoveryColorResolver";
+import { getRiskColorByDistrict } from "../utils/riskColorResolver";
+import { processSeoulDistricts } from "../utils/districtProcessor";
+import { useSelectGrade } from "@entities/sinkhole/context";
+import { useRecovery } from "../context/RecoveryContext";
 
-export const MapSection = () => {
+// 서울 경계 좌표 (대략적인 경계)
+const SEOUL_BOUNDS = {
+  north: 37.715133,
+  south: 37.413294,
+  east: 127.269311,
+  west: 126.734086
+};
+
+// 위치가 서울 내부에 있는지 확인하는 함수
+const isWithinSeoul = (lat: number, lng: number): boolean => {
+  return lat >= SEOUL_BOUNDS.south && 
+         lat <= SEOUL_BOUNDS.north && 
+         lng >= SEOUL_BOUNDS.west && 
+         lng <= SEOUL_BOUNDS.east;
+};
+
+interface MapSectionProps {
+  colorMode?: "recovery" | "risk"; // 색상 모드 (복구 현황 vs 위험도)
+}
+
+export const MapSection = ({ colorMode = "recovery" }: MapSectionProps) => {
+  // Recovery용 Context (colorMode가 recovery일 때만 사용)
+  let selectedLocation = null;
+  try {
+    if (colorMode === "recovery") {
+      const recoveryContext = useRecovery();
+      selectedLocation = recoveryContext.selectedLocation;
+    }
+  } catch {
+    // RecoveryContext가 없는 경우
+    selectedLocation = null;
+  }
+  
+  // Sinkhole용 Context (colorMode가 risk일 때만 사용)
+  let selectedGradeData = null;
+  try {
+    if (colorMode === "risk") {
+      const sinkholeContext = useSelectGrade();
+      selectedGradeData = sinkholeContext.selectedGradeData;
+    }
+  } catch {
+    // SinkholeContext가 없는 경우
+    selectedGradeData = null;
+  }
   // Kakao Map 인스턴스를 저장하는 ref
   const mapRef = useRef<any>(null);
   // 지도가 렌더링될 DOM 컨테이너 ref
@@ -29,14 +77,14 @@ export const MapSection = () => {
         // DOM 컨테이너가 준비되지 않은 경우 종료
         if (!containerRef.current) return;
 
-        // 서울 전체 중심 좌표 (서울의 지리적 중심점)
+        // 서울 전체 중심 좌표 (항상 고정)
         const seoulCenter = new (window as any).kakao.maps.LatLng(37.5518, 126.9917);
         
-        // Kakao Map 인스턴스 생성 - 서울 전체가 보이도록 설정
+        // Kakao Map 인스턴스 생성 - 항상 서울 전체 보기
         const kakao = (window as any).kakao;
         const map = new kakao.maps.Map(containerRef.current, {
           center: seoulCenter,
-          level: 10, // 서울 전체가 한 화면에 들어오는 줌 레벨
+          level: 10, // 항상 서울 전체가 보이는 줌 레벨로 고정
         });
 
         // 지도 상호작용 완전 비활성화 (정적 지도로 사용)
@@ -45,28 +93,77 @@ export const MapSection = () => {
         
         // 줌 레벨 변경 시 강제로 원래 레벨로 복원
         kakao.maps.event.addListener(map, 'zoom_changed', function() {
-          map.setLevel(10); // 줌 레벨을 강제로 10으로 고정
+          map.setLevel(10); // 줌 레벨을 항상 10으로 고정
         });
         
         // 중심 좌표 변경 시 강제로 서울 중심으로 복원
         kakao.maps.event.addListener(map, 'center_changed', function() {
-          map.setCenter(seoulCenter); // 중심을 강제로 서울 중심으로 고정
+          map.setCenter(seoulCenter); // 중심을 서울 중심으로 고정
         });
 
         // 지도 인스턴스를 ref에 저장
         mapRef.current = map;
 
+        // 선택된 위치에 다시로 핀 추가 (서울 내부인 경우만)
+        if (selectedLocation && isWithinSeoul(selectedLocation.lat, selectedLocation.lng)) {
+          const markerPosition = new kakao.maps.LatLng(selectedLocation.lat, selectedLocation.lng);
+          const pinElement = createDasiroPin();
+          
+          new kakao.maps.CustomOverlay({
+            position: markerPosition,
+            content: pinElement,
+            xAnchor: 0.5,
+            yAnchor: 0.5,
+            map: map,
+          });
+          
+          console.log("선택된 위치에 다시로 핀 추가:", selectedLocation.address);
+        } else{
+          console.log("선택된 위치가 서울 내부가 아닙니다.");
+        }
+
         // 서울 행정구역 GeoJSON 데이터 로드 및 복구 현황 시각화
         try {
           const geoJsonData: FC = await fetchSeoulGeoJson();
           
+          // GeoJSON을 구별 데이터 객체로 변환
+          const districtsData = processSeoulDistricts(geoJsonData);
+          console.log("서울 구별 데이터:", districtsData);
+          
           // 서울 외부 지역 마스킹 처리 (서울 경계만 표시)
           renderSeoulMask(kakao, map, geoJsonData);
           
-          // 각 구별 복구 현황에 따른 색상 폴리곤 렌더링
-          // getRecoveryColor 함수가 구 이름에 따라 복구 상태별 색상 반환
+          // 색상 모드에 따라 구별 색상 결정
+          const getDistrictColor = (name: string) => {
+            // 선택된 등급 데이터가 있는 경우, 해당 구들만 표시
+            if (selectedGradeData && selectedGradeData.items.length > 0) {
+              const isSelectedDistrict = selectedGradeData.items.some(item => item.sigungu === name);
+              if (isSelectedDistrict) {
+                // 선택된 구는 위험도에 맞는 색상 표시
+                if (colorMode === "risk") {
+                  return getRiskColorByDistrict(name, districtsData);
+                } else {
+                  return getRecoveryColor(name);
+                }
+              } else {
+                // 선택되지 않은 구는 회색으로 비활성화
+                return "#E0E0E0";
+              }
+            }
+            
+            // 기본 색상 모드 적용 (등급 선택이 없는 경우)
+            if (colorMode === "risk") {
+              const color = getRiskColorByDistrict(name, districtsData);
+              return color;
+            } else {
+              const color = getRecoveryColor(name);
+              return color;
+            }
+          };
+
+          // 각 구별 색상에 따른 폴리곤 렌더링
           renderDistrictPolygons(kakao, map, geoJsonData, ({ name }) => {
-            return getRecoveryColor(name);
+            return getDistrictColor(name || "");
           });
           
           console.log("서울 경계 및 복구 현황 렌더링 완료");
@@ -82,7 +179,7 @@ export const MapSection = () => {
 
     // 비동기 지도 초기화 실행
     initSeoulMap();
-  }, []); // 컴포넌트 마운트 시 한 번만 실행
+  }, [selectedLocation, colorMode, selectedGradeData]); // selectedLocation, colorMode, selectedGradeData 변경 시 지도 재초기화
 
   return (
     <div 

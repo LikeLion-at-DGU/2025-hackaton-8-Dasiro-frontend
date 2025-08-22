@@ -8,7 +8,7 @@ import type {
   ButtonProps,
   CardProps,
   OverlayProps,
-} from "../types/ui";
+} from "../../features/recovery-zone/types/ui";
 
 // 디자인 기준 화면 너비 (px)
 const DESIGN_WIDTH = 375;
@@ -79,7 +79,7 @@ export const Button = style(Container)<ButtonProps>`
   
   ${({ $hover }) => $hover && `
     &:hover {
-      opacity: 0.8;
+      opacity: 1;
     }
   `}
 `;

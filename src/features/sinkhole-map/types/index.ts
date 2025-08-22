@@ -1,0 +1,1 @@
+export { gradeSubtitle } from "./gradeSubtitle";

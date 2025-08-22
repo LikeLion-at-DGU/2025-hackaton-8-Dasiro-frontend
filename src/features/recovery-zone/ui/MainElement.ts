@@ -1,4 +1,4 @@
-import * as BasicElement from "./BasicElement";
+import * as BasicElement from "@shared/ui/BasicElement";
 import style from "styled-components";
 
 export const MainWrapper = style(BasicElement.FlexBoxModel).attrs(() => ({
@@ -6,7 +6,11 @@ export const MainWrapper = style(BasicElement.FlexBoxModel).attrs(() => ({
   $alignItems: "flex-end",
   $width: 336,
   $gap: 30,
-}))``;
+}))`
+#sinkhole-button{
+  display: flex;
+  gap: 10px;
+}`;
 
 export const TopWrapper = style(BasicElement.FlexBoxModel).attrs(() => ({
   $columnDirection: true,
