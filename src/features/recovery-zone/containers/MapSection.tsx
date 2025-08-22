@@ -4,9 +4,12 @@ import { loadKakaoMaps } from "@shared/lib/loadKakaoMaps";
 import { fetchSeoulGeoJson, type FC } from "@shared/lib/SeoulMap/SeoulGeoJson";
 import { renderSeoulMask } from "@shared/lib/SeoulMap/renderSeoulMask";
 import { renderDistrictPolygons } from "@shared/lib/SeoulMap/renderDistrictPolygons";
+import { createDasiroPin } from "@shared/components/LocationPin";
 import { getRecoveryColor } from "../utils/recoveryColorResolver";
 import { getRiskColorByDistrict } from "../utils/riskColorResolver";
 import { processSeoulDistricts } from "../utils/districtProcessor";
+import { useSelectGrade } from "@entities/sinkhole/context";
+import { useRecovery } from "../context/RecoveryContext";
 
 // 서울 경계 좌표 (대략적인 경계)
 const SEOUL_BOUNDS = {
@@ -25,11 +28,33 @@ const isWithinSeoul = (lat: number, lng: number): boolean => {
 };
 
 interface MapSectionProps {
-  selectedLocation?: { lat: number; lng: number; address: string } | null;
   colorMode?: "recovery" | "risk"; // 색상 모드 (복구 현황 vs 위험도)
 }
 
-export const MapSection = ({ selectedLocation, colorMode = "recovery" }: MapSectionProps) => {
+export const MapSection = ({ colorMode = "recovery" }: MapSectionProps) => {
+  // Recovery용 Context (colorMode가 recovery일 때만 사용)
+  let selectedLocation = null;
+  try {
+    if (colorMode === "recovery") {
+      const recoveryContext = useRecovery();
+      selectedLocation = recoveryContext.selectedLocation;
+    }
+  } catch {
+    // RecoveryContext가 없는 경우
+    selectedLocation = null;
+  }
+  
+  // Sinkhole용 Context (colorMode가 risk일 때만 사용)
+  let selectedGradeData = null;
+  try {
+    if (colorMode === "risk") {
+      const sinkholeContext = useSelectGrade();
+      selectedGradeData = sinkholeContext.selectedGradeData;
+    }
+  } catch {
+    // SinkholeContext가 없는 경우
+    selectedGradeData = null;
+  }
   // Kakao Map 인스턴스를 저장하는 ref
   const mapRef = useRef<any>(null);
   // 지도가 렌더링될 DOM 컨테이너 ref
@@ -79,15 +104,20 @@ export const MapSection = ({ selectedLocation, colorMode = "recovery" }: MapSect
         // 지도 인스턴스를 ref에 저장
         mapRef.current = map;
 
-        // 선택된 위치에 마커 추가 (서울 내부인 경우만)
+        // 선택된 위치에 다시로 핀 추가 (서울 내부인 경우만)
         if (selectedLocation && isWithinSeoul(selectedLocation.lat, selectedLocation.lng)) {
           const markerPosition = new kakao.maps.LatLng(selectedLocation.lat, selectedLocation.lng);
-          const marker = new kakao.maps.Marker({
+          const pinElement = createDasiroPin();
+          
+          new kakao.maps.CustomOverlay({
             position: markerPosition,
-            map: map
+            content: pinElement,
+            xAnchor: 0.5,
+            yAnchor: 0.5,
+            map: map,
           });
           
-          console.log("선택된 위치에 마커 추가:", selectedLocation.address);
+          console.log("선택된 위치에 다시로 핀 추가:", selectedLocation.address);
         } else{
           console.log("선택된 위치가 서울 내부가 아닙니다.");
         }
@@ -105,14 +135,28 @@ export const MapSection = ({ selectedLocation, colorMode = "recovery" }: MapSect
           
           // 색상 모드에 따라 구별 색상 결정
           const getDistrictColor = (name: string) => {
-            console.log(`색상 모드: ${colorMode}, 구: ${name}`);
+            // 선택된 등급 데이터가 있는 경우, 해당 구들만 표시
+            if (selectedGradeData && selectedGradeData.items.length > 0) {
+              const isSelectedDistrict = selectedGradeData.items.some(item => item.sigungu === name);
+              if (isSelectedDistrict) {
+                // 선택된 구는 위험도에 맞는 색상 표시
+                if (colorMode === "risk") {
+                  return getRiskColorByDistrict(name, districtsData);
+                } else {
+                  return getRecoveryColor(name);
+                }
+              } else {
+                // 선택되지 않은 구는 회색으로 비활성화
+                return "#E0E0E0";
+              }
+            }
+            
+            // 기본 색상 모드 적용 (등급 선택이 없는 경우)
             if (colorMode === "risk") {
               const color = getRiskColorByDistrict(name, districtsData);
-              console.log(`${name} 위험도 색상: ${color}`);
               return color;
             } else {
               const color = getRecoveryColor(name);
-              console.log(`${name} 복구 색상: ${color}`);
               return color;
             }
           };
@@ -135,7 +179,7 @@ export const MapSection = ({ selectedLocation, colorMode = "recovery" }: MapSect
 
     // 비동기 지도 초기화 실행
     initSeoulMap();
-  }, [selectedLocation, colorMode]); // selectedLocation, colorMode 변경 시 지도 재초기화
+  }, [selectedLocation, colorMode, selectedGradeData]); // selectedLocation, colorMode, selectedGradeData 변경 시 지도 재초기화
 
   return (
     <div 

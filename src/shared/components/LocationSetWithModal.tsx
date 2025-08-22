@@ -1,23 +1,22 @@
 import { useState } from "react";
 import { MainElement } from "@features/recovery-zone/ui";
 import { LocationPickerMap } from "@features/recovery-zone/widgets/LocationPickerMap";
+import { useRecovery } from "@features/recovery-zone/context/RecoveryContext";
 
 interface LocationSetWithModalProps {
   initialLocationText?: string;
-  onLocationSelect?: (location: { lat: number; lng: number; address: string }) => void;
 }
 
 export const LocationSetWithModal = ({
-  initialLocationText = "위치 설정",
-  onLocationSelect
+  initialLocationText = "위치 설정"
 }: LocationSetWithModalProps) => {
+  const { selectedLocation, setSelectedLocation } = useRecovery();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<{
+  const [tempSelectedLocation, setTempSelectedLocation] = useState<{
     lat: number;
     lng: number;
     address: string;
   } | null>(null);
-  const [isLocationAllowed, setIsLocationAllowed] = useState(false);
 
   const handleLocationClick = () => {
     console.log("위치 설정 버튼 클릭됨");
@@ -35,15 +34,14 @@ export const LocationSetWithModal = ({
     lng: number;
     address: string;
   }) => {
-    setSelectedLocation(location);
-    // 여기서는 내부 상태만 업데이트, 상위 전달은 "허용" 버튼에서
+    setTempSelectedLocation(location);
+    // 여기서는 임시 상태만 업데이트, 실제 Context 전달은 "허용" 버튼에서
   };
 
   const handleLocationAllow = () => {
-    if (selectedLocation) {
-      console.log("위치 허용됨:", selectedLocation);
-      setIsLocationAllowed(true);
-      onLocationSelect?.(selectedLocation); // 여기서 상위 컴포넌트로 위치 전달
+    if (tempSelectedLocation) {
+      console.log("위치 허용됨:", tempSelectedLocation);
+      setSelectedLocation(tempSelectedLocation); // Context에 위치 설정
     }
     setIsModalOpen(false);
   };
@@ -70,7 +68,6 @@ export const LocationSetWithModal = ({
               </div>
               <button onClick={handleLocationAllow}>허용</button>
               <button onClick={() => {
-                setIsLocationAllowed(false);
                 setIsModalOpen(false);
               }}>허용 안 함</button>
             </div>
@@ -82,7 +79,7 @@ export const LocationSetWithModal = ({
         onClick={handleLocationClick}
         style={{ cursor: "pointer", pointerEvents: "auto" }}
       >
-        {isLocationAllowed ? "현재 위치" : initialLocationText}
+        {selectedLocation ? "현재 위치" : initialLocationText}
         <img
           src="/images/icons/downarrow.png"
           alt="화살표"

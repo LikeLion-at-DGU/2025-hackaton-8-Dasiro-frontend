@@ -3,7 +3,6 @@ import { DraggableBottomSheet } from "../components/DraggableBottomSheet";
 import { FilterButtonList } from "../components/FilterButtonList";
 import { GradeBottomInner } from "../../sinkhole-map/components/GradeButtonList";
 
-
 interface BottomSheetProps {
   isSinkholeMap?: boolean;
 }

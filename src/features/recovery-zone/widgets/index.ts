@@ -1,3 +1,3 @@
 export { FilterButton } from "./FilterButton";
-export { StoreCard } from "./StoreCard";
+export { StoreCard, LegacyStoreCard } from "./StoreCard";
 export { LocationPickerMap } from "./LocationPickerMap";

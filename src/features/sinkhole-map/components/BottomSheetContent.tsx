@@ -3,6 +3,8 @@ import * as SinkholeBottomSheetElement from "@features/sinkhole-map/ui/BottomShe
 import * as BasicElement from "@shared/ui/BasicElement";
 import ddang from "/images/icons/ddang.png";
 import badge from "/images/icons/badge.png";
+import whitemarker from "/images/icons/whitemarker.png";
+import { gradeSubtitle } from "@features/sinkhole-map/types";
 
 const getGradeIcon = (grade: number) => `/images/icons/grade${grade}.png`;
 
@@ -47,6 +49,16 @@ ${({ theme }) => theme.fonts.subBold16};
   }
 `;
 
+const StyledButton = style(BasicElement.Button)`
+  ${({ theme }) => theme.fonts.bodySemiB14}
+  color: ${({ theme }) => theme.colors.orange06};
+  background-color: ${({ theme }) => theme.colors.orange01};
+  img{
+    width: 12.8px;
+    height: 16px;
+  }
+`;
+
 export const BottomSheetContent = () => {
   return (
     <BasicElement.Container $gap={35} $columnDirection={true}>
@@ -62,7 +74,7 @@ export const BottomSheetContent = () => {
       <StyledContainer $gap={15}>
         <div className="title">
           <img src={ddang} alt="땅땅이" className="ddang" />
-          1등급, 아주 튼튼하니 안심하세요!
+          {gradeSubtitle[grade].subtitle}
         </div>
         <div className="content">
           염창동은 싱크홀 안전등급 종합 1등급으로, 매우 안전한 지역이에요. 지반
@@ -85,6 +97,15 @@ export const BottomSheetContent = () => {
           곳이니 조금 더 안심하고 부동산을 거래하실 수 있어요!
         </div>
       </StyledContainer>
+      <StyledButton
+        $width={"fit-content"}
+        $gap={10}
+        $padding={[6, 20]}
+        $borderRadius={50}
+      >
+        <img src={whitemarker} alt="하얀색 핀" />
+        지도보기
+      </StyledButton>
     </BasicElement.Container>
   );
 };

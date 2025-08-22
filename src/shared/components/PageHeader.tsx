@@ -7,21 +7,17 @@ import { SinkholeMainElement } from "@features/sinkhole-map";
 interface PageHeaderProps {
   showLocationSet?: boolean;
   locationSetText?: string;
-  onLocationSelect?: (location: {
-    lat: number;
-    lng: number;
-    address: string;
-  }) => void;
   searchBar?: ReactNode;
   noticeBar?: ReactNode;
+  showSinkholeButton?: boolean;
 }
 
 export const PageHeader = ({
   showLocationSet = false,
   locationSetText = "위치 설정",
-  onLocationSelect,
   searchBar,
   noticeBar,
+  showSinkholeButton = false,
 }: PageHeaderProps) => {
   const [activeButton, setActiveButton] = useState<"badge" | "layer">("layer"); // 기본값은 layer
 
@@ -41,17 +37,18 @@ export const PageHeader = ({
           {showLocationSet && (
             <LocationSetWithModal
               initialLocationText={locationSetText}
-              onLocationSelect={onLocationSelect}
             />
           )}
         </MainElement.TopBar>
 
         {searchBar && searchBar}
         {noticeBar && noticeBar}
-        <div id="sinkhole-button">
-          {SinkholeMainElement.SinkholeButton("layer", activeButton === "layer", () => handleButtonClick("layer"))}
-          {SinkholeMainElement.SinkholeButton("badge", activeButton === "badge", () => handleButtonClick("badge"))}
-        </div>
+        {showSinkholeButton && (
+          <div id="sinkhole-button">
+            {SinkholeMainElement.SinkholeButton("layer", activeButton === "layer", () => handleButtonClick("layer"))}
+            {SinkholeMainElement.SinkholeButton("badge", activeButton === "badge", () => handleButtonClick("badge"))}
+          </div>
+        )}
       </MainElement.TopWrapper>
     </>
   );

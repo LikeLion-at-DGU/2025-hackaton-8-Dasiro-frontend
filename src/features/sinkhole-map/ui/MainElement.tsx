@@ -3,6 +3,11 @@ import style from "styled-components";
 import badge from "/images/icons/badge.png";
 import layer from "/images/icons/layer.png";
 import nolayer from "/images/icons/nolayer.png";
+import { MainElement as RecoveryMainElement } from "@features/recovery-zone";
+
+// recovery-zone의 MainElement 재사용
+export const MainWrapper = RecoveryMainElement.MainWrapper;
+export const MainContent = RecoveryMainElement.MainContent;
 
 export const SelectButton = style(BasicElement.Button).attrs<{
   $isActive?: boolean;
