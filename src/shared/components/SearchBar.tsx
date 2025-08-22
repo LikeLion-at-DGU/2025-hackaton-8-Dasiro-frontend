@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { MainElement } from "@features/recovery-zone/ui";
 import * as BasicElement from "@shared/ui/BasicElement";
 import styled from "styled-components";
 import search from "/images/icons/search.png";
@@ -39,10 +38,6 @@ export const SearchBar = ({
     onInputChange?.(value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch?.(searchValue);
-  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {

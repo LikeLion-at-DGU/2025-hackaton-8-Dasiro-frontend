@@ -1,4 +1,4 @@
-import { PageHeader, LocationSetWithModal, NoticeBar } from "@shared/components";
+import { PageHeader, NoticeBar } from "@shared/components";
 
 export const RecoveryHeader = () => {
   return (

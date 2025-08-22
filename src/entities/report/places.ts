@@ -1,4 +1,4 @@
-import {postResponse, getResponse} from "@shared/lib/instance";
+import {getResponse} from "@shared/lib/instance";
 
 export type PlaceCategory = "FOOD" | "CAFE" | "CONVENIENCE" | "OTHER";
 

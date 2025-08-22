@@ -1,4 +1,4 @@
-import React, { useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { MainElement } from "@features/recovery-zone/ui";
 import { LocationSetWithModal } from "./LocationSetWithModal";
 import logo from "/images/logo.png";

@@ -1,5 +1,4 @@
 import style from "styled-components";
-import * as SinkholeBottomSheetElement from "@features/sinkhole-map/ui/BottomSheetElement";
 import * as BasicElement from "@shared/ui/BasicElement";
 import ddang from "/images/icons/ddang.png";
 import badge from "/images/icons/badge.png";
