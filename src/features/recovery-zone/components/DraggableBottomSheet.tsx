@@ -98,13 +98,13 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
       ref={bottomSheetRef}
       style={{ 
         height: `${height}vh`,
-        maxHeight: '100vh',
+        // maxHeight: '100vh',
         minHeight: minHeight,
         // 드래그 중에는 애니메이션 비활성화, 그 외에는 부드러운 전환 효과
         transition: isDragging ? 'none' : 'height 0.3s ease'
       }}
     >
-      <BottomSheetElement.BottomBar id="bottomBar">
+      <BottomSheetElement.BottomBar className="bottomBar">
         {/* 드래그 핸들 바 - 사용자가 이것을 드래그하여 시트 높이 조절 */}
         <img
           src={sheetbar}
@@ -117,7 +117,11 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
         />
-        <BottomSheetElement.BottomInner id="bottomInner">
+        <BottomSheetElement.BottomInner
+          style={{
+            '--bottom-sheet-height': `${height}vh`
+          } as React.CSSProperties}
+        >
           {children}
         </BottomSheetElement.BottomInner>
       </BottomSheetElement.BottomBar>

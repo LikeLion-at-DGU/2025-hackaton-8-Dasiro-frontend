@@ -121,6 +121,7 @@ export const FilterButtonList = () => {
       {/* 복구 완료 상점 카드 목록 - 스크롤 가능한 세로 목록 */}
       <BottomSheetElement.BottomCardList
         style={{
+          maxHeight: 'calc(var(--bottom-sheet-height, 50vh) - 120px)', // 시트 높이에서 버튼과 여백 빼기
           overflowY: 'auto',
           paddingBottom: '20px',
           scrollbarWidth: 'none',

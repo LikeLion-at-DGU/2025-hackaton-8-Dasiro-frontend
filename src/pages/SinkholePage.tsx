@@ -38,7 +38,7 @@ const SinkholePage = () => {
         </MainElement.MainWrapper>
 
         {/* 하단 슬라이드 시트 - 싱크홀 등급 버튼 */}
-        <BottomSheet isSinkholeMap={true} />
+        <BottomSheet isSinkholeMap={true} id={"sinkhole"} />
 
         {/* 배경 장식용 원형 요소들 */}
         <BackgroundCircles />

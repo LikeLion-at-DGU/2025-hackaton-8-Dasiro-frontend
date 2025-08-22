@@ -26,7 +26,7 @@ const BannerWrapper = style(BasicElement.Container).attrs(() => ({
 
 const Banner = () => {
   return (
-    <BannerWrapper>
+    <BannerWrapper id="Banner">
       <div>
         <div>한 눈에 보는 우리 동네 땅 건강검진 결과 🩺</div>
         <div>땅땅이가 알려주는 싱크홀맵 안전등급</div>

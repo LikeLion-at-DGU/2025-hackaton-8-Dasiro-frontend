@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { BottomSheetElement } from "@features/recovery-zone";
 import { BottomSheetGradeButton } from "@features/sinkhole-map/ui/BottomSheetElement";
-import { Banner } from "@features/sinkhole-map/containers/Banner";
+
 import { BottomSheetContent } from "@features/sinkhole-map/components/BottomSheetContent";
 import { getDistrictsByGrade } from "@entities/sinkhole/api";
 import { useSelectGrade } from "@entities/sinkhole/context";
@@ -60,8 +60,8 @@ export const GradeBottomInner = () => {
           msOverflowStyle: "none",
         }}
       >
-        <Banner />
-        <BottomSheetContent/>
+        
+        <BottomSheetContent selectedGrade={selectedGrade} />
       </BottomSheetElement.BottomCardList>
     </>
   );

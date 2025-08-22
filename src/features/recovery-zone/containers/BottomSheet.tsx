@@ -5,12 +5,15 @@ import { GradeBottomInner } from "../../sinkhole-map/components/GradeButtonList"
 
 interface BottomSheetProps {
   isSinkholeMap?: boolean;
+  id?: "recovery" | "sinkhole";
 }
 
-export const BottomSheet = ({ isSinkholeMap = false }: BottomSheetProps) => {
+export const BottomSheet = ({ isSinkholeMap = false, id="recovery"}: BottomSheetProps) => {
   return (
-    <DraggableBottomSheet>
-      {isSinkholeMap ? <GradeBottomInner /> : <FilterButtonList />}
-    </DraggableBottomSheet>
+    <div id={id}>
+      <DraggableBottomSheet>
+        {isSinkholeMap ? <GradeBottomInner /> : <FilterButtonList />}
+      </DraggableBottomSheet>
+    </div>
   );
 };

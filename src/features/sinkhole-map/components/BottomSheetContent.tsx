@@ -4,10 +4,10 @@ import ddang from "/images/icons/ddang.png";
 import badge from "/images/icons/badge.png";
 import whitemarker from "/images/icons/whitemarker.png";
 import { gradeSubtitle } from "@features/sinkhole-map/types";
+import { Banner } from "@features/sinkhole-map/containers/Banner";
 
 const getGradeIcon = (grade: number) => `/images/icons/grade${grade}.png`;
 
-const grade: number = 1; // Replace 1 with the actual grade value as needed
 
 const StyledContainer = style(BasicElement.Container).attrs(({ $gap }) => ({
   $columnDirection: true,
@@ -58,22 +58,27 @@ const StyledButton = style(BasicElement.Button)`
   }
 `;
 
-export const BottomSheetContent = () => {
+interface BottomSheetContentProps {
+  selectedGrade?: number;
+}
+
+export const BottomSheetContent = ({ selectedGrade = 1 }: BottomSheetContentProps) => {
   return (
     <BasicElement.Container $gap={35} $columnDirection={true}>
+      <Banner />
       <StyledContainer $gap={50}>
         <div>
-          <span id="dong">염창동</span>의<br /> 싱크홀 안전도는 {grade}
+          <span id="dong">염창동</span>의<br /> 싱크홀 안전도는 {selectedGrade}
           등급이에요!
         </div>
         <div>
-          <img src={getGradeIcon(grade)} alt="뱃지" />
+          <img src={getGradeIcon(selectedGrade)} alt="뱃지" />
         </div>
       </StyledContainer>
       <StyledContainer $gap={15}>
         <div className="title">
           <img src={ddang} alt="땅땅이" className="ddang" />
-          {gradeSubtitle[grade].subtitle}
+          {gradeSubtitle[selectedGrade].subtitle}
         </div>
         <div className="content">
           염창동은 싱크홀 안전등급 종합 1등급으로, 매우 안전한 지역이에요. 지반

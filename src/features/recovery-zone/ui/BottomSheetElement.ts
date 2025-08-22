@@ -46,7 +46,6 @@ export const BottomInner = style(BasicElement.FlexBoxModel).attrs(() => ({
     $columnDirection: true,
     $alignItems: "flex-start"
 }))`
-    max-height: 93.965vh;
     position: relative;
 `;
 
