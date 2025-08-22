@@ -27,7 +27,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
       <Row $side="left">
         <AvatarWrapper>
           <Avatar>
-            <img src="/images/character/character3.png" alt="땅땅이" />
+            <img src="/images/character/character2.png" alt="땅땅이" />
           </Avatar>
           <p>땅땅이</p>
         </AvatarWrapper>
@@ -75,7 +75,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
       {side === "left" && (
         <AvatarWrapper>
           <Avatar>
-            <img src="/images/character/character3.png" alt="땅땅이" />
+            <img src="/images/character/character2.png" alt="땅땅이" />
           </Avatar>
           <p>땅땅이</p>
         </AvatarWrapper>
