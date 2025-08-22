@@ -6,7 +6,9 @@ import SinkholePage from "@pages/SinkholePage";
 import RecoveryPage from "@pages/RecoveryPage";
 import SafeRoutePage from "@pages/SafeRoutePage";
 import OnboardingPage from "@pages/OnboardingPage";
-import CitizenReportPage from "@pages/CitizenReportPage";
+import CitizenIntro from "@pages/CitizenIntroPage";
+import CitizenInfo from "@pages/CitizenInfoPage";
+import CitizenReport from "@pages/CitizenReportPage";
 
 const router = createBrowserRouter([
   {
@@ -17,7 +19,9 @@ const router = createBrowserRouter([
       { path: "/", element: <RecoveryPage /> },
       { path: "/safeRoute", element: <SafeRoutePage /> },
       { path: "/onboard", element: <OnboardingPage /> },
-      { path: "/citizen", element: <CitizenReportPage /> },
+      { path: "/citizenIntro", element: <CitizenIntro /> },
+      { path: "/citizenInfo", element: <CitizenInfo /> },
+      { path: "/citizenReport", element: <CitizenReport /> },
     ],
   },
 ]);

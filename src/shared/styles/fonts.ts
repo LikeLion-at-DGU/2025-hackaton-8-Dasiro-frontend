@@ -1,6 +1,5 @@
 import { css } from "styled-components";
 
-//TODO: 플젝 디자인시스템 맞게 수정
 const fontGenerator = (
   weight: number,
   size: string,
@@ -9,7 +8,7 @@ const fontGenerator = (
   font-weight: ${weight};
   font-size: ${size};
   line-height: ${lineHeight};
-  font-family: "suite";
+  font-family: "suit";
 `;
 
 export const fonts = {
@@ -26,7 +25,7 @@ export const fonts = {
 
   bodyExtra14: fontGenerator(800, "14px"),
   bodyBold14: fontGenerator(700, "14px"),
-  bodySemiB14: fontGenerator(600, "14px", "25px"),
+  bodySemiB14: fontGenerator(600, "14px", "20px"),
   bodyMedium14: fontGenerator(500, "14px"),
 
   capExtra12: fontGenerator(800, "12px"),

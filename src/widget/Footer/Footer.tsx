@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import * as S from "./Footer.styled";
-import sinkholeIcon from "@images/Footer/map.png";
-import sinkholeActiveIcon from "@images/Footer/map-active.png";
-import recoveryIcon from "@images/Footer/recovery.png";
-import recoveryActiveIcon from "@images/Footer/recovery-active.png";
-import routeIcon from "@images/Footer/safe.png";
-import routeActiveIcon from "@images/Footer/safe-active.png";
+import sinkholeIcon from "/images/Footer/map.png";
+import sinkholeActiveIcon from "/images/Footer/map-active.png";
+import recoveryIcon from "/images/Footer/recovery.png";
+import recoveryActiveIcon from "/images/Footer/recovery-active.png";
+import routeIcon from "/images/Footer/safe.png";
+import routeActiveIcon from "/images/Footer/safe-active.png";
 
 type TabKey = "map" | "store" | "route";
 

@@ -31,4 +31,18 @@ export const getResponse = async <T>(url: string): Promise<T | null> => {
   }
 };
 
+// FormData POST
+export const postFormData = async <TResponse>(
+  url: string,
+  form: FormData
+): Promise<TResponse | null> => {
+  try {
+    const res = await instance.post<TResponse>(url, form);
+    return res.data;
+  } catch (error) {
+    console.error("FormData POST 실패:", error);
+    return null;
+  }
+};
+
 export default instance;
