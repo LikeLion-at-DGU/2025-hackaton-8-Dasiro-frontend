@@ -111,6 +111,7 @@ export default function OnboardingPage() {
   );
 
   const len = slides.length;
+  const spotSide = idx % 2 === 0 ? "right" : "left";
   const hasSkip = idx < len - 1;
 
   const goPrev = () => setIdx((i) => Math.max(0, i - 1));
@@ -139,7 +140,12 @@ export default function OnboardingPage() {
   };
 
   return (
-    <Wrap onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <Wrap
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      $spotSide={spotSide}
+      $useSpotImg={true}
+    >
       <TopBar>
         {hasSkip && (
           <Skip type="button" onClick={skip} aria-label="온보딩 건너뛰기">
@@ -225,33 +231,48 @@ export default function OnboardingPage() {
 
 /* ============ styles ============ */
 
-const Wrap = styled.section`
-  --topbar-h: 24px;
-  --topbar-pad: max(6px, env(safe-area-inset-top));
-  --dots-h: 14px;
+const Wrap = styled.section<{
+  $spotSide: "left" | "right";
+  $useSpotImg?: boolean;
+}>`
   position: relative;
   display: grid;
-  grid-template-rows: calc(var(--topbar-h) + var(--topbar-pad)) var(--dots-h) 1fr;
-  row-gap: 2rem;
+  grid-template-rows: calc(24px + max(6px, env(safe-area-inset-top))) 14px 1fr;
+  row-gap: 1rem;
   padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
   min-height: 100dvh;
 
-  background: radial-gradient(
-      45% 35% at 82% 72%,
-      rgba(255, 163, 112, 0.28) 0%,
-      rgba(255, 163, 112, 0) 65%
-    ),
-    radial-gradient(
-      35% 28% at 18% 20%,
-      rgba(255, 200, 170, 0.18) 0%,
-      rgba(255, 200, 170, 0) 60%
+  background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0) 38%
     ),
     linear-gradient(
-      180deg,
-      ${({ theme }) => theme.colors.orange05} 0%,
-      #fff 100%
+      0deg,
+      rgba(255, 163, 112, 0.06) 0%,
+      rgba(255, 163, 112, 0) 80%
     );
-  box-shadow: 0 0 68.277px rgba(163, 113, 71, 0.08);
+  background-repeat: no-repeat;
+
+  ${({ $useSpotImg, $spotSide }) =>
+    $useSpotImg &&
+    css`
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: url("/images/icons/${$spotSide === "left"
+            ? "left"
+            : "right"}-circle.png")
+          no-repeat;
+        background-position: ${$spotSide === "left"
+          ? "left 0% bottom 27%"
+          : "right 0% top 40%"};
+        background-size: ${$spotSide === "left" ? "15rem" : "20rem"};
+        z-index: 0;
+      }
+    `}
 `;
 
 const TopBar = styled.div`
