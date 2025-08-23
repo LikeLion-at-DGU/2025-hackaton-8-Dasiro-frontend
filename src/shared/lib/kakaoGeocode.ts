@@ -1,19 +1,10 @@
+import {
+  compact,
+  isJamoOnly,
+  isTooShort,
+  sanitize,
+} from "@features/citizen-report/lib/addressValidation";
 import { loadKakaoMaps } from "@shared/lib/loadKakaoMaps";
-
-function sanitize(s: string) {
-  return (s ?? "").trim();
-}
-function compact(s: string) {
-  return sanitize(s).replace(/\s+/g, "");
-}
-function isJamoOnly(s: string) {
-  // 한글 자모만: ㄱ-ㅎ / ㅏ-ㅣ
-  return /^[\u3131-\u314E\u314F-\u3163]+$/.test(s);
-}
-function isTooShort(s: string) {
-  // 공백 제거 기준 최소 2자 이상 요구
-  return compact(s).length < 2;
-}
 
 function candidateMatchesQuery(q: string, ...cands: (string | undefined)[]) {
   const qC = compact(q);

@@ -6,31 +6,15 @@ import InputBar, { type SendPayload } from "@shared/ui/InputBar";
 import type { ChatMessage } from "@shared/types/chat";
 import { isThanks } from "@shared/utils/isThanks";
 
+import { looksValidAddressQuery } from "@features/citizen-report/lib/addressValidation";
+import { isSetComplete } from "@features/citizen-report/lib/setComplete";
 import {
-  createReport,
-  uploadReportImages,
-  analyzeReport,
-} from "@entities/report/api";
-import { clamp0to100, getAnalysisCopy } from "@features/utils/riskCopy";
-import { geocodeText } from "@shared/lib/kakaoGeocode";
-import { formatCoord } from "@shared/lib/coord";
+  startAnalysisFlow,
+  type PickedLocation,
+} from "@features/citizen-report/lib/startAnalysis";
 
 type LayoutContext = { setFooterHidden: (v: boolean) => void };
-type AwaitingKind = "image" | "text" | null;
-type PickedLocation = { lat: number; lng: number; address?: string } | null;
-
-/* ========= 입력 유효성 검사 유틸 ========= */
-const sanitize = (s?: string) => (s ?? "").trim();
-const compact = (s?: string) => sanitize(s).replace(/\s+/g, "");
-const isJamoOnly = (s: string) =>
-  /^[\u3131-\u314E\u314F-\u3163]+$/.test(compact(s));
-const isTooShort = (s: string) => compact(s).length < 2;
-const looksValidAddressQuery = (s?: string) => {
-  const c = compact(s);
-  if (!c || isTooShort(c) || isJamoOnly(c)) return false;
-  return /[가-힣A-Za-z0-9]/.test(c);
-};
-/* ======================================= */
+export type AwaitingKind = "image" | "text" | null;
 
 export default function CitizenReportPage() {
   const navigate = useNavigate();
@@ -81,127 +65,6 @@ export default function CitizenReportPage() {
   const append = (items: ChatMessage[]) =>
     setMessages((prev) => [...prev, ...items]);
 
-  /**
-   * 텍스트 + 이미지 세트가 갖춰졌을 때 호출 순서
-   * 1) POST /api/v1/reports             (reportId get)
-   * 2) POST /api/v1/reports/:id/images  (이미지 업로드, 최대 3장)
-   * 3) POST /api/v1/reports/:id/analyze (위험도 분석 결과 get)
-   *    - 중간 멘트(접수/업로드/분석)는 결과가 나오면 자동 제거
-   */
-  const startAnalysis = async (text: string, files: File[]) => {
-    const loadingId = crypto.randomUUID();
-    append([{ id: loadingId, type: "bot", text: "제보를 접수하고 있어요···" }]);
-
-    let uploadingId: string | null = null;
-    let analyzingId: string | null = null;
-
-    try {
-      let latNum: number | undefined;
-      let lngNum: number | undefined;
-
-      if (pickedLocation?.lat && pickedLocation?.lng) {
-        latNum = pickedLocation.lat;
-        lngNum = pickedLocation.lng;
-      } else if (text?.trim()) {
-        const geo = await geocodeText(text.trim());
-        if (geo) {
-          latNum = geo.lat;
-          lngNum = geo.lng;
-          append([
-            {
-              id: crypto.randomUUID(),
-              type: "bot",
-              text: `위치를 '${geo.address}'로 인식했어요.`,
-            },
-          ]);
-        } else {
-          setMessages((prev) =>
-            prev
-              .filter((m) => m.id !== loadingId)
-              .concat({
-                id: crypto.randomUUID(),
-                type: "bot",
-                text:
-                  "주소를 정확히 입력해주세요!\n" +
-                  "예) 서울 중구 필동로 1길 30 / 신당동 100-1 / 충무로역 7번 출구",
-              })
-          );
-          setAwaiting("text");
-          return;
-        }
-      }
-
-      // 2) 문자열로 포맷
-      const latStr = formatCoord(latNum);
-      const lngStr = formatCoord(lngNum);
-
-      // 3) 제보 생성
-      const reportId = await createReport({
-        text: text?.trim() || undefined,
-        lat: latStr,
-        lng: lngStr,
-      });
-
-      // 4) 이미지 업로드
-      let imageUrls: string[] = [];
-      if (files?.length) {
-        uploadingId = crypto.randomUUID();
-        append([
-          {
-            id: uploadingId,
-            type: "bot",
-            text: `이미지 ${Math.min(files.length, 3)}장 업로드 중…`,
-          },
-        ]);
-        const uploaded = await uploadReportImages(reportId, files);
-        imageUrls = uploaded.image_urls ?? [];
-      }
-
-      // 5) 분석 요청
-      analyzingId = crypto.randomUUID();
-      append([
-        {
-          id: analyzingId,
-          type: "bot",
-          text: "AI가 위험도를 분석하는 중이에요…",
-        },
-      ]);
-      const analysis = await analyzeReport(reportId, imageUrls);
-
-      const apiScore = clamp0to100(analysis.risk_score);
-      const {
-        score,
-        bucket,
-        analysis: analysisText,
-        action,
-      } = getAnalysisCopy(apiScore);
-
-      // 결과가 나오면 중간 멘트들 제거
-      setMessages((prev) =>
-        prev
-          .filter((m) => ![loadingId, uploadingId, analyzingId].includes(m.id))
-          .concat({
-            id: crypto.randomUUID(),
-            type: "analysis",
-            meta: { score, bucket, analysis: analysisText, action },
-          })
-      );
-    } catch (e) {
-      console.error(e);
-      setMessages((prev) =>
-        prev
-          .filter((m) => ![loadingId, uploadingId, analyzingId].includes(m.id))
-          .concat({
-            id: crypto.randomUUID(),
-            type: "bot",
-            text:
-              "제보 처리에 실패했어요. 잠시 후 다시 시도해 주세요.\n" +
-              "문제가 계속되면 네트워크 상태를 확인해 주세요.",
-          })
-      );
-    }
-  };
-
   const onSend = async ({ text, files }: SendPayload) => {
     const hasText = !!text && text.trim().length > 0;
     const hasFiles = !!files && files.length > 0;
@@ -230,10 +93,16 @@ export default function CitizenReportPage() {
       out.push({ id: crypto.randomUUID(), type: "user", text: text!.trim() });
     append(out);
 
-    const setComplete =
-      (awaiting === "image" && hasFiles && !!pendingText) ||
-      (awaiting === "text" && hasText && !!pendingFiles?.length);
+    // 둘 다 갖춰졌을 때만 true
+    const setDone = isSetComplete(
+      awaiting,
+      hasText,
+      hasFiles,
+      pendingText,
+      pendingFiles
+    );
 
+    // [A] 텍스트+이미지 동시에 도착
     if (hasText && hasFiles) {
       if (!looksValidAddressQuery(text)) {
         append([
@@ -253,12 +122,19 @@ export default function CitizenReportPage() {
       setPendingText(null);
       setPendingFiles(null);
       setAwaiting(null);
-      await startAnalysis(text!.trim(), files!);
+      await startAnalysisFlow({
+        text: text!.trim(),
+        files: files!,
+        pickedLocation,
+        append,
+        setMessages,
+        setAwaiting,
+      });
       return;
     }
 
-    // --- [B] 세트가 완성된 경우
-    if (setComplete) {
+    // [B] 세트가 이제야 완성
+    if (setDone) {
       if (awaiting === "image") {
         // 텍스트 선입력 → 방금 이미지 옴
         if (!pendingText || !hasFiles) {
@@ -277,9 +153,7 @@ export default function CitizenReportPage() {
             {
               id: crypto.randomUUID(),
               type: "bot",
-              text:
-                "주소를 정확히 입력해주세요!\n" +
-                "예) 서울 중구 필동로 1길 30 / 신당동 100-1 / 충무로역 7번 출구",
+              text: "주소를 정확히 입력해주세요!\n예) 서울 중구 필동로 1길 30 / 신당동 100-1 / 충무로역 7번 출구",
             },
           ]);
           setAwaiting("text");
@@ -289,7 +163,14 @@ export default function CitizenReportPage() {
         setPendingText(null);
         setPendingFiles(null);
         setAwaiting(null);
-        await startAnalysis(t, files!);
+        await startAnalysisFlow({
+          text: t,
+          files: files!,
+          pickedLocation,
+          append,
+          setMessages,
+          setAwaiting,
+        });
         return;
       } else if (awaiting === "text") {
         // 이미지 선입력 → 방금 텍스트 옴
@@ -310,9 +191,7 @@ export default function CitizenReportPage() {
             {
               id: crypto.randomUUID(),
               type: "bot",
-              text:
-                "주소를 정확히 입력해주세요!\n" +
-                "예) 서울 중구 필동로 1길 30 / 신당동 100-1 / 충무로역 7번 출구",
+              text: "주소를 정확히 입력해주세요!\n예) 서울 중구 필동로 1길 30 / 신당동 100-1 / 충무로역 7번 출구",
             },
           ]);
           setAwaiting("text");
@@ -322,12 +201,19 @@ export default function CitizenReportPage() {
         setPendingFiles(null);
         setPendingText(null);
         setAwaiting(null);
-        await startAnalysis(t, f);
+        await startAnalysisFlow({
+          text: t,
+          files: f,
+          pickedLocation,
+          append,
+          setMessages,
+          setAwaiting,
+        });
         return;
       }
     }
 
-    // --- [C] 아직 세트가 아니면 대기로 유도
+    // [C] 아직 세트가 아님 → 대기로 유도
     if (hasText && !hasFiles) {
       const t = text!.trim();
       if (!looksValidAddressQuery(t)) {
@@ -335,13 +221,10 @@ export default function CitizenReportPage() {
           {
             id: crypto.randomUUID(),
             type: "bot",
-            text:
-              "주소를 정확히 입력해주세요!\n" +
-              "예) 서울 중구 필동로 1길 30 / 신당동 100-1 / 충무로역 7번 출구",
+            text: "주소를 정확히 입력해주세요!\n예) 서울 중구 필동로 1길 30 / 신당동 100-1 / 충무로역 7번 출구",
           },
         ]);
-        // 잘못된 텍스트는 보류하지 않음
-        setPendingText(null);
+        setPendingText(null); // 잘못된 텍스트는 보류하지 않음
         setAwaiting("text");
         return;
       }
