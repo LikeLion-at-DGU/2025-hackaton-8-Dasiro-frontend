@@ -120,5 +120,38 @@ export const STORE_TEST_DATA: Place[] = [
     main_image_url: "/images/image351.png",
     kakao_place_id: "54321",
     kakao_url: "https://place.map.kakao.com/54321"
+  },
+   {
+    name: "테스트 식당 3",
+    category: "FOOD",
+    address: "서울시 중구 명동길 4",
+    lat: 37.5680,
+    lng: 126.9795,
+    distance_m: 80,
+    main_image_url: "/images/image351.png",
+    kakao_place_id: "54321",
+    kakao_url: "https://place.map.kakao.com/54321"
+  },
+     {
+    name: "테스트 식당 4",
+    category: "FOOD",
+    address: "서울시 중구 명동길 4",
+    lat: 37.5680,
+    lng: 126.9795,
+    distance_m: 80,
+    main_image_url: "/images/image351.png",
+    kakao_place_id: "54321",
+    kakao_url: "https://place.map.kakao.com/54321"
+  },
+     {
+    name: "테스트 식당 5",
+    category: "FOOD",
+    address: "서울시 중구 명동길 4",
+    lat: 37.5680,
+    lng: 126.9795,
+    distance_m: 80,
+    main_image_url: "/images/image351.png",
+    kakao_place_id: "54321",
+    kakao_url: "https://place.map.kakao.com/54321"
   }
 ];
