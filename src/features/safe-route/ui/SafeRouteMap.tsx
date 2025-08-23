@@ -5,12 +5,12 @@ import { fitToCoords } from "../lib/fitBounds";
 import type { Loc } from "@shared/types/location";
 import { reverseGeocode } from "../lib/reverseGeocode";
 import markerIcon from "@shared/assets/icons/marker.png";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import FloatAction from "@shared/ui/FloatAction";
 
 type Props = {
   origin?: Loc;
   dest?: Loc;
+  routePath?: Array<{ lat: number; lng: number }>;
   useMyLocation?: boolean;
   onMyLocation?: (p: Loc) => void;
   pickTarget?: "origin" | "dest" | null;
@@ -20,6 +20,7 @@ type Props = {
 export default function SafeRouteMap({
   origin,
   dest,
+  routePath,
   useMyLocation = true,
   onMyLocation,
   pickTarget,
@@ -135,13 +136,18 @@ export default function SafeRouteMap({
       destMarkerRef.current = null;
     }
 
-    // 경로 라인 & fitBounds
+    // 경로 라인 & fitBounds (routePath 우선)
     if (origin && dest) {
-      const path = [
-        { lat: origin.lat, lng: origin.lng },
-        { lat: dest.lat, lng: dest.lng },
-      ];
-      const kakaoPath = path.map((p) => new kakao.maps.LatLng(p.lat, p.lng));
+      const points: Array<{ lat: number; lng: number }> =
+        routePath && routePath.length >= 2
+          ? routePath
+          : [
+              { lat: origin.lat, lng: origin.lng },
+              { lat: dest.lat, lng: dest.lng },
+            ];
+
+      const kakaoPath = points.map((p) => new kakao.maps.LatLng(p.lat, p.lng));
+
       if (!lineRef.current) {
         lineRef.current = new kakao.maps.Polyline({
           map,
@@ -158,13 +164,14 @@ export default function SafeRouteMap({
           strokeOpacity: 0.95,
         });
       }
-      fitToCoords(map, path);
+
+      fitToCoords(map, points);
       map.setLevel(map.getLevel() + 1);
     } else if (lineRef.current) {
       lineRef.current.setMap(null);
       lineRef.current = null;
     }
-  }, [mapReady, origin, dest]);
+  }, [mapReady, origin, dest, routePath]);
 
   // 픽 모드: 지도 클릭 좌표 전달
   useEffect(() => {
@@ -197,7 +204,6 @@ export default function SafeRouteMap({
     const { lat, lng } = myLocRef.current;
     const pos = new kakao.maps.LatLng(lat, lng);
 
-    // 현재 위치 점 스타일링
     const el = document.createElement("div");
     el.style.width = "20px";
     el.style.height = "20px";
@@ -272,31 +278,10 @@ export default function SafeRouteMap({
     }
   }
 
-  const navigate = useNavigate();
-
-  //TODO: 추후 경로 수정 필요
-  const onFloatClick = () => navigate("/report");
-
   return (
     <>
       <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
-      {!(origin && dest) && (
-        <FloatImg
-          src="/images/icons/mapFloating.png"
-          role="button"
-          onClick={onFloatClick}
-        />
-      )}
+      {!(origin && dest) && <FloatAction />}
     </>
   );
 }
-const FloatImg = styled.img`
-  width: 3.5rem;
-  height: 3.5rem;
-  position: absolute;
-  bottom: 80px;
-  right: 0;
-  cursor: pointer;
-  z-index: 40;
-  pointer-events: auto;
-`;
