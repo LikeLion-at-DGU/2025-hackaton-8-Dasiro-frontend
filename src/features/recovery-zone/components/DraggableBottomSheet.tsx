@@ -48,8 +48,8 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
       // 드래그 거리를 vh 단위로 변환
       const deltaY = startYRef.current - e.clientY;
       const deltaVh = (deltaY / window.innerHeight) * 100;
-      // 최소 42.3vh, 최대 100vh 범위로 제한
-      const newHeight = Math.max(36, Math.min(100, startHeightRef.current + deltaVh));
+      // 최소 36vh, 최대 100vh 범위로 제한
+      const newHeight = Math.max(minHeight, Math.min(100, startHeightRef.current + deltaVh));
       
       console.log('Mouse move - newHeight:', newHeight);
       setHeight(newHeight);
@@ -64,7 +64,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
       const deltaY = startYRef.current - e.touches[0].clientY;
       const deltaVh = (deltaY / window.innerHeight) * 100;
       // 최소 42.3vh, 최대 100vh 범위로 제한
-      const newHeight = Math.max(42.3, Math.min(100, startHeightRef.current + deltaVh));
+      const newHeight = Math.max(minHeight, Math.min(100, startHeightRef.current + deltaVh));
       
       console.log('Touch move - newHeight:', newHeight);
       setHeight(newHeight);
@@ -98,13 +98,13 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
       ref={bottomSheetRef}
       style={{ 
         height: `${height}vh`,
-        maxHeight: '100vh',
+        // maxHeight: '100vh',
         minHeight: minHeight,
         // 드래그 중에는 애니메이션 비활성화, 그 외에는 부드러운 전환 효과
         transition: isDragging ? 'none' : 'height 0.3s ease'
       }}
     >
-      <BottomSheetElement.BottomBar id="bottomBar">
+      <BottomSheetElement.BottomBar className="bottomBar">
         {/* 드래그 핸들 바 - 사용자가 이것을 드래그하여 시트 높이 조절 */}
         <img
           src={sheetbar}
@@ -117,7 +117,11 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
         />
-        <BottomSheetElement.BottomInner id="bottomInner">
+        <BottomSheetElement.BottomInner
+          style={{
+            '--bottom-sheet-height': `${height}vh`
+          } as React.CSSProperties}
+        >
           {children}
         </BottomSheetElement.BottomInner>
       </BottomSheetElement.BottomBar>

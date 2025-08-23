@@ -46,7 +46,6 @@ export const BottomInner = style(BasicElement.FlexBoxModel).attrs(() => ({
     $columnDirection: true,
     $alignItems: "flex-start"
 }))`
-    max-height: 93.965vh;
     position: relative;
 `;
 
@@ -66,6 +65,9 @@ export const BottomCardList = style(BasicElement.FlexBoxModel).attrs(() => ({
 }))`
     &::-webkit-scrollbar {
         display: none;
+    }
+    .dong{
+        color: ${({ theme }) => theme.colors.orange01};
     }
 `;
 
@@ -96,7 +98,8 @@ export const BottomCard = style(BasicElement.FlexBoxModel).attrs(() => ({
     $columnDirection: false,
     $justifyContent: "flex-start"
 }))`
-    
+    border-bottom: 1px dashed #E1E1E1;
+    padding-bottom: 12px;
     >img {
         height: 70px;
         aspect-ratio: 1:1;

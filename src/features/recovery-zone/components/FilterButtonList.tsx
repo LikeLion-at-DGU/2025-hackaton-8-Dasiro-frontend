@@ -4,6 +4,7 @@ import { FilterButton, StoreCard } from "../widgets";
 import { FILTER_BUTTONS } from "../constants";
 import { getNearPlaces, type Place } from "@entities/report/places";
 import { useRecovery } from "../context/RecoveryContext";
+import { useCoupon } from "@shared/contexts/CouponContext";
 
 export const FilterButtonList = () => {
   const {
@@ -17,6 +18,8 @@ export const FilterButtonList = () => {
     selectedCategory,
     setSelectedCategory,
   } = useRecovery();
+
+  const { showCouponModal } = useCoupon();
 
   // 장소 데이터 불러오기
   useEffect(() => {
@@ -79,6 +82,12 @@ export const FilterButtonList = () => {
     }
   }, [selectedLocation]);
 
+  // 쿠폰 클릭 핸들러
+  const handleCouponClick = (place: Place) => {
+    console.log(`${place.name} 쿠폰 클릭됨`);
+    showCouponModal(place);
+  };
+
   // 렌더링 디버깅
   console.log('FilterButtonList 렌더링:', { 
     isLoading, 
@@ -121,6 +130,7 @@ export const FilterButtonList = () => {
       {/* 복구 완료 상점 카드 목록 - 스크롤 가능한 세로 목록 */}
       <BottomSheetElement.BottomCardList
         style={{
+          maxHeight: 'calc(var(--bottom-sheet-height, 50vh) - 120px)', // 시트 높이에서 버튼과 여백 빼기
           overflowY: 'auto',
           paddingBottom: '20px',
           scrollbarWidth: 'none',
@@ -135,7 +145,7 @@ export const FilterButtonList = () => {
               key={place.id}
               place={place}
               cardClickHandler={(place) => console.log(`${place.name} 카드 클릭됨`)}
-              couponClickHandler={(place) => console.log(`${place.name} 쿠폰 클릭됨`)}
+              couponClickHandler={handleCouponClick}
             />
           ))
         ) : (
