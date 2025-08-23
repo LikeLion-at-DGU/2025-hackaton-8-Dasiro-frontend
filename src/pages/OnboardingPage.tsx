@@ -153,7 +153,6 @@ export default function OnboardingPage() {
           </Skip>
         )}
       </TopBar>
-
       <Dots role="tablist" aria-label="온보딩 진행 표시">
         {slides.map((s, i) => (
           <Dot
@@ -170,7 +169,6 @@ export default function OnboardingPage() {
           />
         ))}
       </Dots>
-
       <Content>
         {slides.map((s, i) => (
           <SlidePane
@@ -196,6 +194,30 @@ export default function OnboardingPage() {
                   decoding="async"
                 />
               </HeroInner>
+              <ArrowLayer aria-hidden>
+                {idx > 0 && (
+                  <NavBtnLeft
+                    aria-label="이전"
+                    onClick={goPrev}
+                    style={{ pointerEvents: "auto" }}
+                  >
+                    <Chevron>
+                      <img src="/images/icons/arrow-left.svg" />
+                    </Chevron>
+                  </NavBtnLeft>
+                )}
+                {idx < len - 1 && (
+                  <NavBtnRight
+                    aria-label="다음"
+                    onClick={goNext}
+                    style={{ pointerEvents: "auto" }}
+                  >
+                    <Chevron>
+                      <img src="/images/icons/arrow-right.svg" />
+                    </Chevron>
+                  </NavBtnRight>
+                )}
+              </ArrowLayer>
             </HeroBox>
 
             <DescBox $last={i === len - 1}>
@@ -204,27 +226,12 @@ export default function OnboardingPage() {
               ))}
             </DescBox>
 
-            <BottomRow>
+            <BottomRow $last={i === len - 1}>
               {i === len - 1 ? <CTA onClick={start}>시작하기</CTA> : null}
             </BottomRow>
           </SlidePane>
         ))}
       </Content>
-
-      {idx > 0 && (
-        <NavBtnLeft aria-label="이전" onClick={goPrev}>
-          <Chevron>
-            <img src="/images/icons/arrow-left.svg" />
-          </Chevron>
-        </NavBtnLeft>
-      )}
-      {idx < len - 1 && (
-        <NavBtnRight aria-label="다음" onClick={goNext}>
-          <Chevron>
-            <img src="/images/icons/arrow-right.svg" />
-          </Chevron>
-        </NavBtnRight>
-      )}
     </Wrap>
   );
 }
@@ -238,9 +245,18 @@ const Wrap = styled.section<{
   position: relative;
   display: grid;
   grid-template-rows: calc(24px + max(6px, env(safe-area-inset-top))) 14px 1fr;
-  row-gap: 1rem;
+  row-gap: 1.5rem;
   padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
-  min-height: 100dvh;
+  min-height: 100vh;
+  height: 100vh;
+  @supports (height: 100dvh) {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+  @supports (height: 100svh) {
+    min-height: 100svh;
+    height: 100svh;
+  }
 
   background-image: linear-gradient(
       180deg,
@@ -267,9 +283,9 @@ const Wrap = styled.section<{
             : "right"}-circle.png")
           no-repeat;
         background-position: ${$spotSide === "left"
-          ? "left 0% bottom 27%"
-          : "right 0% top 40%"};
-        background-size: ${$spotSide === "left" ? "15rem" : "20rem"};
+          ? "left 0% top 11rem"
+          : "right 0% top 7rem"};
+        background-size: 15rem;
         z-index: 0;
       }
     `}
@@ -321,7 +337,6 @@ const Content = styled.div`
 
 const SlidePane = styled.article<{ $active: boolean; $last: boolean }>`
   position: absolute;
-  inset: 0;
   display: grid;
   gap: 12px;
   opacity: ${({ $active }) => ($active ? 1 : 0)};
@@ -329,6 +344,10 @@ const SlidePane = styled.article<{ $active: boolean; $last: boolean }>`
   transition: opacity 180ms ease, transform 180ms ease;
   pointer-events: ${({ $active }) => ($active ? "auto" : "none")};
   visibility: ${({ $active }) => ($active ? "visible" : "hidden")};
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 `;
 
 const TitleBox = styled.div`
@@ -378,7 +397,7 @@ const DescBox = styled.div<{ $last?: boolean }>`
   flex-direction: column;
   gap: 6px;
   text-align: center;
-  margin-top: ${({ $last }) => ($last ? "0.75rem" : "1.25rem")};
+  margin-top: ${({ $last }) => ($last ? "2rem" : "3rem")};
 `;
 
 const DescP = styled.p`
@@ -391,11 +410,12 @@ const DescP = styled.p`
   }
 `;
 
-const BottomRow = styled.div`
+const BottomRow = styled.div<{ $last?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 4px;
+  margin-top: ${({ $last }) => ($last ? "1rem" : "3rem")};
+  width: 100%;
 `;
 
 const CTA = styled.button`
@@ -409,10 +429,10 @@ const CTA = styled.button`
   cursor: pointer;
 `;
 
+/* ▼▼ 화살표 전용: 나머지 스타일 건드리지 마세요 ▼▼ */
+
+/* 버튼 공통 스타일(포지션 X) */
 const navBtnBase = css`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   width: 32px;
   height: 32px;
   border-radius: 9999px;
@@ -422,16 +442,32 @@ const navBtnBase = css`
   place-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  z-index: 3;
+  pointer-events: auto;
 `;
+
+const ArrowLayer = styled.div`
+  position: fixed;
+  display: grid;
+  width: 100%;
+  max-width: 375px;
+  height: 100%;
+  align-items: center;
+  z-index: 1000;
+  pointer-events: none;
+`;
+
 const NavBtnLeft = styled.button`
   ${navBtnBase};
-  left: 20px;
+  grid-column: 1;
+  justify-self: start;
 `;
+
 const NavBtnRight = styled.button`
   ${navBtnBase};
-  right: 20px;
+  grid-column: 3;
+  justify-self: end;
 `;
+
 const Chevron = styled.span`
   font-size: 20px;
   display: flex;
