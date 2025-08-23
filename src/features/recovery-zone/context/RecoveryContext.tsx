@@ -43,9 +43,9 @@ export const RecoveryProvider = ({ children }: RecoveryProviderProps) => {
   const [places, setPlaces] = useState<Place[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
-  // 필터 상태
-  const [selectedRecoveryStatus, setSelectedRecoveryStatus] = useState<string>("복구 현황");
-  const [selectedCategory, setSelectedCategory] = useState<string>("업종");
+  // 필터 상태 - 초기값은 undefined로 설정하여 버튼에 라벨이 표시되도록 함
+  const [selectedRecoveryStatus, setSelectedRecoveryStatus] = useState<string>("전체");
+  const [selectedCategory, setSelectedCategory] = useState<string>("전체");
 
   return (
     <RecoveryContext.Provider value={{

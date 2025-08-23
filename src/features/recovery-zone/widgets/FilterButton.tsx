@@ -8,6 +8,7 @@ interface FilterButtonProps {
   dropdownOptions?: string[];
   selectedOption?: string;
   onOptionSelect?: (option: string) => void;
+  disabled?: boolean;
 }
 
 export const FilterButton = ({ 
@@ -15,12 +16,15 @@ export const FilterButton = ({
   onClick, 
   dropdownOptions, 
   selectedOption,
-  onOptionSelect 
+  onOptionSelect,
+  disabled = false
 }: FilterButtonProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const isSelected = !!(selectedOption && selectedOption !== label);
 
   const handleButtonClick = () => {
+    if (disabled) return;
+    
     if (dropdownOptions) {
       setIsDropdownOpen(!isDropdownOpen);
     } else {
@@ -35,7 +39,15 @@ export const FilterButton = ({
 
   return (
     <BottomSheetElement.DropdownContainer className="dropdownContainer">
-      <BottomSheetElement.BottomButton $isSelected={isSelected} $isDropdownOpen={isDropdownOpen} onClick={handleButtonClick}>
+      <BottomSheetElement.BottomButton 
+        $isSelected={isSelected} 
+        $isDropdownOpen={isDropdownOpen}
+        onClick={handleButtonClick}
+        style={{ 
+          opacity: disabled ? 0.5 : 1,
+          cursor: disabled ? 'not-allowed' : 'pointer'
+        }}
+      >
         <span>{selectedOption || label}</span>
         <img 
           src={buttonarrow} 

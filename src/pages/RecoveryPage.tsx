@@ -9,6 +9,7 @@ import {
 import { PageHeader, NoticeBar } from "@shared/components";
 import { RecoveryProvider } from "@features/recovery-zone/context/RecoveryContext";
 import { CouponProvider } from "@shared/contexts/CouponContext";
+import FloatAction from "@shared/ui/FloatAction";
 
 const RecoveryPage = () => {
   return (
@@ -22,9 +23,10 @@ const RecoveryPage = () => {
               showLocationSet
               locationSetText="위치 설정"
               noticeBar={<NoticeBar />}
+              showToast={true}
             />
           
-          {/* 메인 콘텐츠 컨테이너 (현재 빈 상태) */}
+          {/* 메인 콘텐츠 컨테이너 */}
           <MainElement.MainContent />
           
             {/* 서울 지역 복구 현황 지도 - 구별 색상 표시 */}
@@ -36,6 +38,7 @@ const RecoveryPage = () => {
 
           {/* 배경 장식용 원형 요소들 */}
           <BackgroundCircles />
+          <FloatAction/>
         </S.Wrap>
       </RecoveryProvider>
     </CouponProvider>

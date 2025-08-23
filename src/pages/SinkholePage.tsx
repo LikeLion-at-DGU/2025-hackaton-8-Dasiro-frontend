@@ -9,6 +9,7 @@ import {
 import { BottomSheet } from "@features/sinkhole-map/containers/BottomSheet";
 import { SelectGradeProvider, useSelectGrade } from "@entities/sinkhole/context";
 import { searchDistricts } from "@entities/sinkhole/api";
+import FloatAction from "@shared/ui/FloatAction";
 
 // SinkholePage 내부 컴포넌트
 const SinkholePageContent = () => {
@@ -64,6 +65,7 @@ const SinkholePageContent = () => {
 
       {/* 배경 장식용 원형 요소들 */}
       <BackgroundCircles />
+      <FloatAction/>
     </S.Wrap>
   );
 };

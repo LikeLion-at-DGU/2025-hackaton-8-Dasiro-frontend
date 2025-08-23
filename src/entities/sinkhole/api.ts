@@ -38,3 +38,4 @@ export const getSafezoneDistricts = async (): Promise<SafezoneDistrictsResponse 
   const url = `/api/v1/districts/safezones`;
   return await getResponse<SafezoneDistrictsResponse>(url);
 };
+
