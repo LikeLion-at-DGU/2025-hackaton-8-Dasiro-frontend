@@ -98,7 +98,8 @@ export const BottomCard = style(BasicElement.FlexBoxModel).attrs(() => ({
     $columnDirection: false,
     $justifyContent: "flex-start"
 }))`
-    
+    border-bottom: 1px dashed ${({ theme }) => theme.colors.black03};
+    padding-bottom: 12px;
     >img {
         height: 70px;
         aspect-ratio: 1:1;

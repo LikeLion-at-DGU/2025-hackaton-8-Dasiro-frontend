@@ -195,6 +195,7 @@ export const PageHeader = ({
                 src={xicon}
                 alt="x"
                 style={{ width: "24px", aspectRatio: "1/1", cursor: "pointer" }}
+                onClick={handleCouponModalClose}
               />
             </div>
             <div style={{display: "flex", gap: "30px", flexDirection: "column"}}>
@@ -203,6 +204,7 @@ export const PageHeader = ({
                   src={logo}
                   alt="로고"
                   style={{ width: "77.25px", height: "36px" }}
+                  
                 />
               </div>
               <div id="coupon-wrapper">

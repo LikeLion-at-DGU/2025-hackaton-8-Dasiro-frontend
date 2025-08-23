@@ -70,7 +70,7 @@ export const LegacyStoreCard = ({
   };
 
   return (
-    <BottomSheetElement.BottomCard onClick={cardClickHandler} id="bottomCard">
+    <BottomSheetElement.BottomCard onClick={cardClickHandler} className="bottomCard">
       <BottomSheetElement.CardContent>
         <img src={image} alt={title} />
         <div className="cardInner">
