@@ -33,9 +33,7 @@ export default function OnboardingPage() {
   }, [setFooterHidden]);
 
   useEffect(() => {
-    if (isOnboarded()) {
-      nav(returnTo, { replace: true });
-    }
+    if (isOnboarded()) nav(returnTo, { replace: true });
   }, [nav, returnTo]);
 
   const slides = useMemo<Slide[]>(
@@ -45,7 +43,7 @@ export default function OnboardingPage() {
         hero: "/images/character/character1.png",
         titleLines: [
           <>
-            완벽하게 <Accent>복구된</Accent> 우리 <Accent>동네 가게</Accent>,
+            완벽하게 <Accent>복구</Accent>된 우리 <Accent>동네 가게</Accent>,
           </>,
           <>오늘은 여기 어때요?</>,
         ],
@@ -62,7 +60,7 @@ export default function OnboardingPage() {
         titleLines: [
           <>지금 걷고 있는 이 길,</>,
           <>
-            <Accent>안심해도</Accent> 될까요?
+            <Accent>안심</Accent>해도 될까요?
           </>,
         ],
         descLines: [
@@ -123,10 +121,10 @@ export default function OnboardingPage() {
     setOnboarded(true);
     nav(returnTo, { replace: true });
   };
-
   const skip = () => finish();
   const start = () => finish();
 
+  // swipe
   const startX = useRef<number | null>(null);
   const onTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
     startX.current = e.touches[0].clientX;
@@ -142,13 +140,15 @@ export default function OnboardingPage() {
 
   return (
     <Wrap onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-      {hasSkip && (
-        <Skip type="button" onClick={skip} aria-label="온보딩 건너뛰기">
-          건너뛰기
-        </Skip>
-      )}
+      <TopBar>
+        {hasSkip && (
+          <Skip type="button" onClick={skip} aria-label="온보딩 건너뛰기">
+            건너뛰기
+          </Skip>
+        )}
+      </TopBar>
 
-      <Dots $hasSkip={hasSkip} role="tablist" aria-label="온보딩 진행 표시">
+      <Dots role="tablist" aria-label="온보딩 진행 표시">
         {slides.map((s, i) => (
           <Dot
             key={s.id}
@@ -165,12 +165,13 @@ export default function OnboardingPage() {
         ))}
       </Dots>
 
-      <Stage>
+      <Content>
         {slides.map((s, i) => (
           <SlidePane
             id={`slide-${s.id}`}
             key={s.id}
             $active={i === idx}
+            $last={i === len - 1}
             aria-hidden={i !== idx}
           >
             <TitleBox>
@@ -191,29 +192,33 @@ export default function OnboardingPage() {
               </HeroInner>
             </HeroBox>
 
-            <DescBox>
+            <DescBox $last={i === len - 1}>
               {s.descLines.map((line, j) => (
                 <DescP key={j}>{line}</DescP>
               ))}
             </DescBox>
+
+            <BottomRow>
+              {i === len - 1 ? <CTA onClick={start}>시작하기</CTA> : null}
+            </BottomRow>
           </SlidePane>
         ))}
-      </Stage>
+      </Content>
 
       {idx > 0 && (
         <NavBtnLeft aria-label="이전" onClick={goPrev}>
-          <Chevron>{"‹"}</Chevron>
+          <Chevron>
+            <img src="/images/icons/arrow-left.svg" />
+          </Chevron>
         </NavBtnLeft>
       )}
       {idx < len - 1 && (
         <NavBtnRight aria-label="다음" onClick={goNext}>
-          <Chevron>{"›"}</Chevron>
+          <Chevron>
+            <img src="/images/icons/arrow-right.svg" />
+          </Chevron>
         </NavBtnRight>
       )}
-
-      <Bottom>
-        {idx === len - 1 ? <CTA onClick={start}>시작하기</CTA> : null}
-      </Bottom>
     </Wrap>
   );
 }
@@ -221,11 +226,16 @@ export default function OnboardingPage() {
 /* ============ styles ============ */
 
 const Wrap = styled.section`
+  --topbar-h: 24px;
+  --topbar-pad: max(6px, env(safe-area-inset-top));
+  --dots-h: 14px;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-rows: calc(var(--topbar-h) + var(--topbar-pad)) var(--dots-h) 1fr;
+  row-gap: 2rem;
+  padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
   min-height: 100dvh;
+
   background: radial-gradient(
       45% 35% at 82% 72%,
       rgba(255, 163, 112, 0.28) 0%,
@@ -239,16 +249,22 @@ const Wrap = styled.section`
     linear-gradient(
       180deg,
       ${({ theme }) => theme.colors.orange05} 0%,
-      #ffffff 100%
+      #fff 100%
     );
   box-shadow: 0 0 68.277px rgba(163, 113, 71, 0.08);
 `;
 
+const TopBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: calc(var(--topbar-h) + var(--topbar-pad));
+  padding-top: var(--topbar-pad);
+`;
+
 const Skip = styled.button`
-  position: absolute;
-  top: max(12px, env(safe-area-inset-top));
-  right: 12px;
-  padding: 8px 10px;
+  height: var(--topbar-h);
+  padding: 0 8px;
   background: transparent;
   border: 0;
   color: ${({ theme }) => theme.colors.black03};
@@ -256,12 +272,12 @@ const Skip = styled.button`
   cursor: pointer;
 `;
 
-const Dots = styled.div<{ $hasSkip: boolean }>`
+const Dots = styled.div`
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 6px;
-  margin-top: ${({ $hasSkip }) => ($hasSkip ? "2.25rem" : "0.5rem")};
-  margin-bottom: 1.25rem;
+  height: var(--dots-h);
 `;
 
 const Dot = styled.button<{ $active: boolean }>`
@@ -276,19 +292,17 @@ const Dot = styled.button<{ $active: boolean }>`
   cursor: pointer;
 `;
 
-const Stage = styled.div`
+const Content = styled.div`
   position: relative;
-  flex: 1;
-  min-height: 0;
+  height: 100%;
   overflow: hidden;
 `;
 
-const SlidePane = styled.article<{ $active: boolean }>`
+const SlidePane = styled.article<{ $active: boolean; $last: boolean }>`
   position: absolute;
   inset: 0;
   display: grid;
-  align-content: start;
-
+  gap: 12px;
   opacity: ${({ $active }) => ($active ? 1 : 0)};
   transform: translateX(${({ $active }) => ($active ? "0" : "8px")});
   transition: opacity 180ms ease, transform 180ms ease;
@@ -300,7 +314,6 @@ const TitleBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
-  text-align: center;
 `;
 
 const TitleLine = styled.h2`
@@ -317,11 +330,11 @@ const HeroBox = styled.div<{ $imgW?: number; $imgH?: number; $boxH?: number }>`
   display: grid;
   place-items: center;
 
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
 
   height: ${({ $boxH }) =>
-    $boxH ? `${$boxH}px` : "clamp(160px, 26vh, 200px)"};
+    $boxH ? `${$boxH}px` : "clamp(150px, 30vh, 200px)"};
 
   img {
     max-height: 100%;
@@ -339,19 +352,40 @@ const HeroInner = styled.div`
   width: 100%;
 `;
 
-const DescBox = styled.div`
+const DescBox = styled.div<{ $last?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 6px;
-  width: 100%;
   text-align: center;
-  margin-top: 4rem;
+  margin-top: ${({ $last }) => ($last ? "0.75rem" : "1.25rem")};
 `;
 
 const DescP = styled.p`
   ${fonts.bodySemiB14};
   color: ${({ theme }) => theme.colors.black02};
   margin: 0;
+
+  @media (max-width: 360px) {
+    ${fonts.capSemi12};
+  }
+`;
+
+const BottomRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+`;
+
+const CTA = styled.button`
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  ${fonts.subExtra16};
+  background: ${({ theme }) => theme.colors.orange01};
+  color: ${({ theme }) => theme.colors.black07};
+  cursor: pointer;
 `;
 
 const navBtnBase = css`
@@ -367,34 +401,20 @@ const navBtnBase = css`
   place-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  z-index: 2;
+  z-index: 3;
 `;
 const NavBtnLeft = styled.button`
   ${navBtnBase};
-  left: 6px;
+  left: 20px;
 `;
 const NavBtnRight = styled.button`
   ${navBtnBase};
-  right: 6px;
+  right: 20px;
 `;
 const Chevron = styled.span`
   font-size: 20px;
-  line-height: 1;
-  color: ${({ theme }) => theme.colors.black02};
-`;
-
-const Bottom = styled.footer`
   display: flex;
-  margin-top: auto;
-  width: 100%;
-`;
-const CTA = styled.button`
-  width: 100%;
-  border: 0;
-  border-radius: 12px;
-  padding: 14px 16px;
-  ${fonts.subExtra16};
-  background: ${({ theme }) => theme.colors.orange01};
-  color: ${({ theme }) => theme.colors.black07};
-  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.black02};
 `;
