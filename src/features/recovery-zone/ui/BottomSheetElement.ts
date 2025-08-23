@@ -66,6 +66,9 @@ export const BottomCardList = style(BasicElement.FlexBoxModel).attrs(() => ({
     &::-webkit-scrollbar {
         display: none;
     }
+    .dong{
+        color: ${({ theme }) => theme.colors.orange01};
+    }
 `;
 
 export const BottomButton = style(BasicElement.Button).attrs<{ $isSelected?: boolean; $isDropdownOpen?: boolean }>(() => ({

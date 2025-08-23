@@ -9,9 +9,9 @@ import type { Grade } from "@entities/sinkhole/selectgrade";
 
 export const GradeBottomInner = () => {
   // 선택된 싱크홀 등급
-  const [selectedGrade, setSelectedGrade] = useState<number>(1);
+  const [selectedGrade, setSelectedGrade] = useState<number>();
   // Context에서 상태 관리
-  const { setSelectedGradeData } = useSelectGrade();
+  const { setSelectedGradeData, isBadgeActive } = useSelectGrade();
 
   // 등급별 구 데이터 조회
   const handleGradeClick = async (grade: number) => {
@@ -35,22 +35,24 @@ export const GradeBottomInner = () => {
 
   return (
     <>
-      {/* 등급 버튼 목록 - 1등급에서 5등급까지 */}
-      <BottomSheetElement.BottomButtonList
-        id="bottomButtonList"
-        $isSinkholeMap={true}
-        $isSearch={false}
-      >
-        {[1, 2, 3, 4, 5].map((grade) => (
-          <BottomSheetGradeButton
-            key={grade}
-            $isActive={selectedGrade === grade}
-            onClick={() => handleGradeClick(grade)}
-          >
-            {grade}등급
-          </BottomSheetGradeButton>
-        ))}
-      </BottomSheetElement.BottomButtonList>
+      {/* badge 버튼이 활성화되지 않았을 때만 등급 버튼 목록 표시 */}
+      {!isBadgeActive && (
+        <BottomSheetElement.BottomButtonList
+          id="bottomButtonList"
+          $isSinkholeMap={true}
+          $isSearch={false}
+        >
+          {[1, 2, 3, 4, 5].map((grade) => (
+            <BottomSheetGradeButton
+              key={grade}
+              $isActive={selectedGrade === grade}
+              onClick={() => handleGradeClick(grade)}
+            >
+              {grade}등급
+            </BottomSheetGradeButton>
+          ))}
+        </BottomSheetElement.BottomButtonList>
+      )}
       <BottomSheetElement.BottomCardList
         style={{
           gap: "40px",

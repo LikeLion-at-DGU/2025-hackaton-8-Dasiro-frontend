@@ -38,6 +38,7 @@ export const PageHeader = ({
     
     if (type === "badge" && sinkholeContext) {
       // badge 버튼 클릭 시 안심존 데이터 조회
+      sinkholeContext.setIsBadgeActive(true);
       try {
         const response = await getSafezones();
         if (response && response.status === "success") {
@@ -52,6 +53,7 @@ export const PageHeader = ({
       }
     } else if (type === "layer" && sinkholeContext) {
       // layer 버튼 클릭 시 등급 모드로 복귀
+      sinkholeContext.setIsBadgeActive(false);
       sinkholeContext.setViewMode("grade");
     }
   };

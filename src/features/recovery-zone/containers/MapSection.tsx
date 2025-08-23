@@ -11,9 +11,10 @@ import { useRecovery } from "../context/RecoveryContext";
 
 interface MapSectionProps {
   colorMode?: "recovery" | "risk"; // 색상 모드 (복구 현황 vs 위험도)
+  forceViewMode?: "grade" | "safezone"; // 강제로 viewMode 지정
 }
 
-export const MapSection = ({ colorMode = "recovery" }: MapSectionProps) => {
+export const MapSection = ({ colorMode = "recovery", forceViewMode }: MapSectionProps) => {
   // Recovery용 Context (colorMode가 recovery일 때만 사용)
   let selectedLocation = null;
   try {
@@ -35,7 +36,7 @@ export const MapSection = ({ colorMode = "recovery" }: MapSectionProps) => {
       const sinkholeContext = useSelectGrade();
       selectedGradeData = sinkholeContext.selectedGradeData;
       safezoneData = sinkholeContext.safezoneData;
-      viewMode = sinkholeContext.viewMode;
+      viewMode = forceViewMode || sinkholeContext.viewMode;
     }
   } catch {
     // SinkholeContext가 없는 경우
@@ -97,21 +98,43 @@ export const MapSection = ({ colorMode = "recovery" }: MapSectionProps) => {
           const getDistrictColor = (feature: any) => {
             const name = feature.properties?.name || feature.properties?.SIG_KOR_NM || '';
             
-            // Sinkhole 모드에서 안심존 데이터가 있는 경우
-            if (colorMode === "risk" && viewMode === "safezone" && safezoneData && safezoneData.items.length > 0) {
-              const safezoneItem = safezoneData.items.find(item => item.sigungu === name);
-              if (safezoneItem) {
-                // 안심존 구는 final_grade에 따른 색상 표시
-                if (safezoneItem.final_grade === "G1") {
-                  return "#4CAF50"; // 1등급 - 초록색 (매우 안전)
-                } else if (safezoneItem.final_grade === "G2") {
-                  return "#8BC34A"; // 2등급 - 연한 초록색 (안전)
-                }
-                // fallback
-                return getRiskColorByDistrict(name, districtsData);
+            // 디버깅용 로그 (첫 번째 구역에서만 출력)
+            if (name === '종로구') {
+              console.log("MapSection Debug:", { colorMode, viewMode, safezoneDataLength: safezoneData?.items?.length || 0, forceViewMode });
+            }
+            
+            // forceViewMode가 "safezone"인 경우 최우선으로 테스트 데이터 사용
+            if (forceViewMode === "safezone") {
+              console.log(`District ${name}: Using test data for safezone mode`);
+              // 테스트: 강남구와 서초구만 G1, G2로 색칠
+              if (name === "강남구") {
+                return "#4CAF50"; // 1등급 - 초록색 (매우 안전)
+              } else if (name === "서초구") {
+                return "#8BC34A"; // 2등급 - 연한 초록색 (안전)
               } else {
-                // 안심존이 아닌 구는 회색으로 비활성화
+                // 나머지는 회색으로 비활성화
                 return "#E0E0E0";
+              }
+            }
+            
+            // Sinkhole 모드에서 안심존 데이터가 있는 경우
+            if (colorMode === "risk" && viewMode === "safezone") {
+              
+              if (safezoneData && safezoneData.items.length > 0) {
+                const safezoneItem = safezoneData.items.find(item => item.sigungu === name);
+                if (safezoneItem) {
+                  // 안심존 구는 final_grade에 따른 색상 표시
+                  if (safezoneItem.final_grade === "G1") {
+                    return "#4CAF50"; // 1등급 - 초록색 (매우 안전)
+                  } else if (safezoneItem.final_grade === "G2") {
+                    return "#8BC34A"; // 2등급 - 연한 초록색 (안전)
+                  }
+                  // fallback
+                  return getRiskColorByDistrict(name, districtsData);
+                } else {
+                  // 안심존이 아닌 구는 회색으로 비활성화
+                  return "#E0E0E0";
+                }
               }
             }
             
@@ -169,7 +192,7 @@ export const MapSection = ({ colorMode = "recovery" }: MapSectionProps) => {
         mapInstanceRef.current.destroy();
       }
     };
-  }, [selectedLocation, colorMode, selectedGradeData, safezoneData, viewMode]); // 상태 변경 시 지도 재초기화
+  }, [selectedLocation, colorMode, selectedGradeData, safezoneData, viewMode, forceViewMode]); // 상태 변경 시 지도 재초기화
 
   return (
     <div 
