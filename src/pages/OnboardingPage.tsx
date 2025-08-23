@@ -301,7 +301,6 @@ const TopBar = styled.div`
 
 const Skip = styled.button`
   height: var(--topbar-h);
-  padding: 0 8px;
   background: transparent;
   border: 0;
   color: ${({ theme }) => theme.colors.black03};
