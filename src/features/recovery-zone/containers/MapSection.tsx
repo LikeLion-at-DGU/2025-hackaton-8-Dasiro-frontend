@@ -1,7 +1,7 @@
 // Recovery Zone 지도 섹션 - 서울 구별 복구 현황을 색상으로 표시하는 지도
 import { useEffect, useRef } from "react";
 import { createD3SeoulMap } from "@shared/lib/SeoulMap/d3SeoulMap";
-import { getRecoveryColor } from "../utils/recoveryColorResolver";
+import { getRecoveryColor, loadRecoveryData } from "../utils/recoveryColorResolver";
 import { getRiskColorByDistrict } from "../utils/riskColorResolver";
 import { processSeoulDistricts } from "../utils/districtProcessor";
 import { fetchSeoulGeoJson } from "@shared/lib/SeoulMap/SeoulGeoJson";
@@ -56,6 +56,11 @@ export const MapSection = ({ colorMode = "recovery", forceViewMode }: MapSection
       try {
         // DOM 컨테이너가 준비되지 않은 경우 종료
         if (!containerRef.current) return;
+
+        // Recovery 모드일 때 API 데이터 로드
+        if (colorMode === "recovery") {
+          await loadRecoveryData();
+        }
 
         // 기존 맵 인스턴스 정리
         if (mapInstanceRef.current) {

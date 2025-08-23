@@ -150,7 +150,12 @@ export const CardContent = style(BasicElement.FlexBoxModel).attrs(() => ({
     $gap: 15,
     $columnDirection: false,
     $justifyContent: "flex-start"
-}))``;
+}))`
+    .cardDate {
+        ${({ theme }) => theme.fonts.capMedium10};
+        color: ${({ theme }) => theme.colors.black04};
+    }
+`;
 
 // 드롭다운 관련 요소들
 export const DropdownContainer = style(BasicElement.Container).attrs(() => ({

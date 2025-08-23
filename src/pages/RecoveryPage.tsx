@@ -24,7 +24,7 @@ const RecoveryPage = () => {
               noticeBar={<NoticeBar />}
             />
           
-          {/* 메인 콘텐츠 컨테이너 (현재 빈 상태) */}
+          {/* 메인 콘텐츠 컨테이너 */}
           <MainElement.MainContent />
           
             {/* 서울 지역 복구 현황 지도 - 구별 색상 표시 */}

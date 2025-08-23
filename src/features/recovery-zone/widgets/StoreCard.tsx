@@ -8,21 +8,22 @@ interface StoreCardProps {
   couponClickHandler?: (place: Place) => void;
 }
 
-// Legacy props interface for backward compatibility
+// Legacy props interface for backward compatibility (incident data)
 interface LegacyStoreCardProps {
   image: string;
   title: string;
   address: string;
-  hasCoupon?: boolean;
+  occurred_at: string;
+  cause: string;
+  method: string;
   cardClickHandler?: () => void;
-  couponClickHandler?: () => void;
 }
 
 // New StoreCard component using Place data
-export const StoreCard = ({ 
-  place, 
+export const StoreCard = ({
+  place,
   cardClickHandler,
-  couponClickHandler
+  couponClickHandler,
 }: StoreCardProps) => {
   const handleCouponClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -36,9 +37,9 @@ export const StoreCard = ({
   return (
     <BottomSheetElement.BottomCard onClick={handleCardClick} id="bottomCard">
       <BottomSheetElement.CardContent>
-        <img 
-          src={place.main_image_url || "/images/default-store.png"} 
-          alt={place.name} 
+        <img
+          src={place.main_image_url || "/images/default-store.png"}
+          alt={place.name}
         />
         <div className="cardInner">
           <div className="cardTitls">{place.name}</div>
@@ -56,34 +57,33 @@ export const StoreCard = ({
 };
 
 // Legacy StoreCard component for backward compatibility
-export const LegacyStoreCard = ({ 
-  image, 
-  title, 
-  address, 
-  hasCoupon = false, 
+export const LegacyStoreCard = ({
+  image,
+  title,
+  address,
+  occurred_at,
+  cause,
+  method,
   cardClickHandler,
-  couponClickHandler
 }: LegacyStoreCardProps) => {
-  const handleCouponClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    couponClickHandler?.();
-  };
-
   return (
-    <BottomSheetElement.BottomCard onClick={cardClickHandler} className="bottomCard">
+    <BottomSheetElement.BottomCard
+      onClick={cardClickHandler}
+      className="LegacyBottomCard"
+    >
       <BottomSheetElement.CardContent>
         <img src={image} alt={title} />
-        <div className="cardInner">
-          <div className="cardTitls">{title}</div>
-          <div className="cardPos">{address}</div>
+        <div className="cardInner"  style={{gap: "7px"}}>
+          <div className="cardDate">{occurred_at}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div className="cardTitls">{address}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <div className="cardPos">원인 | {cause}</div>
+              <div className="cardPos">복구방법 | {method}</div>
+            </div>
+          </div>
         </div>
       </BottomSheetElement.CardContent>
-      {hasCoupon && (
-        <div className="couponBox" onClick={handleCouponClick}>
-          <img src={coupon} alt="" className="coupon" />
-          <span>쿠폰</span>
-        </div>
-      )}
     </BottomSheetElement.BottomCard>
   );
 };
