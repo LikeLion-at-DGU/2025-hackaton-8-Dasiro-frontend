@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, type ReactNode } from "react";
+import React, { useState, useRef, useEffect, type ReactNode } from "react";
 import { BottomSheetElement } from "../ui";
 import sheetbar from "/images/icons/sheetbar.png";
 
 interface DraggableBottomSheetProps {
   children: ReactNode;
+  onSetHeight?: (height: number) => void;
 }
 
 const minHeight:number = 36;
@@ -19,6 +20,20 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
   const startYRef = useRef(0);
   // 드래그 시작 시 시트 높이 저장
   const startHeightRef = useRef(minHeight);
+  
+  // 외부에서 높이를 제어할 수 있는 함수
+  const setHeightFromExternal = (newHeight: number) => {
+    console.log('setHeightFromExternal called with:', newHeight);
+    setHeight(newHeight);
+  };
+
+  // 전역 함수로 노출
+  useEffect(() => {
+    (window as any).setBottomSheetHeight = setHeightFromExternal;
+    return () => {
+      delete (window as any).setBottomSheetHeight;
+    };
+  }, []);
 
   // 마우스 드래그 시작 핸들러
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -95,6 +110,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
 
   return (
     <BottomSheetElement.BottomSheetWrapper
+      id="bottomSheet"
       ref={bottomSheetRef}
       style={{ 
         height: `${height}vh`,
@@ -119,8 +135,10 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
         />
         <BottomSheetElement.BottomInner
           style={{
-            '--bottom-sheet-height': `${height}vh`
+            '--bottom-sheet-height': `${height}vh`,
+            maxHeight: `calc(var(--bottom-sheet-height) - 15.5vh)`
           } as React.CSSProperties}
+          id="bottomInner"
         >
           {children}
         </BottomSheetElement.BottomInner>
