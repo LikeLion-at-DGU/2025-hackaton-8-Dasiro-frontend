@@ -7,12 +7,7 @@ import {
 } from "@entities/report/api";
 import { clamp0to100, getAnalysisCopy } from "@features/utils/riskCopy";
 import type { ChatMessage } from "@shared/types/chat";
-
-export type PickedLocation = {
-  lat: number;
-  lng: number;
-  address?: string;
-} | null;
+import type { PickedLocation } from "../types";
 
 type Deps = {
   text: string;
@@ -38,7 +33,7 @@ export async function startAnalysisFlow({
   let analyzingId: string | null = null;
 
   try {
-    // 1) 좌표 결정: (A) 선택 좌표 → (B) 텍스트 지오코딩 → (C) 좌표 없이
+    // 1) 좌표: (A) 선택 좌표 → (B) 텍스트 지오코딩 → (C) 좌표 없이
     let latNum: number | undefined;
     let lngNum: number | undefined;
 
@@ -75,7 +70,7 @@ export async function startAnalysisFlow({
       }
     }
 
-    // 2) 문자열로 포맷
+    // 2) 문자열 포맷
     const latStr = formatCoord(latNum);
     const lngStr = formatCoord(lngNum);
 
@@ -120,7 +115,7 @@ export async function startAnalysisFlow({
       action,
     } = getAnalysisCopy(apiScore);
 
-    // 결과가 나오면 중간 멘트들 제거
+    // 진행 멘트 제거 후 결과만 남김
     setMessages((prev) =>
       prev
         .filter((m) => ![loadingId, uploadingId, analyzingId].includes(m.id))
