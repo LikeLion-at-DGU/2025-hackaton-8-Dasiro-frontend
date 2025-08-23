@@ -448,7 +448,7 @@ const ArrowLayer = styled.div`
   position: fixed;
   display: grid;
   width: 100%;
-  max-width: 375px;
+  max-width: 400px;
   height: 100%;
   align-items: center;
   z-index: 1000;
