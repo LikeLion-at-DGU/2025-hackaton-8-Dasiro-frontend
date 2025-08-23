@@ -46,7 +46,7 @@ html {
 
 body {
 	width: 100vw;
-	max-width: 375px;
+	max-width: 400px;
 	overflow: hidden;
 	background-color: white;
 	color: black;

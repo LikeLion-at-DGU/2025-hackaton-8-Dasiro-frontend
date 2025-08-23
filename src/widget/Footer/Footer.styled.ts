@@ -11,7 +11,7 @@ export const Wrapper = styled.footer`
   left: 0;
   right: 0;
   z-index: 100;
-  max-width: 375px;
+  max-width: 400px;
   margin: 0 auto;
   padding: 1.125rem 2.0625rem;
   box-shadow: 0 -6px 14px 0 rgba(47, 47, 47, 0.06);
