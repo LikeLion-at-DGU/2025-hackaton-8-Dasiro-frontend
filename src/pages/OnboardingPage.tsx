@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styled, { css } from "styled-components";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { fonts } from "@shared/styles/fonts";
+import { isOnboarded, setOnboarded } from "@features/onboarding/lib/storage";
 
 type LayoutContext = { setFooterHidden: (v: boolean) => void };
 
@@ -19,13 +20,23 @@ const DEST_PATH = "/";
 
 export default function OnboardingPage() {
   const nav = useNavigate();
+  const loc = useLocation();
   const { setFooterHidden } = useOutletContext<LayoutContext>();
   const [idx, setIdx] = useState(0);
+
+  const params = new URLSearchParams(loc.search);
+  const returnTo = params.get("return") || DEST_PATH;
 
   useEffect(() => {
     setFooterHidden(true);
     return () => setFooterHidden(false);
   }, [setFooterHidden]);
+
+  useEffect(() => {
+    if (isOnboarded()) {
+      nav(returnTo, { replace: true });
+    }
+  }, [nav, returnTo]);
 
   const slides = useMemo<Slide[]>(
     () => [
@@ -106,10 +117,16 @@ export default function OnboardingPage() {
 
   const goPrev = () => setIdx((i) => Math.max(0, i - 1));
   const goNext = () => setIdx((i) => Math.min(len - 1, i + 1));
-  const skip = () => nav(DEST_PATH);
-  const start = () => nav(DEST_PATH);
+  const jump = (i: number) => setIdx(() => Math.max(0, Math.min(len - 1, i)));
 
-  // swipe
+  const finish = () => {
+    setOnboarded(true);
+    nav(returnTo, { replace: true });
+  };
+
+  const skip = () => finish();
+  const start = () => finish();
+
   const startX = useRef<number | null>(null);
   const onTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
     startX.current = e.touches[0].clientX;
@@ -126,20 +143,36 @@ export default function OnboardingPage() {
   return (
     <Wrap onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       {hasSkip && (
-        <Skip type="button" onClick={skip}>
+        <Skip type="button" onClick={skip} aria-label="온보딩 건너뛰기">
           건너뛰기
         </Skip>
       )}
 
-      <Dots $hasSkip={hasSkip}>
+      <Dots $hasSkip={hasSkip} role="tablist" aria-label="온보딩 진행 표시">
         {slides.map((s, i) => (
-          <Dot key={s.id} $active={i === idx} />
+          <Dot
+            key={s.id}
+            $active={i === idx}
+            role="tab"
+            aria-selected={i === idx}
+            aria-controls={`slide-${s.id}`}
+            tabIndex={0}
+            onClick={() => jump(i)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") jump(i);
+            }}
+          />
         ))}
       </Dots>
 
       <Stage>
         {slides.map((s, i) => (
-          <SlidePane key={s.id} $active={i === idx} aria-hidden={i !== idx}>
+          <SlidePane
+            id={`slide-${s.id}`}
+            key={s.id}
+            $active={i === idx}
+            aria-hidden={i !== idx}
+          >
             <TitleBox>
               {s.titleLines.map((line, j) => (
                 <TitleLine key={j}>{line}</TitleLine>
@@ -148,7 +181,13 @@ export default function OnboardingPage() {
 
             <HeroBox $imgW={s.imgW} $imgH={s.imgH} $boxH={s.heroBoxH}>
               <HeroInner>
-                <img src={s.hero} alt="" />
+                <img
+                  src={s.hero}
+                  alt=""
+                  width={s.imgW}
+                  height={s.imgH}
+                  decoding="async"
+                />
               </HeroInner>
             </HeroBox>
 
@@ -185,7 +224,7 @@ const Wrap = styled.section`
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 2rem 1.5rem;
+  padding: 2rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
   min-height: 100dvh;
   background: radial-gradient(
       45% 35% at 82% 72%,
@@ -202,13 +241,16 @@ const Wrap = styled.section`
       ${({ theme }) => theme.colors.orange05} 0%,
       #ffffff 100%
     );
-
   box-shadow: 0 0 68.277px rgba(163, 113, 71, 0.08);
 `;
 
 const Skip = styled.button`
-  display: flex;
-  justify-content: flex-end;
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: 12px;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
   color: ${({ theme }) => theme.colors.black03};
   ${fonts.bodySemiB14};
   cursor: pointer;
@@ -218,17 +260,20 @@ const Dots = styled.div<{ $hasSkip: boolean }>`
   display: flex;
   justify-content: center;
   gap: 6px;
-  margin-top: ${({ $hasSkip }) => ($hasSkip ? "1rem" : "0.25rem")};
+  margin-top: ${({ $hasSkip }) => ($hasSkip ? "2.25rem" : "0.5rem")};
   margin-bottom: 1.25rem;
 `;
 
-const Dot = styled.span<{ $active: boolean }>`
+const Dot = styled.button<{ $active: boolean }>`
   width: 6px;
   height: 6px;
   border-radius: 9999px;
   background: ${({ theme }) => theme.colors.orange01};
   opacity: ${({ $active }) => ($active ? 1 : 0.3)};
   transition: opacity 0.2s;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
 `;
 
 const Stage = styled.div`
@@ -339,10 +384,9 @@ const Chevron = styled.span`
 `;
 
 const Bottom = styled.footer`
-  position: absolute;
   display: flex;
-  top: 31rem;
-  width: 85%;
+  margin-top: auto;
+  width: 100%;
 `;
 const CTA = styled.button`
   width: 100%;

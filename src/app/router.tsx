@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-//layouts
+// layouts
 import DefaultLayout from "src/shared/layouts/DefaultLayout";
 import SinkholePage from "@pages/SinkholePage";
 import RecoveryPage from "@pages/RecoveryPage";
@@ -9,11 +9,13 @@ import OnboardingPage from "@pages/OnboardingPage";
 import CitizenIntro from "@pages/CitizenIntroPage";
 import CitizenInfo from "@pages/CitizenInfoPage";
 import CitizenReport from "@pages/CitizenReportPage";
+import { onboardingGuardLoader } from "@features/onboarding/lib/onboardingGuardLoader";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <DefaultLayout />,
+    loader: onboardingGuardLoader,
     children: [
       { path: "/sinkhole", element: <SinkholePage /> },
       { path: "/", element: <RecoveryPage /> },
