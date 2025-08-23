@@ -46,8 +46,15 @@ export default function RouteSummaryCard({
             else onModeChange?.(m);
           };
 
+          const dense = selected && !!durationText;
+
           return (
-            <ButtonComp key={m} aria-pressed={selected} onClick={handleClick}>
+            <ButtonComp
+              key={m}
+              aria-pressed={selected}
+              onClick={handleClick}
+              $dense={dense}
+            >
               <S.IconContainer aria-hidden>
                 <S.IconImg
                   src={selected ? meta.activeIcon : meta.inactiveIcon}
