@@ -161,7 +161,7 @@ export async function createD3SeoulMap(config: D3SeoulMapConfig): Promise<D3Seou
             .style('top', (event.pageY - 10) + 'px');
         }
       })
-      .on('mouseleave', function(event, d) {
+      .on('mouseleave', function(_, d) {
         // 원래 색상으로 복원
         const originalColor = d3.select(this).attr('data-original-fill');
         if (originalColor) {

@@ -7,7 +7,6 @@ import { GradeSubtitle } from "@features/sinkhole-map/constants";
 import { useSelectGrade } from "@entities/sinkhole/context";
 import { MapSection } from "@features/recovery-zone";
 import { getSafezoneDistricts } from "@entities/sinkhole/api";
-import type { SafezoneDistrictItem } from "@features/sinkhole-map/constants";
 
 const StyledContainer = styled(BasicElement.Container).attrs(({ $gap }) => ({
   $columnDirection: true,
@@ -48,7 +47,7 @@ interface SafetyDescriptionProps {
 export const SafetyDescription = ({
   selectedGrade = 1,
 }: SafetyDescriptionProps) => {
-  const { searchedDistrict, isBadgeActive, viewMode, safezoneData } =
+  const { searchedDistrict, isBadgeActive } =
     useSelectGrade();
   const [safezoneDistrictNames, setSafezoneDistrictNames] = useState<string>("염창동, 신길동, 마포동");
 

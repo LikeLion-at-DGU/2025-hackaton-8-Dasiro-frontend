@@ -87,13 +87,11 @@ export const PageHeader = ({
   // CouponContext 안전하게 사용
   let couponModalPlace = null;
   let closeCouponModal = () => {};
-  let handleCouponUse = (place: any) => {};
 
   try {
     const couponContext = useCoupon();
     couponModalPlace = couponContext.couponModalPlace;
     closeCouponModal = couponContext.closeCouponModal;
-    handleCouponUse = couponContext.useCoupon;
   } catch {
     // CouponProvider가 없는 경우 기본값 사용
   }
@@ -140,11 +138,6 @@ export const PageHeader = ({
     }
   };
 
-  const handleUseCouponClick = () => {
-    if (couponModalPlace) {
-      handleCouponUse(couponModalPlace);
-    }
-  };
 
   return (
     <>
