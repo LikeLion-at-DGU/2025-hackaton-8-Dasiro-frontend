@@ -38,17 +38,19 @@ export const StoreCard = ({
   const handleKakaoClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     if (place.kakao_url) {
-      window.open(place.kakao_url, '_blank');
+      window.open(place.kakao_url, "_blank");
     }
   };
 
   return (
     <BottomSheetElement.BottomCard onClick={handleCardClick} id="bottomCard">
       <BottomSheetElement.CardContent>
-        <img
-          src={place.main_image_url || "/images/default-store.png"}
-          alt={place.name}
-        />
+        <div style={{ borderRadius: "8px", overflow: "hidden" }}>
+          <img
+            src={place.main_image_url || "/images/default-store.png"}
+            alt={place.name}
+          />
+        </div>
         <div className="cardInner">
           <div className="cardTitles">
             {place.name}{" "}
@@ -86,7 +88,9 @@ export const LegacyStoreCard = ({
       className="LegacyBottomCard"
     >
       <BottomSheetElement.CardContent>
-        <img src={image} alt={title} />
+        <div style={{ borderRadius: "8px", overflow: "hidden" }}>
+          <img src={image} alt={title} />
+        </div>
         <div className="cardInner" style={{ gap: "7px" }}>
           <div className="cardDate">{occurred_at}</div>
           <div

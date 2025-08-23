@@ -61,7 +61,8 @@ export const BottomButtonList = style(BasicElement.FlexBoxModel).attrs<{
 export const BottomCardList = style(BasicElement.FlexBoxModel).attrs(() => ({
     $gap: 18,
     $columnDirection: true,
-    $alignItems: "flex-start"
+    $alignItems: "flex-start",
+    $justifyContent: "flex-start",
 }))`
     &::-webkit-scrollbar {
         display: none;

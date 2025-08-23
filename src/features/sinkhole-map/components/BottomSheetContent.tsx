@@ -18,9 +18,18 @@ const StyledButton = style(BasicElement.Button)`
 
 interface BottomSheetContentProps {
   selectedGrade?: number;
+  onSetHeight?: (height: number) => void;
 }
 
-export const BottomSheetContent = ({ selectedGrade = 1 }: BottomSheetContentProps) => {
+export const BottomSheetContent = ({ selectedGrade = 1, onSetHeight }: BottomSheetContentProps) => {
+  const handleMinimizeSheet = () => {
+    console.log('handleMinimizeSheet called, onSetHeight:', onSetHeight);
+    // 전역 함수 사용
+    if ((window as any).setBottomSheetHeight) {
+      (window as any).setBottomSheetHeight(36);
+    }
+  };
+
   return (
     <BasicElement.Container $gap={35} $columnDirection={true}>
       <Banner />
@@ -32,6 +41,7 @@ export const BottomSheetContent = ({ selectedGrade = 1 }: BottomSheetContentProp
         $gap={10}
         $padding={[6, 20]}
         $borderRadius={50}
+        onClick={handleMinimizeSheet}
       >
         <img src={whitemarker} alt="하얀색 핀" />
         지도보기
