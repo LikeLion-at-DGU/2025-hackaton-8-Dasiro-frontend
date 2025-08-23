@@ -121,7 +121,7 @@ export default function MapWithOverlay() {
       <S.Overlay>
         <S.Card ref={cardRef}>
           <S.SwapHandle onClick={swapRoute} aria-label="출발지/도착지 바꾸기">
-            <img src="src/shared/assets/icons/switch.png" />
+            <img src="/images/icons/switch.png" />
           </S.SwapHandle>
 
           {/* 출발지 */}

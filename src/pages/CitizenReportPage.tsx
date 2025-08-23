@@ -4,28 +4,42 @@ import CitizenLayout from "@shared/ui/CitizenLayout";
 import MessageList from "@shared/ui/MessageList";
 import InputBar, { type SendPayload } from "@shared/ui/InputBar";
 import type { ChatMessage } from "@shared/types/chat";
-import { createReportWithFiles } from "@entities/report/api";
-import { clamp0to100, getAnalysisCopy } from "@features/utils/riskCopy";
 import { isThanks } from "@shared/utils/isThanks";
 
+import { looksValidAddressQuery } from "@features/citizen-report/lib/addressValidation";
+import { startAnalysisFlow } from "@features/citizen-report/lib/startAnalysis";
+
+import type {
+  AwaitingKind,
+  PickedLocation,
+  CandidatePlace,
+} from "@features/citizen-report/types";
+import { useObjectURLPool } from "@features/citizen-report/hooks/useObjectUrlPool";
+import { MSG } from "@features/citizen-report/constants/messages";
+import { limitTo3 } from "@features/citizen-report/lib/filesCount";
+import { geocodeCandidates } from "@features/citizen-report/lib/getcodeCandidates";
+import CandidatesSheet from "@features/citizen-report/ui/report/candidateSheet";
+
 type LayoutContext = { setFooterHidden: (v: boolean) => void };
-type AwaitingKind = "image" | "text" | null;
 
 export default function CitizenReportPage() {
   const navigate = useNavigate();
   const { setFooterHidden } = useOutletContext<LayoutContext>();
-  const THANKS_REPLY =
-    "도움이 되었길 바라요! 다른 지역도 궁금하면 편하게 물어보세요.";
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [awaiting, setAwaiting] = useState<AwaitingKind>(null);
-
-  // 세트 인식 보류값
+  const [_, setAwaiting] = useState<AwaitingKind>(null);
+  const [pickedLocation, setPickedLocation] = useState<PickedLocation>(null);
   const [pendingText, setPendingText] = useState<string | null>(null);
   const [pendingFiles, setPendingFiles] = useState<File[] | null>(null);
+  const [candidates, setCandidates] = useState<CandidatePlace[] | null>(null);
 
-  // 미리보기 ObjectURL 정리
-  const urlPoolRef = useRef<string[]>([]);
+  const urlPoolRef = useObjectURLPool();
+  const startingRef = useRef(false);
+
+  const append = (items: ChatMessage[]) =>
+    setMessages((prev) => [...prev, ...items]);
+  const say = (text: string) =>
+    append([{ id: crypto.randomUUID(), type: "bot", text }]);
 
   useEffect(() => {
     setFooterHidden(true);
@@ -33,142 +47,163 @@ export default function CitizenReportPage() {
   }, [setFooterHidden]);
 
   const initial = useMemo<ChatMessage[]>(
-    () => [
-      {
-        id: "m1",
-        type: "bot",
-        text:
-          "반가워요, 제보자 님!\n걷고 있는 길이 불안하게 느껴지셨나요?\n" +
-          "걱정되는 장소의 사진을 보내주시면,\n싱크홀 위험도를 분석해드릴게요.",
-      },
-    ],
+    () => [{ id: "m1", type: "bot", text: MSG.hello }],
     []
   );
   useEffect(() => setMessages(initial), [initial]);
 
-  useEffect(() => {
-    // 언마운트 시 생성한 ObjectURL 정리
-    return () => {
-      urlPoolRef.current.forEach((u) => URL.revokeObjectURL(u));
-      urlPoolRef.current = [];
-    };
-  }, []);
+  const tryStart = async (next?: {
+    loc?: PickedLocation | null;
+    text?: string | null;
+    files?: File[] | null;
+  }) => {
+    if (startingRef.current) return;
 
-  const append = (items: ChatMessage[]) =>
-    setMessages((prev) => [...prev, ...items]);
+    const loc = next?.loc ?? pickedLocation;
+    const textRaw = next?.text ?? pendingText ?? "";
+    const text = textRaw.trim();
+    const files = limitTo3(next?.files ?? pendingFiles ?? []);
 
-  // 분석 시작 -> 결과(analysis 타입 메시지 추가)
-  const startAnalysis = async (text: string, files: File[]) => {
-    const loadingId = crypto.randomUUID();
-    append([
-      {
-        id: loadingId,
-        type: "bot",
-        text: "싱크홀 위험도를 분석하고 있어요··· ",
-      },
-    ]);
+    const ok = !!loc?.lat && !!loc?.lng && !!text && files.length > 0;
+    if (!ok) return;
 
-    const res = await createReportWithFiles({ text, files });
-    const apiScore = clamp0to100(res?.risk_percentage);
-    const { score, bucket, analysis, action } = getAnalysisCopy(apiScore);
+    try {
+      startingRef.current = true;
 
-    setMessages((prev) => {
-      const withoutLoading = prev.filter((m) => m.id !== loadingId);
-      return [
-        ...withoutLoading,
-        {
-          id: crypto.randomUUID(),
-          type: "analysis",
-          meta: { score, bucket, analysis, action },
-        },
-      ];
-    });
+      // 분석 시작
+      await startAnalysisFlow({
+        text,
+        files,
+        pickedLocation: loc!,
+        append,
+        setMessages,
+        setAwaiting,
+      });
+
+      setPendingText(null);
+      setPendingFiles(null);
+      setPickedLocation(null);
+      setAwaiting("text");
+    } finally {
+      startingRef.current = false;
+    }
   };
 
+  const handlePickCandidate = async (c: CandidatePlace) => {
+    const loc: PickedLocation = { lat: c.lat, lng: c.lng, address: c.address };
+    const text = pendingText ?? c.address;
+
+    setPickedLocation(loc);
+    setPendingText(text);
+    setCandidates(null);
+    setAwaiting("image");
+    say(`'${c.placeName || c.address}'를 선택했어요.`);
+
+    if (!pendingFiles || pendingFiles.length === 0) {
+      say(MSG.askImage);
+    }
+    await tryStart({ loc, text, files: pendingFiles });
+  };
+
+  const handleCancelCandidates = () => {
+    setCandidates(null);
+    say(MSG.pickCanceled);
+    setAwaiting("text");
+  };
+
+  /* 전송 */
   const onSend = async ({ text, files }: SendPayload) => {
-    const hasText = !!text && text.trim().length > 0;
-    const hasFiles = !!files && files.length > 0;
+    if (candidates && (!text || !text.trim())) return;
+
+    const hasText = !!text?.trim();
+    const hasFiles = !!files?.length;
     if (!hasText && !hasFiles) return;
 
-    if (hasText && !hasFiles && isThanks(text)) {
+    if (hasText && !hasFiles && isThanks(text!)) {
       append([
         { id: crypto.randomUUID(), type: "user", text: text!.trim() },
-        { id: crypto.randomUUID(), type: "bot", text: THANKS_REPLY },
+        { id: crypto.randomUUID(), type: "bot", text: MSG.thanks },
       ]);
       return;
     }
 
-    // 즉시 표시용 미리보기 URL
-    const previewUrls = hasFiles
-      ? files!.map((f) => URL.createObjectURL(f))
-      : [];
-    if (previewUrls.length) urlPoolRef.current.push(...previewUrls);
+    let limited: File[] = [];
+    if (hasFiles) {
+      limited = limitTo3(files!);
+      if (files!.length > 3) say(MSG.tooMany);
+      const previews = limited.map((f) => URL.createObjectURL(f));
+      if (previews.length) {
+        urlPoolRef.current.push(...previews);
+        append([{ id: crypto.randomUUID(), type: "image", images: previews }]);
+      }
+    }
 
-    // 사용자 메시지 표시 (이미지 → 텍스트)
-    const out: ChatMessage[] = [];
-    if (hasFiles)
-      out.push({ id: crypto.randomUUID(), type: "image", images: previewUrls });
-    if (hasText)
-      out.push({ id: crypto.randomUUID(), type: "user", text: text!.trim() });
-    append(out);
+    if (hasText) {
+      append([{ id: crypto.randomUUID(), type: "user", text: text!.trim() }]);
+    }
 
-    // 세트 인식
-    const setComplete =
-      (awaiting === "image" && hasFiles) || (awaiting === "text" && hasText);
+    if (hasText) {
+      const q = text!.trim();
+      if (!looksValidAddressQuery(q)) {
+        say(MSG.askAddress);
+        setPendingText(null);
+        setAwaiting("text");
+        return;
+      }
 
-    if (hasText && hasFiles) {
-      // 한 번에 둘 다
-      setPendingText(null);
-      setPendingFiles(null);
-      setAwaiting(null);
-      await startAnalysis(text!.trim(), files!);
+      const results = await geocodeCandidates(q);
+
+      if (results.length > 1) {
+        setCandidates(results);
+        say(
+          `'${q}'으로 ${results.length}개 장소를 찾았어요.\n아래 목록에서 위치를 선택해 주세요.`
+        );
+        setPendingText(q);
+        if (limited.length) setPendingFiles(limited);
+        setAwaiting(null);
+        return;
+      }
+
+      if (results.length === 1) {
+        const r = results[0];
+        const loc: PickedLocation = {
+          lat: r.lat,
+          lng: r.lng,
+          address: r.address,
+        };
+        const t = pendingText ?? q;
+
+        setPickedLocation(loc);
+        setPendingText(t);
+        say(`위치를 '${r.placeName || r.address}'로 인식했어요.`);
+
+        if (limited.length) setPendingFiles(limited);
+
+        await tryStart({
+          loc,
+          text: t,
+          files: limited.length ? limited : pendingFiles,
+        });
+
+        if (!limited.length) {
+          setAwaiting("image");
+          say(MSG.askImage);
+        }
+        return;
+      }
+
+      say(MSG.noMatch);
+      setAwaiting("text");
       return;
     }
 
-    if (setComplete) {
-      // 이전에 요청하던 반대 타입이 이번에 도착
-      if (awaiting === "image") {
-        if (!pendingText || !hasFiles) return;
-        setPendingText(null);
-        setPendingFiles(null);
-        setAwaiting(null);
-        await startAnalysis(pendingText, files!);
-        return;
-      } else if (awaiting === "text") {
-        if (!pendingFiles?.length || !hasText) return;
-        const t = text!.trim();
-        const f = pendingFiles!;
-        setPendingFiles(null);
-        setPendingText(null);
-        setAwaiting(null);
-        await startAnalysis(t, f);
-        return;
-      }
-    }
+    // 텍스트 없이 이미지만 온 경우
+    if (limited.length) {
+      setPendingFiles(limited);
+      await tryStart({ files: limited });
 
-    // 아직 세트가 아니면 가이드
-    if (hasText && !hasFiles) {
-      setPendingText(text!.trim());
-      if (awaiting !== "image") {
-        append([
-          {
-            id: crypto.randomUUID(),
-            type: "bot",
-            text: "정확한 분석을 위해 사진도 함께 보내주세요.\n땅땅이가 꼼꼼히 살펴볼게요!",
-          },
-        ]);
-        setAwaiting("image");
-      }
-    } else if (hasFiles && !hasText) {
-      setPendingFiles(files!);
-      if (awaiting !== "text") {
-        append([
-          {
-            id: crypto.randomUUID(),
-            type: "bot",
-            text: "정확한 분석을 위해 간단한 주소도 함께 말씀해 주세요.\n땅땅이가 꼼꼼히 살펴볼게요!",
-          },
-        ]);
+      if (!pendingText) {
+        say(MSG.askImage.replace("사진도", "주소도"));
         setAwaiting("text");
       }
     }
@@ -177,7 +212,19 @@ export default function CitizenReportPage() {
   return (
     <CitizenLayout
       onClose={() => navigate(-1)}
-      footer={<InputBar onSend={onSend} onPickImage={() => {}} />}
+      footer={
+        candidates ? (
+          <CandidatesSheet
+            candidates={candidates}
+            title="해당하는 장소를 선택해 주세요"
+            subtitle="목록에서 정확한 지점을 골라주세요."
+            onPick={handlePickCandidate}
+            onCancel={handleCancelCandidates}
+          />
+        ) : (
+          <InputBar onSend={onSend} onPickImage={() => {}} />
+        )
+      }
     >
       <MessageList messages={messages} autoScroll />
     </CitizenLayout>
