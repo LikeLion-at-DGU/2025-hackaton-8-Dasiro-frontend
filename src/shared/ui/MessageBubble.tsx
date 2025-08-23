@@ -123,7 +123,7 @@ const Avatar = styled.div`
 const Bubble = styled.div<{ $variant: BubbleVariant }>`
   ${fonts.bodyMedium14};
   max-width: 90%;
-  padding: 0.94rem 1.25rem;
+  padding: 0.55rem 1.25rem;
   border-radius: 20px 20px 0 0;
   white-space: ${({ $variant }) =>
     $variant === "bot" ? "pre-line" : "normal"};

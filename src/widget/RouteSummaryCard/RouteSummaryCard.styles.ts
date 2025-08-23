@@ -3,8 +3,7 @@ import styled from "styled-components";
 
 export const Wrapper = styled.div`
   position: absolute;
-  left: 16px;
-  right: 16px;
+  width: 100%;
   pointer-events: none;
   z-index: 12;
   display: flex;
@@ -19,13 +18,13 @@ export const Container = styled.div`
   pointer-events: auto;
 `;
 
-const ButtonBase = styled.button`
+const ButtonBase = styled.button<{ $dense?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: ${({ $dense }) => ($dense ? "5px" : "10px")};
   width: 100%;
-  padding: 6px 23px;
+  padding: 6px ${({ $dense }) => ($dense ? "20px" : "23px")};
   border-radius: 50px;
   background: ${({ theme }) => theme.colors.black07};
   color: ${({ theme }) => theme.colors.black03};
@@ -39,8 +38,12 @@ const ButtonBase = styled.button`
   }
 
   @media (max-width: 320px) {
-    padding: 6px 15px;
+    padding: 6px ${({ $dense }) => ($dense ? "18px" : "15px")};
   }
+`;
+
+export const IcconText = styled.span`
+  white-space: nowrap;
 `;
 
 export const PrimaryButton = styled(ButtonBase)``;
@@ -59,5 +62,3 @@ export const IconImg = styled.img`
   user-select: none;
   pointer-events: none;
 `;
-
-export const IcconText = styled.span``;

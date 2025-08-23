@@ -86,7 +86,7 @@ const Sheet = styled.div`
   backdrop-filter: saturate(180%) blur(10px);
   ${Elevation};
   width: 100%;
-  max-width: 375px;
+  max-width: 400px;
   margin-inline: auto;
 `;
 

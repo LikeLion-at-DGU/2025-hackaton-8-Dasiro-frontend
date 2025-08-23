@@ -131,7 +131,6 @@ export default function InputBar({
           type="file"
           accept="image/*"
           multiple
-          capture="environment"
           onChange={handleFiles}
           style={{ display: "none" }}
         />
