@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { BottomSheetElement } from "../ui";
 import { FilterButton, StoreCard, LegacyStoreCard } from "../widgets";
 import { FILTER_BUTTONS } from "../constants";
-import { getNearPlaces, type Place } from "@entities/report/places";
+import { getPlaces, type Place } from "@entities/report/places";
 import { getIncidents } from "@entities/recovery/incidents";
 import { TEMP_REPAIRED_TEST_DATA, UNDER_REPAIR_TEST_DATA, STORE_TEST_DATA } from "../constants";
 import { type CardItem } from "@entities/recovery/types";
+import { mapFilterToCategory } from "../utils/categoryMapper";
 import { useRecovery } from "../context/RecoveryContext";
 import { useCoupon } from "@shared/contexts/CouponContext";
 
@@ -26,7 +27,12 @@ export const FilterButtonList = () => {
 
   // 장소 데이터 불러오기 (복구현황에 따라 다른 API 호출)
   useEffect(() => {
-    console.log('useEffect 실행:', { selectedLocation, selectedRecoveryStatus, places: places.length });
+    console.log('useEffect 실행:', { 
+      selectedLocation, 
+      selectedRecoveryStatus, 
+      selectedCategory, 
+      places: places.length 
+    });
     
     if (selectedLocation) {
       setIsLoading(true);
@@ -99,35 +105,56 @@ export const FilterButtonList = () => {
           setIsLoading(false);
         });
       } else {
-        // 복구완료나 전체일 때는 기존 places API 사용
-        getNearPlaces({
-          lat: selectedLocation.lat,
-          lng: selectedLocation.lng,
-          radius: 200,
-          category: "FOOD",
+        // 복구완료나 전체일 때는 places API 사용
+        // selectedLocation에서 구 이름 추출 (예: "서울시 중구 명동" -> "중구")
+        const sigungu = selectedLocation.address ? 
+          selectedLocation.address.split(' ').find(part => part.endsWith('구')) || "중구"
+          : "중구";
+          
+        getPlaces({
+          category: selectedCategory && selectedCategory !== "전체" ? mapFilterToCategory(selectedCategory) : undefined,
+          sigungu: sigungu,
           page: 1,
           page_size: 20
         })
         .then(response => {
           console.log('불러온 상점 데이터:', response);
-          if (response && response.items) {
-            setPlaces(response.items);
+          if (response && response.data && response.data.items && response.data.items.length > 0) {
+            // API 데이터에 클라이언트 사이드 필터링 적용
+            let filteredPlaces = response.data.items;
+            if (selectedCategory && selectedCategory !== "전체") {
+              const targetCategory = mapFilterToCategory(selectedCategory);
+              filteredPlaces = response.data.items.filter(place => place.category === targetCategory);
+            }
+            setPlaces(filteredPlaces);
           } else {
             console.warn('응답 데이터가 비어있습니다, 테스트 데이터 사용:', response);
             console.log('상점 테스트 데이터 사용:', STORE_TEST_DATA);
-            setPlaces(STORE_TEST_DATA);
+            // 테스트 데이터에도 필터링 적용
+            let filteredTestData = STORE_TEST_DATA;
+            if (selectedCategory && selectedCategory !== "전체") {
+              const targetCategory = mapFilterToCategory(selectedCategory);
+              filteredTestData = STORE_TEST_DATA.filter(place => place.category === targetCategory);
+            }
+            setPlaces(filteredTestData);
           }
         })
         .catch(error => {
-          console.error('장소 데이터 로드 실패:', error);
-          setPlaces([]);
+          console.error('장소 데이터 로드 실패, 테스트 데이터 사용:', error);
+          // 에러 시에도 테스트 데이터에 필터링 적용
+          let filteredTestData = STORE_TEST_DATA;
+          if (selectedCategory && selectedCategory !== "전체") {
+            const targetCategory = mapFilterToCategory(selectedCategory);
+            filteredTestData = STORE_TEST_DATA.filter(place => place.category === targetCategory);
+          }
+          setPlaces(filteredTestData);
         })
         .finally(() => {
           setIsLoading(false);
         });
       }
     }
-  }, [selectedLocation, selectedRecoveryStatus]);
+  }, [selectedLocation, selectedRecoveryStatus, selectedCategory]);
 
   // 쿠폰 클릭 핸들러
   const handleCouponClick = (place: Place) => {
@@ -151,8 +178,12 @@ export const FilterButtonList = () => {
       >
         {FILTER_BUTTONS.map((button, index) => {
           const getSelectedOption = () => {
-            if (button.label === "복구현황") return selectedRecoveryStatus;
-            if (button.label === "업종") return selectedCategory;
+            if (button.label === "복구현황") {
+              return selectedRecoveryStatus === "전체" ? undefined : selectedRecoveryStatus;
+            }
+            if (button.label === "업종") {
+              return selectedCategory === "전체" ? undefined : selectedCategory;
+            }
             return undefined;
           };
 
@@ -181,7 +212,6 @@ export const FilterButtonList = () => {
       {/* 복구 완료 상점 카드 목록 - 스크롤 가능한 세로 목록 */}
       <BottomSheetElement.BottomCardList
         style={{
-          maxHeight: 'calc(var(--bottom-sheet-height, 50vh) - 120px)', // 시트 높이에서 버튼과 여백 빼기
           overflowY: 'auto',
           paddingBottom: '20px',
           scrollbarWidth: 'none',
@@ -212,7 +242,7 @@ export const FilterButtonList = () => {
             // 복구완료나 전체일 때는 기존 StoreCard 사용
             return (
               <StoreCard
-                key={place.id}
+                key={place.name + place.address} // id가 없으므로 name + address를 key로 사용
                 place={place}
                 cardClickHandler={(place) => console.log(`${place.name} 카드 클릭됨`)}
                 couponClickHandler={handleCouponClick}

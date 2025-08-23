@@ -1,30 +1,44 @@
 // Recovery Zone 지도 섹션 - 서울 구별 복구 현황을 색상으로 표시하는 지도
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createD3SeoulMap } from "@shared/lib/SeoulMap/d3SeoulMap";
-import { getRecoveryColor, loadRecoveryData } from "../utils/recoveryColorResolver";
+import { getRecoveryColor, loadRecoveryData, recoveryColors } from "../utils/recoveryColorResolver";
 import { getRiskColorByDistrict } from "../utils/riskColorResolver";
 import { processSeoulDistricts } from "../utils/districtProcessor";
 import { fetchSeoulGeoJson } from "@shared/lib/SeoulMap/SeoulGeoJson";
 import { useSelectGrade } from "@entities/sinkhole/context";
 import { useRecovery } from "../context/RecoveryContext";
+import { getIncidents, type IncidentItem } from "@entities/recovery/incidents";
+import { TEMP_REPAIRED_TEST_DATA, UNDER_REPAIR_TEST_DATA } from "../constants/testData";
+import marker from "/images/icons/marker.png";
 
 
 interface MapSectionProps {
   colorMode?: "recovery" | "risk"; // 색상 모드 (복구 현황 vs 위험도)
   forceViewMode?: "grade" | "safezone"; // 강제로 viewMode 지정
+  showIncidents?: boolean; // incidents 마커 표시 여부
+  incidentStatuses?: ("UNDER_REPAIR" | "TEMP_REPAIRED" | "RECOVERED")[]; // 표시할 incident 상태
 }
 
-export const MapSection = ({ colorMode = "recovery", forceViewMode }: MapSectionProps) => {
+export const MapSection = ({ 
+  colorMode = "recovery", 
+  forceViewMode
+}: MapSectionProps) => {
   // Recovery용 Context (colorMode가 recovery일 때만 사용)
   let selectedLocation = null;
+  let selectedRecoveryStatus = "전체";
+  let places: any[] = [];
   try {
     if (colorMode === "recovery") {
       const recoveryContext = useRecovery();
       selectedLocation = recoveryContext.selectedLocation;
+      selectedRecoveryStatus = recoveryContext.selectedRecoveryStatus;
+      places = recoveryContext.places;
     }
   } catch {
     // RecoveryContext가 없는 경우
     selectedLocation = null;
+    selectedRecoveryStatus = "전체";
+    places = [];
   }
   
   // Sinkhole용 Context (colorMode가 risk일 때만 사용)
@@ -49,6 +63,95 @@ export const MapSection = ({ colorMode = "recovery", forceViewMode }: MapSection
   const mapInstanceRef = useRef<any>(null);
   // 지도가 렌더링될 DOM 컨테이너 ref
   const containerRef = useRef<HTMLDivElement>(null);
+  // incidents 데이터 상태
+  const [incidents, setIncidents] = useState<IncidentItem[]>([]);
+
+  // incidents 데이터 로드 - 복구 현황 필터에 따라 자동으로 마커 표시
+  useEffect(() => {
+    const shouldShowIncidents = colorMode === "recovery" && (selectedRecoveryStatus === "임시복구" || selectedRecoveryStatus === "복구중" || selectedRecoveryStatus === "복구완료");
+    
+    if (shouldShowIncidents) {
+      const fetchIncidents = async () => {
+        try {
+          let status: "TEMP_REPAIRED" | "UNDER_REPAIR" | "RECOVERED";
+          let testData: any[];
+          
+          if (selectedRecoveryStatus === "임시복구") {
+            status = "TEMP_REPAIRED";
+            testData = TEMP_REPAIRED_TEST_DATA;
+          } else if (selectedRecoveryStatus === "복구중") {
+            status = "UNDER_REPAIR";
+            testData = UNDER_REPAIR_TEST_DATA;
+          } else { // 복구완료
+            status = "RECOVERED";
+            // 복구완료 테스트 데이터 (testData.ts에 없으므로 임시 생성)
+            testData = [
+              {
+                id: 6,
+                occurred_at: "2024-07-01",
+                address: "서울특별시 종로구 종로 111",
+                lat: 37.5703,
+                lng: 126.9770,
+                cause: "지하수 누수",
+                method: "완전 복구",
+                status: "RECOVERED" as const,
+                images_count: 2,
+                distance_m: 50
+              },
+              {
+                id: 7,
+                occurred_at: "2024-06-20",
+                address: "서울특별시 영등포구 여의도동 222",
+                lat: 37.5219,
+                lng: 126.9245,
+                cause: "도로 침하",
+                method: "완전 복구", 
+                status: "RECOVERED" as const,
+                images_count: 1,
+                distance_m: 80
+              }
+            ];
+          }
+          
+          const response = await getIncidents([status]);
+          if (response?.data?.items && response.data.items.length > 0) {
+            setIncidents(response.data.items);
+          } else {
+            // API 데이터가 없으면 테스트 데이터 사용
+            setIncidents(testData);
+          }
+        } catch (error) {
+          console.error("Incidents 데이터 로드 실패, 테스트 데이터 사용:", error);
+          // API 호출 실패시 테스트 데이터 사용
+          let testData: any[];
+          if (selectedRecoveryStatus === "임시복구") {
+            testData = TEMP_REPAIRED_TEST_DATA;
+          } else if (selectedRecoveryStatus === "복구중") {
+            testData = UNDER_REPAIR_TEST_DATA;
+          } else { // 복구완료
+            testData = [
+              {
+                id: 6,
+                occurred_at: "2024-07-01",
+                address: "서울특별시 종로구 종로 111",
+                lat: 37.5703,
+                lng: 126.9770,
+                cause: "지하수 누수",
+                method: "완전 복구",
+                status: "RECOVERED" as const,
+                images_count: 2,
+                distance_m: 50
+              }
+            ];
+          }
+          setIncidents(testData);
+        }
+      };
+      fetchIncidents();
+    } else {
+      setIncidents([]);
+    }
+  }, [colorMode, selectedRecoveryStatus]);
 
   // 컴포넌트 마운트 시 D3 서울 지도 초기화
   useEffect(() => {
@@ -105,7 +208,44 @@ export const MapSection = ({ colorMode = "recovery", forceViewMode }: MapSection
             
             // 디버깅용 로그 (첫 번째 구역에서만 출력)
             if (name === '종로구') {
-              console.log("MapSection Debug:", { colorMode, viewMode, safezoneDataLength: safezoneData?.items?.length || 0, forceViewMode });
+              console.log("MapSection Debug:", { colorMode, viewMode, selectedRecoveryStatus, incidentsLength: incidents.length });
+            }
+            
+            // Recovery 모드에서 복구중/임시복구/복구완료 필터가 선택된 경우 해당 지역만 색칠
+            if (colorMode === "recovery" && (selectedRecoveryStatus === "임시복구" || selectedRecoveryStatus === "복구중" || selectedRecoveryStatus === "복구완료")) {
+              let hasDataInDistrict = false;
+              
+              if (selectedRecoveryStatus === "복구완료") {
+                // 복구완료일 때는 places 데이터로 확인 - 마커가 있는 모든 구역 색칠
+                hasDataInDistrict = places.some(place => {
+                  const addressParts = place.address.split(' ');
+                  const district = addressParts.find((part: string) => part.endsWith('구'));
+                  return district === name;
+                });
+              } else {
+                // 임시복구/복구중일 때는 incidents 데이터로 확인
+                hasDataInDistrict = incidents.some(incident => {
+                  const addressParts = incident.address.split(' ');
+                  const district = addressParts.find((part: string) => part.endsWith('구'));
+                  return district === name;
+                });
+              }
+              
+              if (hasDataInDistrict) {
+                // 해당 구에 데이터가 있으면 recoveryColorResolver의 색상 사용
+                let statusColor;
+                if (selectedRecoveryStatus === "임시복구") {
+                  statusColor = recoveryColors["임시복구"];
+                } else if (selectedRecoveryStatus === "복구중") {
+                  statusColor = recoveryColors["복구중"];
+                } else { // 복구완료
+                  statusColor = recoveryColors["복구완료"];
+                }
+                return statusColor;
+              } else {
+                // 데이터가 없는 구는 회색으로 비활성화
+                return "#E0E0E0";
+              }
             }
             
             // forceViewMode가 "safezone"인 경우 최우선으로 테스트 데이터 사용
@@ -171,10 +311,87 @@ export const MapSection = ({ colorMode = "recovery", forceViewMode }: MapSection
           // 색상 적용
           mapInstance.setFillColor(getDistrictColor);
           
+          // 지도 렌더링 후 즉시 마커 추가
+          const svg = mapInstance.svg;
+          
+          // 아무 필터도 선택하지 않았을 때 (전체) 현재 위치 표시
+          if (selectedRecoveryStatus === "전체" && selectedLocation) {
+            console.log("현재 위치 표시:", selectedLocation);
+            const [x, y] = mapInstance.projection([selectedLocation.lng, selectedLocation.lat]) || [0, 0];
+            
+            // 빨간색 원형 점으로 현재 위치 표시 (SafeRouteMap의 drawMyLocationDot과 동일한 스타일)
+            svg.append('circle')
+              .attr('class', 'current-location-dot')
+              .attr('cx', x)
+              .attr('cy', y)
+              .attr('r', 8) // 16px을 반지름 8로 변환
+              .attr('fill', '#FF7765')
+              .attr('stroke', '#fff6f0')
+              .attr('stroke-width', 4)
+              .style('filter', 'drop-shadow(0 0 5px rgba(255, 119, 101, 0.30))');
+            
+            console.log(`현재 위치 점 추가됨: x=${x}, y=${y}`);
+          }
+          
+          // 현재 incidents 데이터가 있으면 즉시 마커 추가
+          if (incidents.length > 0) {
+            console.log("지도 렌더링 후 즉시 마커 추가:", incidents);
+            incidents.forEach((incident, index) => {
+              const [x, y] = mapInstance.projection([incident.lng, incident.lat]) || [0, 0];
+              console.log(`즉시 마커 ${index}: lat=${incident.lat}, lng=${incident.lng}, x=${x}, y=${y}`);
+              
+              const testX = x > 0 && x < containerWidth ? x : containerWidth/2;
+              const testY = y > 0 && y < containerHeight ? y : containerHeight/2;
+              
+              svg.append('image')
+                .attr('class', 'immediate-marker')
+                .attr('x', testX - 6.4) // 중앙 정렬을 위해 width/2만큼 왼쪽으로
+                .attr('y', testY - 16) // 마커의 끝점이 위치를 가리키도록 height만큼 위로
+                .attr('width', 12.8)
+                .attr('height', 16)
+                .attr('href', marker)
+                .style('opacity', '1')
+                .style('cursor', 'pointer');
+              
+              console.log(`즉시 마커 추가됨: x=${testX}, y=${testY}`);
+            });
+          }
+          
+          // places 데이터가 있으면 즉시 마커 추가 (복구완료 필터만)
+          if (places.length > 0 && selectedRecoveryStatus === "복구완료") {
+            console.log("지도 렌더링 후 즉시 places 마커 추가:", places);
+            places.forEach((place, index) => {
+              const [x, y] = mapInstance.projection([place.lng, place.lat]) || [0, 0];
+              console.log(`즉시 places 마커 ${index}: lat=${place.lat}, lng=${place.lng}, x=${x}, y=${y}`);
+              
+              const testX = x > 0 && x < containerWidth ? x : containerWidth/2;
+              const testY = y > 0 && y < containerHeight ? y : containerHeight/2;
+              
+              svg.append('image')
+                .attr('class', 'immediate-place-marker')
+                .attr('x', testX - 6.4) // 중앙 정렬을 위해 width/2만큼 왼쪽으로
+                .attr('y', testY - 16) // 마커의 끝점이 위치를 가리키도록 height만큼 위로
+                .attr('width', 12.8)
+                .attr('height', 16)
+                .attr('href', marker)
+                .style('opacity', '1')
+                .style('cursor', 'pointer');
+              
+              console.log(`즉시 places 마커 추가됨: x=${testX}, y=${testY}`);
+            });
+          }
+          
+          
           // 구역 클릭 이벤트 리스너 추가
           containerRef.current.addEventListener('district-click', (event: any) => {
             const { district } = event.detail;
             console.log('클릭된 구:', district);
+          });
+
+          // 마커 클릭 이벤트 리스너 추가
+          containerRef.current.addEventListener('marker-click', (event: any) => {
+            const { marker } = event.detail;
+            console.log('클릭된 마커:', marker);
           });
           
           console.log("D3 서울 지도 렌더링 완료");
@@ -197,7 +414,8 @@ export const MapSection = ({ colorMode = "recovery", forceViewMode }: MapSection
         mapInstanceRef.current.destroy();
       }
     };
-  }, [selectedLocation, colorMode, selectedGradeData, safezoneData, viewMode, forceViewMode]); // 상태 변경 시 지도 재초기화
+  }, [selectedLocation, colorMode, selectedGradeData, safezoneData, viewMode, forceViewMode, selectedRecoveryStatus, incidents, places]); // 상태 변경 시 지도 재초기화
+
 
   return (
     <div 

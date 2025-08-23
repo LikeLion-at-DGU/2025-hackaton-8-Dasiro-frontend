@@ -78,7 +78,6 @@ export const ALL_INCIDENT_TEST_DATA = [
 // 복구완료/전체 상점 테스트 데이터
 export const STORE_TEST_DATA: Place[] = [
   {
-    id: 1,
     name: "테스트 식당 1",
     category: "FOOD",
     address: "서울시 중구 명동길 1",
@@ -86,11 +85,10 @@ export const STORE_TEST_DATA: Place[] = [
     lng: 126.9780,
     distance_m: 50,
     main_image_url: "/images/image351.png",
-    kakao_url: null,
-    has_active_coupons: true
+    kakao_place_id: "12345",
+    kakao_url: "https://place.map.kakao.com/12345"
   },
   {
-    id: 2,
     name: "테스트 카페 1",
     category: "CAFE",
     address: "서울시 중구 명동길 2",
@@ -98,7 +96,29 @@ export const STORE_TEST_DATA: Place[] = [
     lng: 126.9785,
     distance_m: 100,
     main_image_url: null,
-    kakao_url: null,
-    has_active_coupons: false
+    kakao_place_id: null,
+    kakao_url: null
+  },
+  {
+    name: "테스트 편의점 1",
+    category: "CONVENIENCE",
+    address: "서울시 중구 명동길 3",
+    lat: 37.5675,
+    lng: 126.9790,
+    distance_m: 120,
+    main_image_url: null,
+    kakao_place_id: null,
+    kakao_url: null
+  },
+  {
+    name: "테스트 식당 2",
+    category: "FOOD",
+    address: "서울시 중구 명동길 4",
+    lat: 37.5680,
+    lng: 126.9795,
+    distance_m: 80,
+    main_image_url: "/images/image351.png",
+    kakao_place_id: "54321",
+    kakao_url: "https://place.map.kakao.com/54321"
   }
 ];

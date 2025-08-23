@@ -155,6 +155,13 @@ export const CardContent = style(BasicElement.FlexBoxModel).attrs(() => ({
         ${({ theme }) => theme.fonts.capMedium10};
         color: ${({ theme }) => theme.colors.black04};
     }
+    .cardTitles{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: ${({ theme }) => theme.colors.black02};
+        ${({ theme }) => theme.fonts.bodyBold14};
+    }
 `;
 
 // 드롭다운 관련 요소들

@@ -10,7 +10,7 @@ export interface IncidentDisplay {
   occurred_at: string;
   cause: string;
   method: string;
-  status: "UNDER_REPAIR" | "TEMP_REPAIRED";
+  status: "UNDER_REPAIR" | "TEMP_REPAIRED" | "RECOVERED";
   images_count: number;
 }
 
@@ -32,6 +32,6 @@ export type CardItem = {
   occurred_at?: string;
   cause?: string;
   method?: string;
-  status?: "UNDER_REPAIR" | "TEMP_REPAIRED";
+  status?: "UNDER_REPAIR" | "TEMP_REPAIRED" | "RECOVERED";
   images_count?: number;
 };

@@ -1,13 +1,15 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import style from "styled-components";
 import * as BasicElement from "@shared/ui/BasicElement";
 import { MainElement } from "@features/recovery-zone/ui";
 import { LocationSetWithModal } from "./LocationSetWithModal";
+import { ToastingBox } from "@features/recovery-zone/components/ToastingBox";
 import logo from "/images/logo.png";
 import { SinkholeMainElement } from "@features/sinkhole-map";
 import { useSelectGrade } from "@entities/sinkhole/context";
 import { getSafezones } from "@entities/sinkhole/api";
 import { useCoupon } from "@shared/contexts/CouponContext";
+import { useRecovery } from "@features/recovery-zone/context/RecoveryContext";
 import { Barcode } from "./Barcode";
 import xicon from "/images/icons/x.png";
 
@@ -17,6 +19,7 @@ interface PageHeaderProps {
   searchBar?: ReactNode;
   noticeBar?: ReactNode;
   showSinkholeButton?: boolean;
+  showToast?: boolean; // 토스트 표시 여부
 }
 
 const CouponContent = style(BasicElement.Container).attrs(() => ({
@@ -81,8 +84,15 @@ export const PageHeader = ({
   searchBar,
   noticeBar,
   showSinkholeButton = false,
+  showToast = false,
 }: PageHeaderProps) => {
   const [activeButton, setActiveButton] = useState<"badge" | "layer">("layer"); // 기본값은 layer
+
+  // 토스트 메시지 상태
+  const [showToastMessage, setShowToastMessage] = useState(false);
+  const [toastFilterType, setToastFilterType] = useState<"임시복구" | "복구중">(
+    "임시복구"
+  );
 
   // CouponContext 안전하게 사용
   let couponModalPlace = null;
@@ -95,6 +105,35 @@ export const PageHeader = ({
   } catch {
     // CouponProvider가 없는 경우 기본값 사용
   }
+
+  // RecoveryContext 안전하게 사용 (토스트 표시를 위해)
+  let selectedRecoveryStatus = "전체";
+  try {
+    if (showToast) {
+      const recoveryContext = useRecovery();
+      selectedRecoveryStatus = recoveryContext.selectedRecoveryStatus;
+    }
+  } catch {
+    // RecoveryProvider가 없는 경우 기본값 사용
+  }
+
+  // 복구현황 변경 감지해서 토스트 표시
+  useEffect(() => {
+    if (
+      showToast &&
+      (selectedRecoveryStatus === "임시복구" ||
+        selectedRecoveryStatus === "복구중")
+    ) {
+      setToastFilterType(selectedRecoveryStatus as "임시복구" | "복구중");
+      setShowToastMessage(true);
+      const timer = setTimeout(() => {
+        setShowToastMessage(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowToastMessage(false);
+    }
+  }, [selectedRecoveryStatus, showToast]);
 
   // Sinkhole 컨텍스트 (showSinkholeButton이 true일 때만 사용)
   let sinkholeContext: any = null;
@@ -138,7 +177,6 @@ export const PageHeader = ({
     }
   };
 
-
   return (
     <>
       <MainElement.TopWrapper id="top-wrapper">
@@ -146,11 +184,19 @@ export const PageHeader = ({
           <img
             src={logo}
             alt="로고"
-            style={{ width: "60px", height: "27.961px" }}
+            style={{ 
+              width: "60px", 
+              height: "27.961px",
+              display: showToastMessage ? "none" : "block"
+            }}
           />
           {showLocationSet && (
-            <LocationSetWithModal initialLocationText={locationSetText} />
+            <div style={{ display: showToastMessage ? "none" : "block" }}>
+              <LocationSetWithModal initialLocationText={locationSetText} />
+            </div>
           )}
+          {/* 토스트 메시지 - TopBar 안에 표시 */}
+          {showToastMessage && <ToastingBox filterType={toastFilterType} />}
         </MainElement.TopBar>
 
         {searchBar && searchBar}
@@ -174,7 +220,11 @@ export const PageHeader = ({
       {/* 쿠폰 모달 */}
       {couponModalPlace && (
         <MainElement.ModalOverlay onClick={handleCouponModalClose}>
-          <CouponContent id="coupon-modal" onClick={(e) => e.stopPropagation()} style={{gap: "0px"}}>
+          <CouponContent
+            id="coupon-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ gap: "0px" }}
+          >
             <div
               style={{
                 display: "flex",
@@ -191,13 +241,14 @@ export const PageHeader = ({
                 onClick={handleCouponModalClose}
               />
             </div>
-            <div style={{display: "flex", gap: "30px", flexDirection: "column"}}>
+            <div
+              style={{ display: "flex", gap: "30px", flexDirection: "column" }}
+            >
               <div id="notice">
                 <img
                   src={logo}
                   alt="로고"
                   style={{ width: "77.25px", height: "36px" }}
-                  
                 />
               </div>
               <div id="coupon-wrapper">
@@ -206,13 +257,23 @@ export const PageHeader = ({
                   쿠폰 발급 및 사용 기간 : 2025.07.01 ~ 07.31
                 </p>
               </div>
-              <div style={{ display: "flex", justifyContent: "center", paddingBottom: "25px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  paddingBottom: "25px",
+                }}
+              >
                 <Barcode
-                  data={`COUPON-${couponModalPlace?.id || 'DEFAULT'}-${Date.now()}`}
+                  data={`COUPON-${
+                    couponModalPlace?.name || "DEFAULT"
+                  }-${Date.now()}`}
                   width={200}
                   height={60}
                   showText={true}
-                  text={`${String(couponModalPlace?.id || '001').padStart(3, '0')}-${String(Date.now()).slice(-6)}`}
+                  text={`${String(
+                    couponModalPlace?.name?.slice(0, 3) || "001"
+                  )}-${String(Date.now()).slice(-6)}`}
                   barColor="#333"
                   backgroundColor="transparent"
                 />

@@ -36,11 +36,11 @@ export const getRecoveryColor = (districtName?: string): string => {
 
   // API 데이터가 있으면 사용
   if (apiRecoveryData && maxCounts) {
-    const district = apiRecoveryData.find(d => d.sigungu === districtName);
-    if (district) {
+    const districtData = apiRecoveryData.find(d => d.sigungu === districtName);
+    if (districtData && districtData.recovery_counts) {
       // theme을 직접 접근할 수 없으므로 colors 객체 사용
       const theme = { colors };
-      return getRegionColor(district.recovery_counts, maxCounts, theme);
+      return getRegionColor(districtData.recovery_counts, maxCounts, theme);
     }
   }
 

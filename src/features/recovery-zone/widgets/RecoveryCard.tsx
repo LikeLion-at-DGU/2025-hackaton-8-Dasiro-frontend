@@ -44,12 +44,10 @@ export const StoreCard = ({
           <div className="cardPos">{place.address}</div>
         </div>
       </BottomSheetElement.CardContent>
-      {place.has_active_coupons && (
-        <div className="couponBox" onClick={handleCouponClick}>
-          <img src={coupon} alt="" className="coupon" />
-          <span>쿠폰</span>
-        </div>
-      )}
+      <div className="couponBox" onClick={handleCouponClick}>
+        <img src={coupon} alt="" className="coupon" />
+        <span>쿠폰</span>
+      </div>
     </BottomSheetElement.BottomCard>
   );
 };
