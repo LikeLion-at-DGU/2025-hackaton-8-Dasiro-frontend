@@ -48,8 +48,8 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
       // 드래그 거리를 vh 단위로 변환
       const deltaY = startYRef.current - e.clientY;
       const deltaVh = (deltaY / window.innerHeight) * 100;
-      // 최소 42.3vh, 최대 100vh 범위로 제한
-      const newHeight = Math.max(36, Math.min(100, startHeightRef.current + deltaVh));
+      // 최소 36vh, 최대 100vh 범위로 제한
+      const newHeight = Math.max(minHeight, Math.min(100, startHeightRef.current + deltaVh));
       
       console.log('Mouse move - newHeight:', newHeight);
       setHeight(newHeight);
@@ -64,7 +64,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
       const deltaY = startYRef.current - e.touches[0].clientY;
       const deltaVh = (deltaY / window.innerHeight) * 100;
       // 최소 42.3vh, 최대 100vh 범위로 제한
-      const newHeight = Math.max(42.3, Math.min(100, startHeightRef.current + deltaVh));
+      const newHeight = Math.max(minHeight, Math.min(100, startHeightRef.current + deltaVh));
       
       console.log('Touch move - newHeight:', newHeight);
       setHeight(newHeight);

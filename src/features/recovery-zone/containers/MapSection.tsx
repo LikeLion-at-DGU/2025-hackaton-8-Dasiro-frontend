@@ -92,7 +92,7 @@ export const MapSection = ({ colorMode = "recovery", forceViewMode }: MapSection
           
           // GeoJSON을 구별 데이터 객체로 변환
           const districtsData = processSeoulDistricts(geoJsonData);
-          console.log("서울 구별 데이터:", districtsData);
+          // console.log("서울 구별 데이터:", districtsData);
 
           // 색상 모드에 따라 구별 색상 결정
           const getDistrictColor = (feature: any) => {

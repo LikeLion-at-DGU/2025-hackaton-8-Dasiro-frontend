@@ -1,10 +1,15 @@
 import { useState, type ReactNode } from "react";
+import style from "styled-components";
+import * as BasicElement from "@shared/ui/BasicElement";
 import { MainElement } from "@features/recovery-zone/ui";
 import { LocationSetWithModal } from "./LocationSetWithModal";
 import logo from "/images/logo.png";
 import { SinkholeMainElement } from "@features/sinkhole-map";
 import { useSelectGrade } from "@entities/sinkhole/context";
 import { getSafezones } from "@entities/sinkhole/api";
+import { useCoupon } from "@shared/contexts/CouponContext";
+import { Barcode } from "./Barcode";
+import xicon from "/images/icons/x.png";
 
 interface PageHeaderProps {
   showLocationSet?: boolean;
@@ -14,6 +19,62 @@ interface PageHeaderProps {
   showSinkholeButton?: boolean;
 }
 
+const CouponContent = style(BasicElement.Container).attrs(() => ({
+  $borderRadius: 12,
+  $columnDirection: true,
+  $alignItems: "center",
+  $gap: 16,
+  $backgroundColor: "#fafafa",
+}))`
+  z-index: 1001;
+  min-width: 270px;
+  max-width: 320px;
+  box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.1);
+  position: relative;
+  
+  /* 마스크를 사용하여 양쪽 끝에 원형 클리핑 */
+  mask: 
+    radial-gradient(circle 12px at -12px 175px, transparent 12px, black 12px),
+    radial-gradient(circle 12px at calc(100% + 12px) 175px, transparent 12px, black 12px);
+  mask-composite: intersect;
+  -webkit-mask: 
+    radial-gradient(circle 12px at -12px 175px, transparent 12px, black 12px),
+    radial-gradient(circle 12px at calc(100% + 12px) 175px, transparent 12px, black 12px);
+  -webkit-mask-composite: source-in;
+  
+  #notice{
+    text-align: center;
+    color: ${({ theme }) => theme.colors.black01};
+    ${({ theme }) => theme.fonts.subExtra16};
+    gap: 30px;
+  }
+  .content{
+    text-align: center;
+    color: ${({ theme }) => theme.colors.black02};
+    ${({ theme }) => theme.fonts.capSemi12};
+  }
+  
+  #coupon-wrapper{
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 15px;
+    border-bottom: 3px dashed #E1E1E1;
+    padding-bottom: 20px;
+    
+    .coupon-title{
+      color: ${({ theme }) => theme.colors.black01};
+      ${({ theme }) => theme.fonts.subExtra16};
+    }
+    .content{
+      color: ${({ theme }) => theme.colors.black02};
+      ${({ theme }) => theme.fonts.bodySemiB14};
+    }
+  }
+`;
+
 export const PageHeader = ({
   showLocationSet = false,
   locationSetText = "위치 설정",
@@ -22,7 +83,21 @@ export const PageHeader = ({
   showSinkholeButton = false,
 }: PageHeaderProps) => {
   const [activeButton, setActiveButton] = useState<"badge" | "layer">("layer"); // 기본값은 layer
-  
+
+  // CouponContext 안전하게 사용
+  let couponModalPlace = null;
+  let closeCouponModal = () => {};
+  let handleCouponUse = (place: any) => {};
+
+  try {
+    const couponContext = useCoupon();
+    couponModalPlace = couponContext.couponModalPlace;
+    closeCouponModal = couponContext.closeCouponModal;
+    handleCouponUse = couponContext.useCoupon;
+  } catch {
+    // CouponProvider가 없는 경우 기본값 사용
+  }
+
   // Sinkhole 컨텍스트 (showSinkholeButton이 true일 때만 사용)
   let sinkholeContext: any = null;
   try {
@@ -35,7 +110,7 @@ export const PageHeader = ({
 
   const handleButtonClick = async (type: "badge" | "layer") => {
     setActiveButton(type);
-    
+
     if (type === "badge" && sinkholeContext) {
       // badge 버튼 클릭 시 안심존 데이터 조회
       sinkholeContext.setIsBadgeActive(true);
@@ -58,6 +133,19 @@ export const PageHeader = ({
     }
   };
 
+  // 쿠폰 모달 관련 핸들러
+  const handleCouponModalClose = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      closeCouponModal();
+    }
+  };
+
+  const handleUseCouponClick = () => {
+    if (couponModalPlace) {
+      handleCouponUse(couponModalPlace);
+    }
+  };
+
   return (
     <>
       <MainElement.TopWrapper id="top-wrapper">
@@ -68,9 +156,7 @@ export const PageHeader = ({
             style={{ width: "60px", height: "27.961px" }}
           />
           {showLocationSet && (
-            <LocationSetWithModal
-              initialLocationText={locationSetText}
-            />
+            <LocationSetWithModal initialLocationText={locationSetText} />
           )}
         </MainElement.TopBar>
 
@@ -78,11 +164,68 @@ export const PageHeader = ({
         {noticeBar && noticeBar}
         {showSinkholeButton && (
           <div id="sinkhole-button">
-            {SinkholeMainElement.SinkholeButton("layer", activeButton === "layer", () => handleButtonClick("layer"))}
-            {SinkholeMainElement.SinkholeButton("badge", activeButton === "badge", () => handleButtonClick("badge"))}
+            {SinkholeMainElement.SinkholeButton(
+              "layer",
+              activeButton === "layer",
+              () => handleButtonClick("layer")
+            )}
+            {SinkholeMainElement.SinkholeButton(
+              "badge",
+              activeButton === "badge",
+              () => handleButtonClick("badge")
+            )}
           </div>
         )}
       </MainElement.TopWrapper>
+
+      {/* 쿠폰 모달 */}
+      {couponModalPlace && (
+        <MainElement.ModalOverlay onClick={handleCouponModalClose}>
+          <CouponContent id="coupon-modal" onClick={(e) => e.stopPropagation()} style={{gap: "0px"}}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                paddingTop: "12px",
+                paddingRight: "12px",
+                width: "100%",
+              }}
+            >
+              <img
+                src={xicon}
+                alt="x"
+                style={{ width: "24px", aspectRatio: "1/1", cursor: "pointer" }}
+              />
+            </div>
+            <div style={{display: "flex", gap: "30px", flexDirection: "column"}}>
+              <div id="notice">
+                <img
+                  src={logo}
+                  alt="로고"
+                  style={{ width: "77.25px", height: "36px" }}
+                />
+              </div>
+              <div id="coupon-wrapper">
+                <div className="coupon-title">카페 미묘 10% 할인쿠폰</div>
+                <p className="content">
+                  쿠폰 발급 및 사용 기간 : 2025.07.01 ~ 07.31
+                </p>
+              </div>
+              <div style={{ display: "flex", justifyContent: "center", paddingBottom: "25px" }}>
+                <Barcode
+                  data={`COUPON-${couponModalPlace?.id || 'DEFAULT'}-${Date.now()}`}
+                  width={200}
+                  height={60}
+                  showText={true}
+                  text={`${String(couponModalPlace?.id || '001').padStart(3, '0')}-${String(Date.now()).slice(-6)}`}
+                  barColor="#333"
+                  backgroundColor="transparent"
+                />
+              </div>
+            </div>
+          </CouponContent>
+        </MainElement.ModalOverlay>
+      )}
     </>
   );
 };

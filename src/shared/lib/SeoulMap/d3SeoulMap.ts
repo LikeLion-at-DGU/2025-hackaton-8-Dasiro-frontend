@@ -103,11 +103,11 @@ export async function createD3SeoulMap(config: D3SeoulMapConfig): Promise<D3Seou
   const render = async (geoData?: FC) => {
     const data = geoData || await fetchSeoulGeoJson();
     
-    console.log('D3 Map Render:', { width, height, features: data.features.length });
+    // console.log('D3 Map Render:', { width, height, features: data.features.length });
     
     // 서울 지도에 최적화된 고정 스케일 사용 - 여백을 위해 스케일 축소
     const seoulScale = Math.min(width, height) * 140; // 180에서 140으로 축소하여 여백 확보
-    console.log('Seoul Scale:', seoulScale);
+    // console.log('Seoul Scale:', seoulScale);
     
     projection
       .center([126.9780, 37.5665]) // 서울 중심좌표 고정
@@ -124,7 +124,7 @@ export async function createD3SeoulMap(config: D3SeoulMapConfig): Promise<D3Seou
       .append('path')
       .attr('d', (d: any) => {
         const pathData = path(d);
-        console.log('Path data for', d.properties?.name, ':', pathData?.substring(0, 50));
+        // console.log('Path data for', d.properties?.name, ':', pathData?.substring(0, 50));
         return pathData;
       })
       .attr('fill', fillColor)
@@ -133,7 +133,7 @@ export async function createD3SeoulMap(config: D3SeoulMapConfig): Promise<D3Seou
       .attr('class', 'district')
       .style('cursor', 'pointer');
       
-    console.log('Districts created:', districts.size());
+    // console.log('Districts created:', districts.size());
 
     // 현재 색상 함수는 전역 변수 사용
 
@@ -180,7 +180,7 @@ export async function createD3SeoulMap(config: D3SeoulMapConfig): Promise<D3Seou
       })
       .on('click', function(event, d) {
         const districtName = d.properties?.name || d.properties?.SIG_KOR_NM || 'Unknown';
-        console.log('Clicked district:', districtName);
+        // console.log('Clicked district:', districtName);
         
         // 커스텀 이벤트 발생
         const customEvent = new CustomEvent('district-click', {

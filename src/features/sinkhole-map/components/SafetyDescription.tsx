@@ -80,9 +80,9 @@ export const SafetyDescription = ({
   }, [isBadgeActive]);
 
   // 디버깅용 로그
-  console.log("SafetyDescription - isBadgeActive:", isBadgeActive);
-  console.log("SafetyDescription - viewMode:", viewMode);
-  console.log("SafetyDescription - safezoneData:", safezoneData);
+  // console.log("SafetyDescription - isBadgeActive:", isBadgeActive);
+  // console.log("SafetyDescription - viewMode:", viewMode);
+  // console.log("SafetyDescription - safezoneData:", safezoneData);
 
   // badge 모드일 때와 일반 모드일 때 다른 내용 표시
   if (isBadgeActive) {
