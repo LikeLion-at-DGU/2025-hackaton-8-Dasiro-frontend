@@ -11,7 +11,7 @@ import type {
 } from "../../features/recovery-zone/types/ui";
 
 // 디자인 기준 화면 너비 (px)
-const DESIGN_WIDTH = 375;
+const DESIGN_WIDTH = 400;
 
 // 유틸리티 함수들
 
@@ -19,20 +19,21 @@ const DESIGN_WIDTH = 375;
 const formatSpacing = (value?: number | number[]) => {
   if (!value) return "0px";
   if (typeof value === "number") return `${value}px`;
-  return value.map(v => `${v}px`).join(" ");
+  return value.map((v) => `${v}px`).join(" ");
 };
 
 // 너비 값을 퍼센트 또는 문자열로 포맷팅하는 함수
 const formatWidth = (width?: number | string) => {
   if (!width) return "100%";
   if (typeof width === "string") return width;
-  return `${width / DESIGN_WIDTH * 100}%`;
+  return `${(width / DESIGN_WIDTH) * 100}%`;
 };
 
 // 기본 레이아웃 컴포넌트 - Flexbox 기반 레이아웃
 export const FlexLayout = style.div<FlexLayoutProps>`
   display: flex;
-  flex-direction: ${({ $columnDirection }) => $columnDirection ? "column" : "row"};
+  flex-direction: ${({ $columnDirection }) =>
+    $columnDirection ? "column" : "row"};
   align-items: ${({ $alignItems }) => $alignItems || "center"};
   justify-content: ${({ $justifyContent }) => $justifyContent || "center"};
   width: ${({ $width }) => formatWidth($width)};
@@ -42,12 +43,13 @@ export const FlexLayout = style.div<FlexLayoutProps>`
 export const BoxModel = style.div<BoxModelProps>`
   padding: ${({ $padding }) => formatSpacing($padding)};
   margin: ${({ $margin }) => formatSpacing($margin)};
-  gap: ${({ $gap }) => $gap ? `${$gap}px` : "0px"};
+  gap: ${({ $gap }) => ($gap ? `${$gap}px` : "0px")};
 `;
 
 // 시각적 스타일 컴포넌트 - 색상, 테두리, 그림자 등
 export const Visual = style.div<VisualProps>`
-  background-color: ${({ $backgroundColor }) => $backgroundColor || "transparent"};
+  background-color: ${({ $backgroundColor }) =>
+    $backgroundColor || "transparent"};
   color: ${({ $textColor }) => $textColor || "inherit"};
   border-radius: ${({ $borderRadius }) => formatSpacing($borderRadius)};
   border: ${({ $border }) => $border || "none"};
@@ -60,12 +62,13 @@ export const Visual = style.div<VisualProps>`
 export const FlexBoxModel = style(FlexLayout)<FlexBoxModelProps>`
   padding: ${({ $padding }) => formatSpacing($padding)};
   margin: ${({ $margin }) => formatSpacing($margin)};
-  gap: ${({ $gap }) => $gap ? `${$gap}px` : "0px"};
+  gap: ${({ $gap }) => ($gap ? `${$gap}px` : "0px")};
 `;
 
 // 범용 컨테이너 컴포넌트 - 레이아웃, 박스 모델, 시각적 스타일 모두 포함
 export const Container = style(FlexBoxModel)<ContainerProps>`
-  background-color: ${({ $backgroundColor }) => $backgroundColor || "transparent"};
+  background-color: ${({ $backgroundColor }) =>
+    $backgroundColor || "transparent"};
   color: ${({ $textColor }) => $textColor || "inherit"};
   border-radius: ${({ $borderRadius }) => formatSpacing($borderRadius)};
   border: ${({ $border }) => $border || "none"};
@@ -77,7 +80,9 @@ export const Button = style(Container)<ButtonProps>`
   cursor: ${({ $cursor }) => $cursor || "pointer"};
   transition: opacity 0.2s ease;
   
-  ${({ $hover }) => $hover && `
+  ${({ $hover }) =>
+    $hover &&
+    `
     &:hover {
       opacity: 1;
     }
@@ -92,12 +97,13 @@ export const Card = style(Container)<CardProps>`
 // 오버레이 컴포넌트 - 위치 지정 가능한 절대/상대 위치 요소
 export const Overlay = style.div<OverlayProps>`
   position: ${({ $position }) => $position || "absolute"};
-  top: ${({ $top }) => $top ? `${$top}px` : "auto"};
-  left: ${({ $left }) => $left ? `${$left}px` : "auto"};
-  bottom: ${({ $bottom }) => $bottom ? `${$bottom}px` : "auto"};
-  right: ${({ $right }) => $right ? `${$right}px` : "auto"};
+  top: ${({ $top }) => ($top ? `${$top}px` : "auto")};
+  left: ${({ $left }) => ($left ? `${$left}px` : "auto")};
+  bottom: ${({ $bottom }) => ($bottom ? `${$bottom}px` : "auto")};
+  right: ${({ $right }) => ($right ? `${$right}px` : "auto")};
   z-index: ${({ $zIndex }) => $zIndex || 1};
-  background-color: ${({ $backgroundColor }) => $backgroundColor || "transparent"};
+  background-color: ${({ $backgroundColor }) =>
+    $backgroundColor || "transparent"};
   color: ${({ $textColor }) => $textColor || "inherit"};
   border-radius: ${({ $borderRadius }) => formatSpacing($borderRadius)};
   border: ${({ $border }) => $border || "none"};
