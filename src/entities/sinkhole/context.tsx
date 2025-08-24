@@ -14,6 +14,8 @@ interface SelectGradeContextType {
   setSearchedDistrict: (data: DistrictSearchItem | null) => void;
   isBadgeActive: boolean;
   setIsBadgeActive: (active: boolean) => void;
+  selectedGrade: number | null;
+  setSelectedGrade: (grade: number | null) => void;
 }
 
 const SelectGradeContext = createContext<SelectGradeContextType | undefined>(undefined);
@@ -28,6 +30,7 @@ export const SelectGradeProvider = ({ children }: SelectGradeProviderProps) => {
   const [viewMode, setViewMode] = useState<"grade" | "safezone">("grade");
   const [searchedDistrict, setSearchedDistrict] = useState<DistrictSearchItem | null>(null);
   const [isBadgeActive, setIsBadgeActive] = useState<boolean>(false);
+  const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
 
   return (
     <SelectGradeContext.Provider value={{ 
@@ -40,7 +43,9 @@ export const SelectGradeProvider = ({ children }: SelectGradeProviderProps) => {
       searchedDistrict,
       setSearchedDistrict,
       isBadgeActive,
-      setIsBadgeActive
+      setIsBadgeActive,
+      selectedGrade,
+      setSelectedGrade
     }}>
       {children}
     </SelectGradeContext.Provider>

@@ -1,10 +1,7 @@
 // Recovery Zone 페이지 - 복구 상권 현황을 보여주는 메인 페이지
 import * as S from "@widget/MapWithOverlay/MapWithOverlay.styles";
-import { PageHeader, SearchBar } from "@shared/components";
-import {
-  MainElement,
-  BackgroundCircles,
-} from "@features/recovery-zone";
+import { PageHeader, SearchBar, BackgroundCircles } from "@shared/components";
+import { SinkholeMainElement as MainElement } from "@features/sinkhole-map";
 import { SinkholeMapSection } from "@features/sinkhole-map/containers/SinkholeMapSection";
 import { BottomSheet } from "@features/sinkhole-map/containers/BottomSheet";
 import { SelectGradeProvider, useSelectGrade } from "@entities/sinkhole/context";
