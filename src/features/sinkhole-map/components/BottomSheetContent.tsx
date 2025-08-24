@@ -16,15 +16,8 @@ const StyledButton = style(BasicElement.Button)`
   }
 `;
 
-interface BottomSheetContentProps {
-  selectedGrade?: number;
-  onSetHeight?: (height: number) => void;
-}
-
-export const BottomSheetContent = ({ selectedGrade = 1, onSetHeight }: BottomSheetContentProps) => {
+export const BottomSheetContent = () => {
   const handleMinimizeSheet = () => {
-    console.log('handleMinimizeSheet called, onSetHeight:', onSetHeight);
-    // 전역 함수 사용
     if ((window as any).setBottomSheetHeight) {
       (window as any).setBottomSheetHeight(36);
     }
@@ -33,8 +26,8 @@ export const BottomSheetContent = ({ selectedGrade = 1, onSetHeight }: BottomShe
   return (
     <BasicElement.Container $gap={35} $columnDirection={true}>
       <Banner />
-      <GradeInfo selectedGrade={selectedGrade} />
-      <SafetyDescription selectedGrade={selectedGrade} />
+      <GradeInfo />
+      <SafetyDescription />
       <SafezoneInfo />
       <StyledButton
         $width={"fit-content"}

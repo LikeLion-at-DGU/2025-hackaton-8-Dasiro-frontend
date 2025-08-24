@@ -3,11 +3,22 @@ import style from "styled-components";
 import badge from "/images/icons/badge.png";
 import layer from "/images/icons/layer.png";
 import nolayer from "/images/icons/nolayer.png";
-import { MainElement as RecoveryMainElement } from "@features/recovery-zone";
 
-// recovery-zone의 MainElement 재사용
-export const MainWrapper = RecoveryMainElement.MainWrapper;
-export const MainContent = RecoveryMainElement.MainContent;
+// 싱크홀 페이지 전용 메인 레이아웃
+export const MainWrapper = style(BasicElement.FlexBoxModel).attrs(() => ({
+  $columnDirection: true,
+  $alignItems: "flex-end",
+  $width: 336,
+  $gap: 30,
+}))`
+#sinkhole-button{
+  display: flex;
+  gap: 10px;
+}`;
+
+export const MainContent = style(BasicElement.FlexBoxModel).attrs(() => ({
+  $gap: 30,
+}))``;
 
 export const SelectButton = style(BasicElement.Button).attrs<{
   $isActive?: boolean;
