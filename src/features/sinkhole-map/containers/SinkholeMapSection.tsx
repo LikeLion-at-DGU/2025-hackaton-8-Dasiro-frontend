@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { BaseMapSection, CaptionContent } from "@shared/components/BaseMapSection";
 import { getRiskColorByDistrict } from "@features/sinkhole-map/utils/riskColorResolver";
 import { SAFEZONE_TEST_DATA } from "@features/sinkhole-map/constants";
-import { useSelectGrade } from "@entities/sinkhole/context";
 
 const RiskCaption = () => {
   console.log("RiskCaption 렌더링됨 - 이 로그가 보이면 캡션이 화면에 표시되고 있는 것입니다.");
