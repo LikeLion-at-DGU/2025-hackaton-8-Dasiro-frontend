@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { BaseMapSection, CaptionContent } from "@shared/components/BaseMapSection";
 import { getRiskColorByDistrict } from "@features/sinkhole-map/utils/riskColorResolver";
 import { SAFEZONE_TEST_DATA } from "@features/sinkhole-map/constants";
+import { useSelectGrade } from "@entities/sinkhole/context";
+
 
 const RiskCaption = () => {
   console.log("RiskCaption 렌더링됨 - 이 로그가 보이면 캡션이 화면에 표시되고 있는 것입니다.");
@@ -83,8 +85,8 @@ export const SinkholeMapSection = ({
           } else if (safezoneItem.final_grade === "G2") {
             return "rgba(139, 195, 74, 0.7)"; // 2등급 - 연한 초록색 (안전)
           }
-          // fallback
-          return getRiskColorByDistrict(name, districtsData);
+          // 정의되지 않은 등급은 회색으로 표시
+          return "rgba(224, 224, 224, 0.7)";
         } else {
           // 안심존이 아닌 구는 회색으로 비활성화 (opacity 0.7 적용)
           return "rgba(224, 224, 224, 0.7)";
