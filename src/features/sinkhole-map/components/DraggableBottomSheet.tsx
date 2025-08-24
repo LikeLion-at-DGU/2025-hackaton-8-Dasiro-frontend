@@ -79,6 +79,21 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     };
   }, [isDragging, height]);
 
+  const handleInnerWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (height < 100) {
+      e.preventDefault();
+      setHeight(100);
+    }
+  };
+
+  const handleInnerTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (height < 100) {
+      e.preventDefault();
+      e.stopPropagation();
+      setHeight(100);
+    }
+  };
+
   return (
     <BottomSheetElement.BottomSheetWrapper
       id="bottomSheet"
@@ -104,6 +119,8 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
           } as React.CSSProperties}
           id="bottomInner"
           onTouchStart={(e) => e.stopPropagation()}
+          onWheel={handleInnerWheel}
+          onTouchMove={handleInnerTouchMove}
         >
           {children}
         </BottomSheetElement.BottomInner>
