@@ -34,3 +34,6 @@ export type AnalyzeReportData = {
   sent_to?: string;
   sent_at?: string;
 };
+
+export type PresignReq = { file_name: string; file_type: string };
+export type PresignRes = { upload_url: string; file_url: string };

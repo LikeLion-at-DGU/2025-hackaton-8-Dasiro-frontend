@@ -239,7 +239,7 @@ export default function DestinationSearch({
                           <S.ItemTop>
                             <S.ItemIcon>
                               <img
-                                src="src/shared/assets/icons/location-pin.png"
+                                src="images/icons/location-pin.png"
                                 alt="최근 검색 아이콘"
                                 width={12}
                                 height={16}

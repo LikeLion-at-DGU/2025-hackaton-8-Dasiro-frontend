@@ -60,7 +60,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
   // 주의사항 카드
   if (msg.type === "cautions") {
     return (
-      <Row $side="left" $noAvatar>
+      <Row $side="left" $noAvatar $padBottom>
         <InfoCard variant="cautions" />
       </Row>
     );
@@ -85,7 +85,11 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
   );
 }
 
-const Row = styled.div<{ $side: "left" | "right"; $noAvatar?: boolean }>`
+const Row = styled.div<{
+  $side: "left" | "right";
+  $noAvatar?: boolean;
+  $padBottom?: boolean;
+}>`
   display: flex;
   width: 100%;
   flex-direction: ${({ $side }) => ($side === "left" ? "column" : "row")};
@@ -93,6 +97,8 @@ const Row = styled.div<{ $side: "left" | "right"; $noAvatar?: boolean }>`
   justify-content: ${({ $side }) =>
     $side === "right" ? "flex-end" : "flex-start"};
   align-items: flex-start;
+
+  padding-bottom: ${({ $padBottom }) => ($padBottom ? "3rem" : "0")};
 `;
 
 const AvatarWrapper = styled.div`

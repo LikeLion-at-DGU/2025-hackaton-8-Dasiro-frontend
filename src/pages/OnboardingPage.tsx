@@ -184,7 +184,12 @@ export default function OnboardingPage() {
               ))}
             </TitleBox>
 
-            <HeroBox $imgW={s.imgW} $imgH={s.imgH} $boxH={s.heroBoxH}>
+            <HeroBox
+              $imgW={s.imgW}
+              $imgH={s.imgH}
+              $boxH={s.heroBoxH}
+              $last={i === len - 1}
+            >
               <HeroInner>
                 <img
                   src={s.hero}
@@ -332,6 +337,8 @@ const Content = styled.div`
   position: relative;
   height: 100%;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 `;
 
 const SlidePane = styled.article<{ $active: boolean; $last: boolean }>`
@@ -365,15 +372,20 @@ const Accent = styled.span`
   color: ${({ theme }) => theme.colors.orange01};
 `;
 
-const HeroBox = styled.div<{ $imgW?: number; $imgH?: number; $boxH?: number }>`
+const HeroBox = styled.div<{
+  $imgW?: number;
+  $imgH?: number;
+  $boxH?: number;
+  $last?: boolean;
+}>`
   display: grid;
   place-items: center;
 
-  margin-top: 0.75rem;
+  margin-top: ${({ $last }) => ($last ? "0.75rem" : "1.75rem")};
   margin-bottom: 0.25rem;
 
   height: ${({ $boxH }) =>
-    $boxH ? `${$boxH}px` : "clamp(150px, 30vh, 200px)"};
+    $boxH ? `${$boxH}px` : "clamp(150px, 35vh, 300px)"};
 
   img {
     max-height: 100%;
@@ -396,7 +408,7 @@ const DescBox = styled.div<{ $last?: boolean }>`
   flex-direction: column;
   gap: 6px;
   text-align: center;
-  margin-top: ${({ $last }) => ($last ? "2rem" : "3rem")};
+  margin-top: ${({ $last }) => ($last ? "1rem" : "3rem")};
 `;
 
 const DescP = styled.p`
