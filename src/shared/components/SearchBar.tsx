@@ -5,12 +5,14 @@ import search from "/images/icons/search.png";
 
 const StyledContainer = styled(BasicElement.Container)`
   background-color: ${({ theme }) => theme.colors.orange05};
-  input{
+  input {
     flex: 1;
     border: none;
     background-color: transparent;
     outline: none;
     font-size: 14px;
+    color: ${({ theme }) => theme.colors.black01};
+    ${({ theme }) => theme.fonts.bodyMedium14}
   }
   input::placeholder {
     color: ${({ theme }) => theme.colors.orange03};
@@ -37,7 +39,6 @@ export const SearchBar = ({
     setSearchValue(value);
     onInputChange?.(value);
   };
-
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
