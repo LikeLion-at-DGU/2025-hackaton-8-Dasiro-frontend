@@ -1,4 +1,4 @@
 export { Header } from "./Header";
-export { MapSection } from "./MapSection";
+export { RecoveryMapSection } from "./RecoveryMapSection";
 export { BottomSheet } from "./BottomSheet";
 export { BackgroundCircles } from "./BackgroundCircles";

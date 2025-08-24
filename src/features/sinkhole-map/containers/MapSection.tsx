@@ -1,9 +1,11 @@
-import { MapSection as RecoveryMapSection } from "@features/recovery-zone";
+import { SinkholeMapSection } from "./SinkholeMapSection";
 
-interface SinkholeMapSectionProps {
+interface MapSectionProps {
   colorMode?: "risk" | "recovery";
+  forceViewMode?: "grade" | "safezone";
+  id?: string;
 }
 
-export const MapSection = ({ colorMode = "risk" }: SinkholeMapSectionProps) => {
-  return <RecoveryMapSection colorMode={colorMode} />;
+export const MapSection = ({ forceViewMode, id }: MapSectionProps) => {
+  return <SinkholeMapSection forceViewMode={forceViewMode} id={id} />;
 };

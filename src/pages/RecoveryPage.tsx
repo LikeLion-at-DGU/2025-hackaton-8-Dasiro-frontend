@@ -2,10 +2,10 @@
 import * as S from "@widget/MapWithOverlay/MapWithOverlay.styles";
 import {
   MainElement,
-  MapSection,
   BottomSheet,
   BackgroundCircles,
 } from "@features/recovery-zone";
+import { RecoveryMapSection } from "@features/recovery-zone/containers/RecoveryMapSection";
 import { PageHeader, NoticeBar } from "@shared/components";
 import { RecoveryProvider } from "@features/recovery-zone/context/RecoveryContext";
 import { CouponProvider } from "@shared/contexts/CouponContext";
@@ -30,7 +30,7 @@ const RecoveryPage = () => {
           <MainElement.MainContent />
           
             {/* 서울 지역 복구 현황 지도 - 구별 색상 표시 */}
-            <MapSection />
+            <RecoveryMapSection />
           </MainElement.MainWrapper>
 
           {/* 하단 슬라이드 시트 - 필터 버튼과 상점 리스트 */}

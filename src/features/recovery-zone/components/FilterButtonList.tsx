@@ -71,7 +71,7 @@ export const FilterButtonList = () => {
           selectedRecoveryStatus === "임시복구"
             ? "TEMP_REPAIRED"
             : "UNDER_REPAIR";
-        getIncidents([status])
+        getIncidents({ statuses: [status] })
           .then((response) => {
             console.log("불러온 사고 데이터:", response);
             if (

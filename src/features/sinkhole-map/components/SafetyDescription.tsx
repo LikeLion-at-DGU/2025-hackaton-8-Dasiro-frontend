@@ -5,7 +5,7 @@ import ddang from "/images/icons/ddang.png";
 import badge from "/images/icons/badge.png";
 import { GradeSubtitle } from "@features/sinkhole-map/constants";
 import { useSelectGrade } from "@entities/sinkhole/context";
-import { MapSection } from "@features/recovery-zone";
+import { MapSection } from "../containers/MapSection";
 import { getSafezoneDistricts, getDistrictsByGrade } from "@entities/sinkhole/api";
 import type { Grade } from "@entities/sinkhole/selectgrade";
 
