@@ -35,10 +35,12 @@ export const StoreCard = ({
   return (
     <BottomSheetElement.BottomCard onClick={handleCardClick} id="bottomCard">
       <BottomSheetElement.CardContent>
-        <img
-          src={place.main_image_url || "/images/default-store.png"}
-          alt={place.name}
-        />
+        <div style={{ borderRadius: "2px" }}>
+          <img
+            src={place.main_image_url || "/images/default-store.png"}
+            alt={place.name}
+          />
+        </div>
         <div className="cardInner">
           <div className="cardTitls">{place.name}</div>
           <div className="cardPos">{place.address}</div>
@@ -71,7 +73,9 @@ export const LegacyStoreCard = ({
       className="bottomCard"
     >
       <BottomSheetElement.CardContent>
-        <img src={image} alt={title} />
+        <div style={{borderRadius: "2px"}}>
+          <img src={image} alt={title} />
+        </div>
         <div className="cardInner">
           <div className="cardDate">2024.02.23</div>
           <div className="cardTitls">{title}</div>
