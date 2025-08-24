@@ -26,15 +26,11 @@ const StyledContainer = styled(BasicElement.Container).attrs(({ $gap }) => ({
   }
 `;
 
-interface GradeInfoProps {
-  selectedGrade?: number;
-}
-
-export const GradeInfo = ({ selectedGrade = 1 }: GradeInfoProps) => {
-  const { searchedDistrict, isBadgeActive, selectedGradeData } = useSelectGrade();
+export const GradeInfo = () => {
+  const { searchedDistrict, isBadgeActive, selectedGradeData, selectedGrade } = useSelectGrade();
 
   const dongName = searchedDistrict?.dong || "염창동";
-  const displayGrade = selectedGrade;
+  const displayGrade = selectedGrade ?? 1;
   
   // 등급이 선택되었는지 확인
   const isGradeSelected = selectedGradeData && selectedGradeData.items && selectedGradeData.items.length > 0;
