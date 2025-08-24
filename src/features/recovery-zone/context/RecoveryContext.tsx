@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { Place } from "@entities/report/places";
+import { SEOUL_CITY_HALL } from "@shared/utils/locationUtils";
 
 interface LocationData {
   lat: number;
@@ -35,9 +36,9 @@ interface RecoveryProviderProps {
 
 export const RecoveryProvider = ({ children }: RecoveryProviderProps) => {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>({
-    lat: 37.5665,
-    lng: 126.9780,
-    address: "서울시 중구 명동"
+    lat: SEOUL_CITY_HALL.lat,
+    lng: SEOUL_CITY_HALL.lng,
+    address: SEOUL_CITY_HALL.address
   });
   
   const [places, setPlaces] = useState<Place[]>([]);

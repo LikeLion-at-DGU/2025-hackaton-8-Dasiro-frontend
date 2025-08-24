@@ -43,6 +43,24 @@ export const getRiskColorByDistrict = (
   return district ? getRiskColor(district.riskData) : addOpacityToColor(colors.orange04);
 };
 
+// 위험등급(G1-G5)에 따른 색상 매핑
+export const getRiskColorByGrade = (grade: "G1" | "G2" | "G3" | "G4" | "G5"): string => {
+  switch (grade) {
+    case "G1":
+      return addOpacityToColor(colors.green01); // 1등급 - 매우 낮음
+    case "G2":
+      return addOpacityToColor(colors.green02); // 2등급 - 낮음
+    case "G3":
+      return addOpacityToColor(colors.orange04); // 3등급 - 보통
+    case "G4":
+      return addOpacityToColor(colors.orange02); // 4등급 - 위험
+    case "G5":
+      return addOpacityToColor(colors.orange01); // 5등급 - 매우 위험
+    default:
+      return addOpacityToColor(colors.orange04); // 기본값
+  }
+};
+
 export const riskColorLegend = [
   { range: "80-100", color: addOpacityToColor(colors.orange01), description: "매우 위험" },
   { range: "60-79", color: addOpacityToColor(colors.orange02), description: "위험" },

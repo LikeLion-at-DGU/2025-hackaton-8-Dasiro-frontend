@@ -4,11 +4,6 @@ import { FilterButton, StoreCard, LegacyStoreCard } from "../widgets";
 import { FILTER_BUTTONS } from "../constants";
 import { getPlaces, type Place } from "@entities/report/places";
 import { getIncidents } from "@entities/recovery/incidents";
-import {
-  TEMP_REPAIRED_TEST_DATA,
-  UNDER_REPAIR_TEST_DATA,
-  STORE_TEST_DATA,
-} from "../constants";
 import { type CardItem } from "@entities/recovery/types";
 import { mapFilterToCategory } from "../utils/categoryMapper";
 import { useRecovery } from "../context/RecoveryContext";
@@ -159,7 +154,12 @@ export const FilterButtonList = () => {
           selectedRecoveryStatus === "임시복구"
             ? "TEMP_REPAIRED"
             : "UNDER_REPAIR";
-        getIncidents({ statuses: [status] })
+        getIncidents({ 
+          statuses: [status],
+          lat: selectedLocation.lat,
+          lng: selectedLocation.lng,
+          radius: 3000
+        })
           .then((response) => {
             console.log("불러온 사고 데이터:", response);
             if (
@@ -184,74 +184,37 @@ export const FilterButtonList = () => {
                   images_count: incident.images_count,
                 })
               );
-              setPlaces(convertedItems as any); // 임시로 any 사용, 나중에 Context 수정 필요
+              setPlaces(convertedItems as any);
             } else {
-              // API 데이터가 없으면 테스트 데이터 사용
-              console.log("API 데이터가 없어서 테스트 데이터 사용");
-              const testData =
-                selectedRecoveryStatus === "임시복구"
-                  ? TEMP_REPAIRED_TEST_DATA
-                  : UNDER_REPAIR_TEST_DATA;
-              const convertedTestItems: CardItem[] = testData.map(
-                (incident) => ({
-                  id: incident.id,
-                  name: incident.cause,
-                  address: incident.address,
-                  lat: incident.lat,
-                  lng: incident.lng,
-                  distance_m: incident.distance_m,
-                  type: "incident" as const,
-                  occurred_at: incident.occurred_at,
-                  cause: incident.cause,
-                  method: incident.method,
-                  status: incident.status,
-                  images_count: incident.images_count,
-                })
-              );
-              setPlaces(convertedTestItems as any); // 임시로 any 사용, 나중에 Context 수정 필요
+              // API 데이터가 없으면 빈 배열
+              console.log("API 데이터가 없습니다.");
+              setPlaces([]);
             }
           })
           .catch((error) => {
-            console.error("사고 데이터 로드 실패, 테스트 데이터 사용:", error);
-            // API 호출 실패시 테스트 데이터 사용
-            const testData =
-              selectedRecoveryStatus === "임시복구"
-                ? TEMP_REPAIRED_TEST_DATA
-                : UNDER_REPAIR_TEST_DATA;
-            const convertedTestItems: CardItem[] = testData.map((incident) => ({
-              id: incident.id,
-              name: incident.cause,
-              address: incident.address,
-              lat: incident.lat,
-              lng: incident.lng,
-              distance_m: incident.distance_m,
-              type: "incident" as const,
-              occurred_at: incident.occurred_at,
-              cause: incident.cause,
-              method: incident.method,
-              status: incident.status,
-              images_count: incident.images_count,
-            }));
-            setPlaces(convertedTestItems as any); // 임시로 any 사용, 나중에 Context 수정 필요
+            console.error("사고 데이터 로드 실패:", error);
+            setPlaces([]);
           })
           .finally(() => {
             setIsLoading(false);
           });
       } else {
         // 복구완료나 전체일 때는 places API 사용
-        // selectedLocation에서 구 이름 추출 (예: "서울시 중구 명동" -> "중구")
-        const sigungu = selectedLocation.address
-          ? selectedLocation.address
-              .split(" ")
-              .find((part) => part.endsWith("구")) || "중구"
-          : "중구";
+        // 현재 위치를 기반으로 lat/lng/radius 파라미터 사용
+        if (!selectedLocation) {
+          console.warn("위치 정보가 없어 places API를 호출할 수 없습니다.");
+          setIsLoading(false);
+          return;
+        }
 
         getPlaces({
+          lat: selectedLocation.lat,
+          lng: selectedLocation.lng,
+          radius: 200, // 200미터 반경
           category:
             selectedCategory && selectedCategory !== "전체"
               ? mapFilterToCategory(selectedCategory)
               : undefined,
-          sigungu: sigungu,
           page: 1,
           page_size: 20,
         })
@@ -274,32 +237,15 @@ export const FilterButtonList = () => {
               setPlaces(filteredPlaces);
             } else {
               console.warn(
-                "응답 데이터가 비어있습니다, 테스트 데이터 사용:",
+                "응답 데이터가 비어있습니다:",
                 response
               );
-              console.log("상점 테스트 데이터 사용:", STORE_TEST_DATA);
-              // 테스트 데이터에도 필터링 적용
-              let filteredTestData = STORE_TEST_DATA;
-              if (selectedCategory && selectedCategory !== "전체") {
-                const targetCategory = mapFilterToCategory(selectedCategory);
-                filteredTestData = STORE_TEST_DATA.filter(
-                  (place) => place.category === targetCategory
-                );
-              }
-              setPlaces(filteredTestData);
+              setPlaces([]);
             }
           })
           .catch((error) => {
-            console.error("장소 데이터 로드 실패, 테스트 데이터 사용:", error);
-            // 에러 시에도 테스트 데이터에 필터링 적용
-            let filteredTestData = STORE_TEST_DATA;
-            if (selectedCategory && selectedCategory !== "전체") {
-              const targetCategory = mapFilterToCategory(selectedCategory);
-              filteredTestData = STORE_TEST_DATA.filter(
-                (place) => place.category === targetCategory
-              );
-            }
-            setPlaces(filteredTestData);
+            console.error("장소 데이터 로드 실패:", error);
+            setPlaces([]);
           })
           .finally(() => {
             setIsLoading(false);
@@ -314,7 +260,7 @@ export const FilterButtonList = () => {
     showCouponModal(place);
   };
 
-  const shouldShowButton = bottomSheetHeight >= 90;
+  const shouldShowButton = bottomSheetHeight >= 45;
 
   // 렌더링 디버깅
   console.log("FilterButtonList 렌더링:", {
@@ -415,7 +361,7 @@ export const FilterButtonList = () => {
         ) : (
           <div style={{ padding: "20px", textAlign: "center" }}>
             {selectedLocation
-              ? "주변 상점이 없습니다."
+              ? "해당하는 장소가 없습니다."
               : "위치를 선택해주세요."}
           </div>
         )}

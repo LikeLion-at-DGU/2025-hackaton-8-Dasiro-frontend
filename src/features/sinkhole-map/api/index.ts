@@ -5,7 +5,8 @@ import type {
   SelectGradeResponse, 
   SafezoneResponse, 
   DistrictSearchResponse, 
-  SafezoneDistrictsResponse 
+  SafezoneDistrictsResponse,
+  DistrictColorResponse
 } from "@entities/sinkhole/response";
 
 // 구 등급 필터 조회 API
@@ -20,9 +21,15 @@ export const getDistrictsByGrade = async (params: GetDistrictsByGradeParams): Pr
   return await getResponse<SelectGradeResponse>(url);
 };
 
+export const getDistrictsGuColor = async (): Promise<DistrictColorResponse | null> => {
+  const url = `/api/v1/districts/gu/metrics`;
+  return await getResponse<DistrictColorResponse>(url);
+};
+
+
 // 안심존 구 조회 API
 export const getSafezones = async (): Promise<SafezoneResponse | null> => {
-  const url = `/api/v1/districts/safezones/gu`;
+  const url = `/api/v1/safezones/districts/gu`;
   return await getResponse<SafezoneResponse>(url);
 };
 
@@ -34,7 +41,7 @@ export const getSafezoneGu = async (): Promise<SafezoneResponse | null> => {
 
 // 안심존 행정동 조회 API (동별)
 export const getSafezoneDistricts = async (): Promise<SafezoneDistrictsResponse | null> => {
-  const url = `/api/v1/districts/safezones`;
+  const url = `/api/v1/districts/safezones/districts`;
   return await getResponse<SafezoneDistrictsResponse>(url);
 };
 
@@ -47,5 +54,6 @@ export const searchDistricts = async (params: DistrictSearchParams): Promise<Dis
   if (params.limit) searchParams.append('limit', params.limit.toString());
   
   const url = `/api/v1/districts/search?${searchParams.toString()}`;
+  console.log(url);
   return await getResponse<DistrictSearchResponse>(url);
 };

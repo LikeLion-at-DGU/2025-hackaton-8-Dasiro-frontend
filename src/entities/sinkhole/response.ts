@@ -60,6 +60,12 @@ export interface DistrictSearchItem {
   center_lat: number;
   center_lng: number;
   is_safezone: boolean;
+  total_grade: string;
+  ground_stability: string;
+  groundwater_impact: string;
+  underground_density: string;
+  old_building_dist: string;
+  incident_history: string;
 }
 
 // searchDistricts API response
@@ -73,6 +79,29 @@ export interface DistrictSearchResponse {
   };
 }
 
+// District color item for getDistrictsGuColor API
+export interface DistrictColorItem {
+  gu_code: number;
+  sido: string;
+  sigungu: string;
+  center_lat: number;
+  center_lng: number;
+  final_grade: "G1" | "G2" | "G3" | "G4" | "G5";
+}
+
+// District color data
+export interface DistrictColorData {
+  items: DistrictColorItem[];
+}
+
+// getDistrictsGuColor API response
+export interface DistrictColorResponse {
+  status: string;
+  message: string;
+  code: number;
+  data: DistrictColorData;
+}
+
 // Safezone district item
 export interface SafezoneDistrictItem {
   id: number;
@@ -82,6 +111,14 @@ export interface SafezoneDistrictItem {
   center_lat: number;
   center_lng: number;
   is_safezone: boolean;
+  total_grade?: string; // G1|G2
+}
+
+// Safezone district data
+export interface SafezoneDistrictData {
+  items: SafezoneDistrictItem[];
+  as_of_date: string;
+  count: number;
 }
 
 // getSafezoneDistricts API response
@@ -89,8 +126,5 @@ export interface SafezoneDistrictsResponse {
   status: string;
   message: string;
   code: number;
-  data: {
-    items: SafezoneDistrictItem[];
-    count: number;
-  };
+  data: SafezoneDistrictData;
 }

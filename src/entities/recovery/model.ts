@@ -3,6 +3,9 @@
 // getIncidents API parameters
 export interface GetIncidentsParams {
   statuses?: ("UNDER_REPAIR" | "TEMP_REPAIRED" | "RECOVERED")[];
+  lat?: number;
+  lng?: number;
+  radius?: number;
 }
 
 // Recovery status types

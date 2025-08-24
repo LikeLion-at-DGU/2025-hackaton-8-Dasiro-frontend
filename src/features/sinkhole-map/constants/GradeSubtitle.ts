@@ -3,7 +3,7 @@ interface GradeInfo {
   content: string;
 }
 
-export const GradeSubtitle = (grade: number, dongs: string, count: number): GradeInfo => {
+export const GradeSubtitle = (grade: number, dongs?: string, count?: number): GradeInfo => {
   const gradeData: Record<number, { subtitle: string; template: string }> = {
     1: {
       subtitle: "1등급, 아주 튼튼하니 안심하세요!",
