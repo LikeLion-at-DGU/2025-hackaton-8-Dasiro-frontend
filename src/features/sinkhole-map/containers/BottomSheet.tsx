@@ -1,4 +1,4 @@
-import { DraggableBottomSheet } from "@features/recovery-zone/components/DraggableBottomSheet";
+import { DraggableBottomSheet } from "@features/sinkhole-map/components/DraggableBottomSheet";
 import { GradeBottomInner } from "../components/GradeButtonList";
 
 interface SinkholeBottomSheetProps {

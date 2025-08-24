@@ -238,7 +238,6 @@ export const FilterButtonList = () => {
       {/* 필터 버튼 목록 - 복구현황, 업종별 필터링 */}
       <BottomSheetElement.BottomButtonList
         id="bottomButtonList"
-        $isSinkholeMap={false}
       >
         {FILTER_BUTTONS.map((button, index) => {
           const getSelectedOption = () => {

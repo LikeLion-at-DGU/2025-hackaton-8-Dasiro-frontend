@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { fetchSeoulGeoJson, type FC, type Feature } from './SeoulGeoJson';
+import markerIcon from "/images/icons/marker.png";
 
 export interface D3SeoulMapConfig {
   width: number;
@@ -228,86 +229,67 @@ export async function createD3SeoulMap(config: D3SeoulMapConfig): Promise<D3Seou
   };
 
   // 마커 추가 함수
-  const addMarkers = (markers: Array<{ lat: number; lng: number; id: string | number; data?: any }>) => {
-    console.log("addMarkers 호출:", markers.length, "개 마커");
-    
-    // 기존 마커 제거
+  const addMarkers = (
+    markers: Array<{ lat: number; lng: number; id: string | number; data?: any }>
+  ) => {
     removeMarkers();
-    
-    // 타이밍 문제를 해결하기 위해 requestAnimationFrame으로 한 프레임 지연
+
     requestAnimationFrame(() => {
-      markers.forEach((marker, index) => {
+      markers.forEach((marker) => {
         const [x, y] = projection([marker.lng, marker.lat]) || [0, 0];
-        console.log(`마커 ${index}: lat=${marker.lat}, lng=${marker.lng}, x=${x}, y=${y}`);
-        console.log(`지도 크기: width=${width}, height=${height}`);
-        
-        // 화면 밖 마커는 화면 중앙에 테스트로 표시
-        const testX = x > 0 && x < width ? x : width/2;
-        const testY = y > 0 && y < height ? y : height/2;
-        
-        console.log(`실제 표시 위치: testX=${testX}, testY=${testY}`);
-        
-        // 마커를 SVG에 직접 추가하고 맨 마지막에 배치하여 다른 요소들 위에 표시
-        const circle = svg.append('circle')
-          .attr('class', 'incident-marker-direct')
-          .attr('cx', testX)
-          .attr('cy', testY)
-          .attr('r', 25) // 더 큰 크기로 테스트
-          .attr('fill', '#FF0000')
-          .attr('stroke', '#FFFFFF')
-          .attr('stroke-width', 5)
+
+        const inBoundsX = x > 0 && x < width ? x : width / 2;
+        const inBoundsY = y > 0 && y < height ? y : height / 2;
+
+        const img = markerGroup
+          .append('image')
+          .attr('class', 'incident-marker')
+          .attr('x', inBoundsX - 6.4)
+          .attr('y', inBoundsY - 16)
+          .attr('width', 12.8)
+          .attr('height', 16)
+          .attr('href', markerIcon)
           .attr('data-marker-id', marker.id)
           .style('cursor', 'pointer')
-          .style('opacity', '1')
-          .style('z-index', '999999');
-        
-        // 마커를 맨 앞으로 이동 (SVG에서는 DOM 순서가 z-index 역할)
-        circle.raise();
-        
-        console.log(`마커 엘리먼트 생성됨:`, circle.node());
-        console.log(`SVG 내 모든 엘리먼트:`, svg.selectAll('*').nodes().length);
-        console.log(`마커 위치 확인:`, circle.attr('cx'), circle.attr('cy'));
-        
-        circle.on('click', function(event) {
-            // 마커 클릭 이벤트
+          .style('opacity', '1');
+
+        img
+          .on('click', function (event) {
             const customEvent = new CustomEvent('marker-click', {
-              detail: { marker, event }
+              detail: { marker, event },
             });
             containerEl.dispatchEvent(customEvent);
           })
-          .on('mouseenter', function(event) {
+          .on('mouseenter', function (event) {
             if (tooltip && marker.data) {
               const address = marker.data.address || '';
               const status = marker.data.status || '';
               tooltip
                 .style('opacity', 1)
                 .html(`${address}<br/>상태: ${status}`)
-                .style('left', (event.pageX + 10) + 'px')
-                .style('top', (event.pageY - 10) + 'px');
+                .style('left', event.pageX + 10 + 'px')
+                .style('top', event.pageY - 10 + 'px');
             }
           })
-          .on('mousemove', function(event) {
+          .on('mousemove', function (event) {
             if (tooltip) {
               tooltip
-                .style('left', (event.pageX + 10) + 'px')
-                .style('top', (event.pageY - 10) + 'px');
+                .style('left', event.pageX + 10 + 'px')
+                .style('top', event.pageY - 10 + 'px');
             }
           })
-          .on('mouseleave', function() {
+          .on('mouseleave', function () {
             if (tooltip) {
               tooltip.style('opacity', 0);
             }
           });
       });
-      
-      console.log("모든 마커 추가 완료");
     });
   };
 
   // 마커 제거 함수
   const removeMarkers = () => {
     markerGroup.selectAll('.incident-marker').remove();
-    svg.selectAll('.incident-marker-direct').remove(); // 직접 추가된 마커도 제거
   };
 
   // 정리 함수
