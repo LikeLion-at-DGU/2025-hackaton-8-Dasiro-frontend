@@ -5,7 +5,8 @@ import type {
   SelectGradeResponse, 
   SafezoneResponse, 
   DistrictSearchResponse, 
-  SafezoneDistrictsResponse 
+  SafezoneDistrictsResponse,
+  DistrictColorResponse
 } from "@entities/sinkhole/response";
 
 // 구 등급 필터 조회 API
@@ -19,6 +20,12 @@ export const getDistrictsByGrade = async (params: GetDistrictsByGradeParams): Pr
   const url = `/api/v1/districts/by-grade?grade=${params.grade}`;
   return await getResponse<SelectGradeResponse>(url);
 };
+
+export const getDistrictsGuColor = async (): Promise<DistrictColorResponse | null> => {
+  const url = `/api/v1/districts/gu/metrics`;
+  return await getResponse<DistrictColorResponse>(url);
+};
+
 
 // 안심존 구 조회 API
 export const getSafezones = async (): Promise<SafezoneResponse | null> => {

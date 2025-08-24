@@ -73,6 +73,29 @@ export interface DistrictSearchResponse {
   };
 }
 
+// District color item for getDistrictsGuColor API
+export interface DistrictColorItem {
+  gu_code: number;
+  sido: string;
+  sigungu: string;
+  center_lat: number;
+  center_lng: number;
+  total_grade: "G1" | "G2" | "G3" | "G4" | "G5";
+}
+
+// District color data
+export interface DistrictColorData {
+  items: DistrictColorItem[];
+}
+
+// getDistrictsGuColor API response
+export interface DistrictColorResponse {
+  status: string;
+  message: string;
+  code: number;
+  data: DistrictColorData;
+}
+
 // Safezone district item
 export interface SafezoneDistrictItem {
   id: number;
