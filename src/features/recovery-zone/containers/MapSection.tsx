@@ -539,7 +539,7 @@ export const MapSection = ({
         {/* 서울 25개 구의 복구 현황을 색상으로 표시하는 정적 지도 컨테이너 */}
       </div>
 
-      {/* 지도 캡션 - 오른쪽 아래 */}
+      {/* 지도 캡션 - 오른쪽 아래 (safezone 모드일 때는 숨김) */}
       <div
         style={{
           position: "absolute",
@@ -550,7 +550,7 @@ export const MapSection = ({
           fontSize: "10px",
           color: "#666",
           fontWeight: "500",
-          display: "flex",
+          display: viewMode === "safezone" || forceViewMode === "safezone" ? "none" : "flex",
           gap: "10px",
         }}
       >

@@ -46,7 +46,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
 
   // 터치 드래그 시작 핸들러 (모바일 지원)
   const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault();
+    e.stopPropagation();
     console.log('Touch start');
     setIsDragging(true);
     startYRef.current = e.touches[0].clientY;
@@ -78,7 +78,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
       // 터치 드래그 거리를 vh 단위로 변환
       const deltaY = startYRef.current - e.touches[0].clientY;
       const deltaVh = (deltaY / window.innerHeight) * 100;
-      // 최소 42.3vh, 최대 100vh 범위로 제한
+      // 최소 36vh, 최대 100vh 범위로 제한
       const newHeight = Math.max(minHeight, Math.min(100, startHeightRef.current + deltaVh));
       
       console.log('Touch move - newHeight:', newHeight);
@@ -139,6 +139,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
             maxHeight: `calc(var(--bottom-sheet-height) - 15.5vh)`
           } as React.CSSProperties}
           id="bottomInner"
+          onTouchStart={(e) => e.stopPropagation()}
         >
           {children}
         </BottomSheetElement.BottomInner>

@@ -3,7 +3,7 @@ import { BottomSheetElement } from "@features/recovery-zone";
 import { BottomSheetGradeButton } from "@features/sinkhole-map/ui/BottomSheetElement";
 
 import { BottomSheetContent } from "@features/sinkhole-map/components/BottomSheetContent";
-import { getDistrictsByGrade } from "@entities/sinkhole/api";
+import { getDistrictsGuByGrade } from "@entities/sinkhole/api";
 import { useSelectGrade } from "@entities/sinkhole/context";
 import type { Grade } from "@entities/sinkhole/selectgrade";
 
@@ -19,7 +19,7 @@ export const GradeBottomInner = () => {
     console.log(`${grade}등급 클릭됨`);
     
     try {
-      const response = await getDistrictsByGrade(`G${grade}` as Grade);
+      const response = await getDistrictsGuByGrade(`G${grade}` as Grade);
       if (response && response.status === "success") {
         setSelectedGradeData(response.data);
         console.log(`${grade}등급 데이터:`, response.data);

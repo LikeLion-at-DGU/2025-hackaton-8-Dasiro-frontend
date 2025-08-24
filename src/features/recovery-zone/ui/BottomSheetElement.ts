@@ -47,6 +47,9 @@ export const BottomInner = style(BasicElement.FlexBoxModel).attrs(() => ({
     $alignItems: "flex-start"
 }))`
     position: relative;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
 `;
 
 export const BottomButtonList = style(BasicElement.FlexBoxModel).attrs<{
@@ -64,6 +67,9 @@ export const BottomCardList = style(BasicElement.FlexBoxModel).attrs(() => ({
     $alignItems: "flex-start",
     $justifyContent: "flex-start",
 }))`
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     &::-webkit-scrollbar {
         display: none;
     }
