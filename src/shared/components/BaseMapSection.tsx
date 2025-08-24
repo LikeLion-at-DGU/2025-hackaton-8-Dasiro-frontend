@@ -53,6 +53,8 @@ export const BaseMapSection = ({
 }: BaseMapSectionProps) => {
   // D3 Map 인스턴스를 저장하는 ref
   const mapInstanceRef = useRef<any>(null);
+  // 최초 로딩된 구별 데이터 보관
+  const districtsDataRef = useRef<any>(null);
   // 지도가 렌더링될 DOM 컨테이너 ref
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -98,13 +100,15 @@ export const BaseMapSection = ({
 
           // GeoJSON을 구별 데이터 객체로 변환
           const districtsData = processSeoulDistricts(geoJsonData);
+          // 구별 데이터 저장
+          districtsDataRef.current = districtsData;
 
           // 지도 렌더링
           await mapInstance.render(geoJsonData);
 
           // 색상 적용 (상위 컴포넌트에서 제공한 함수 사용)
           if (getDistrictColor) {
-            mapInstance.setFillColor((feature: any) => 
+            mapInstance.setFillColor((feature: any) =>
               getDistrictColor(feature, districtsData)
             );
           }
@@ -157,6 +161,15 @@ export const BaseMapSection = ({
       }
     };
   }, []); // 최초 한번만 초기화
+
+  // 색상 업데이트: 상위에서 전달된 getDistrictColor가 변경될 때마다 적용
+  useEffect(() => {
+    if (mapInstanceRef.current && districtsDataRef.current && getDistrictColor) {
+      mapInstanceRef.current.setFillColor((feature: any) =>
+        getDistrictColor(feature, districtsDataRef.current)
+      );
+    }
+  }, [getDistrictColor]);
 
   return (
     <div style={{ position: "relative", height: "241px", width: "100%" }}>
