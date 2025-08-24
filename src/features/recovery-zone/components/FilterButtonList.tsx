@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BottomSheetElement } from "../ui";
 import { FilterButton, StoreCard, LegacyStoreCard } from "../widgets";
 import { FILTER_BUTTONS } from "../constants";
@@ -21,6 +21,16 @@ const StyledButton = style(BasicElement.Button)`
   ${({ theme }) => theme.fonts.bodySemiB14}
   color: ${({ theme }) => theme.colors.orange06};
   background-color: ${({ theme }) => theme.colors.orange01};
+  position: fixed;
+  bottom: 15vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  
+  opacity: var(--button-opacity, 0);
+  transform: translateX(-50%) translateY(var(--button-translate-y, 20px));
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  
   img{
     width: 12.8px;
     height: 16px;
@@ -28,8 +38,86 @@ const StyledButton = style(BasicElement.Button)`
 `;
 
 export const FilterButtonList = () => {
+  const [bottomSheetHeight, setBottomSheetHeight] = useState(36);
+  const lastHeightRef = useRef(36);
+  
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    let resizeObserver: ResizeObserver;
+    
+    // 초기 높이 설정
+    const initializeHeight = () => {
+      const bottomSheet = document.getElementById('bottomSheet');
+      if (bottomSheet) {
+        const style = getComputedStyle(bottomSheet);
+        const heightValue = Math.round(parseFloat(style.height) / window.innerHeight * 100);
+        lastHeightRef.current = heightValue;
+        setBottomSheetHeight(heightValue);
+      }
+    };
+    
+    // 지연 수행으로 DOM 준비 대기
+    const initTimer = setTimeout(initializeHeight, 100);
+    
+    const observer = new MutationObserver(() => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const bottomSheet = document.getElementById('bottomSheet');
+        if (bottomSheet) {
+          const style = getComputedStyle(bottomSheet);
+          const heightValue = Math.round(parseFloat(style.height) / window.innerHeight * 100);
+          
+          // 실제로 높이가 변했을 때만 상태 업데이트
+          if (Math.abs(heightValue - lastHeightRef.current) >= 1) {
+            lastHeightRef.current = heightValue;
+            setBottomSheetHeight(heightValue);
+          }
+        }
+      }, 30); // 30ms debounce
+    });
+    
+    const bottomSheet = document.getElementById('bottomSheet');
+    if (bottomSheet) {
+      observer.observe(bottomSheet, {
+        attributes: true,
+        attributeFilter: ['style']
+      });
+      
+      // ResizeObserver 추가 (브라우저 리사이징 대응)
+      if (typeof ResizeObserver !== 'undefined') {
+        resizeObserver = new ResizeObserver(() => {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            initializeHeight();
+          }, 30);
+        });
+        resizeObserver.observe(bottomSheet);
+      }
+      
+      // 즉시 초기화 시도
+      initializeHeight();
+    }
+    
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(initTimer);
+      observer.disconnect();
+      if (resizeObserver) resizeObserver.disconnect();
+    };
+  }, []);
+  
   const handleMinimizeSheet = () => {
     console.log("handleMinimizeSheet called");
+    
+    // BottomCardList 스크롤을 맨 위로 이동
+    const bottomCardList = document.querySelector('.bottom-card-list') as HTMLElement;
+    if (bottomCardList) {
+      bottomCardList.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+    
     // 전역 함수 사용
     if ((window as any).setBottomSheetHeight) {
       (window as any).setBottomSheetHeight(36);
@@ -226,6 +314,8 @@ export const FilterButtonList = () => {
     showCouponModal(place);
   };
 
+  const shouldShowButton = bottomSheetHeight >= 90;
+
   // 렌더링 디버깅
   console.log("FilterButtonList 렌더링:", {
     isLoading,
@@ -329,18 +419,21 @@ export const FilterButtonList = () => {
               : "위치를 선택해주세요."}
           </div>
         )}
-        <div style={{width: "100%", alignItems: "center", display: "flex", justifyContent: "center", position: "absolute", top: "75vh"}}>
-          <StyledButton
-            $width={"fit-content"}
-            $gap={10}
-            $padding={[6, 20]}
-            $borderRadius={50}
-            onClick={handleMinimizeSheet}
-          >
-            <img src={whitemarker} alt="하얀색 핀" />
-            지도보기
-          </StyledButton>
-        </div>
+        <StyledButton
+          $width={"fit-content"}
+          $gap={10}
+          $padding={[6, 20]}
+          $borderRadius={50}
+          onClick={handleMinimizeSheet}
+          style={{
+            opacity: shouldShowButton ? 1 : 0,
+            transform: `translateX(-50%) translateY(${shouldShowButton ? '0px' : '20px'})`,
+            pointerEvents: shouldShowButton ? 'auto' : 'none'
+          }}
+        >
+          <img src={whitemarker} alt="하얀색 핀" />
+          지도보기
+        </StyledButton>
       </BottomSheetElement.BottomCardList>
     </>
   );

@@ -15,6 +15,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
   const bottomSheetRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(minHeight);
+  const lastTouchYRef = useRef<number | null>(null);
 
   const setHeightFromExternal = (newHeight: number) => {
     setHeight(newHeight);
@@ -40,6 +41,18 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     startYRef.current = e.touches[0].clientY;
     startHeightRef.current = height;
   };
+
+  useEffect(() => {
+    const bottomInnerElement = document.getElementById('bottomInner');
+    if (bottomInnerElement) {
+      bottomInnerElement.addEventListener('wheel', handleInnerWheel, { passive: false });
+    }
+    return () => {
+      if (bottomInnerElement) {
+        bottomInnerElement.removeEventListener('wheel', handleInnerWheel);
+      }
+    };
+  }, [height]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -79,6 +92,63 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     };
   }, [isDragging, height]);
 
+  const clampHeight = (value: number) => Math.max(minHeight, Math.min(100, value));
+
+  const handleInnerWheel = (e: WheelEvent) => {
+    const bottomCardList = document.querySelector('.bottom-card-list') as HTMLElement;
+    
+    if (height >= 100 && e.deltaY > 0 && bottomCardList) {
+      // 100vh에서 아래로 스크롤할 때: 내부 스크롤 우선
+      const { scrollTop, scrollHeight, clientHeight } = bottomCardList;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+      
+      if (!isAtBottom) {
+        // 내부 스크롤이 끝에 닿지 않았으면 내부 스크롤 우선
+        return;
+      }
+    }
+    
+    if (height >= 100 && e.deltaY < 0 && bottomCardList) {
+      // 100vh에서 위로 스크롤할 때: 내부 스크롤 우선
+      const { scrollTop } = bottomCardList;
+      
+      if (scrollTop > 0) {
+        // 내부 스크롤이 끝에 닿지 않았으면 내부 스크롤 우선
+        return;
+      } else {
+        // 내부 스크롤이 맨 위에 닿았으면 시트 높이 조절
+        e.preventDefault();
+        const deltaVh = (e.deltaY / window.innerHeight) * 100;
+        setHeight((prev) => clampHeight(prev + deltaVh));
+        return;
+      }
+    }
+    
+    if (height < 100 || (height > minHeight && e.deltaY < 0)) {
+      e.preventDefault();
+      const deltaVh = (e.deltaY / window.innerHeight) * 100;
+      setHeight((prev) => clampHeight(prev + deltaVh));
+    }
+  };
+
+  const handleInnerTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const currentY = e.touches[0].clientY;
+    if (lastTouchYRef.current !== null) {
+      const deltaY = lastTouchYRef.current - currentY;
+      if (height < 100 || (height > minHeight && deltaY < 0)) {
+        e.preventDefault();
+        e.stopPropagation();
+        const deltaVh = (deltaY / window.innerHeight) * 100;
+        setHeight((prev) => clampHeight(prev + deltaVh));
+      }
+    }
+    lastTouchYRef.current = currentY;
+  };
+
+  const handleInnerTouchEnd = () => {
+    lastTouchYRef.current = null;
+  };
+
   return (
     <BottomSheetElement.BottomSheetWrapper
       id="bottomSheet"
@@ -104,6 +174,8 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
           } as React.CSSProperties}
           id="bottomInner"
           onTouchStart={(e) => e.stopPropagation()}
+          onTouchMove={handleInnerTouchMove}
+          onTouchEnd={handleInnerTouchEnd}
         >
           {children}
         </BottomSheetElement.BottomInner>

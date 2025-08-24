@@ -67,8 +67,9 @@ export const BottomCardList = style(BasicElement.FlexBoxModel).attrs(() => ({
   $columnDirection: true,
   $alignItems: "flex-start",
   $justifyContent: "flex-start",
+  className: "bottom-card-list"
 }))`
-  overflow-y: auto;
+  overflow-y: var(--scroll-enabled, auto);
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   &::-webkit-scrollbar {
