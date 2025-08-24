@@ -165,7 +165,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
         <BottomSheetElement.BottomInner
           style={{
             '--bottom-sheet-height': `${height}vh`,
-            maxHeight: `calc(var(--bottom-sheet-height) - 15.5vh)`
+            height: `calc(var(--bottom-sheet-height) - 15.5vh)`
           } as React.CSSProperties}
           id="bottomInner"
           onTouchStart={(e) => e.stopPropagation()}

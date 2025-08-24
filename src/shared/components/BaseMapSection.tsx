@@ -18,6 +18,7 @@ const MapCaption = styled(BasicElement.Overlay)<MapCaptionProps>`
   font-size: 10px;
   color: #666;
   font-weight: 500;
+  right: 0;
 `;
 
 const CaptionContent = ({ color, title }: { color: string; title: string }) => {

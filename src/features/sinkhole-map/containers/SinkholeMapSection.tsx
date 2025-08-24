@@ -5,6 +5,7 @@ import { getRiskColorByDistrict } from "@features/sinkhole-map/utils/riskColorRe
 import { SAFEZONE_TEST_DATA } from "@features/sinkhole-map/constants";
 import { useSelectGrade } from "@entities/sinkhole/context";
 
+
 const RiskCaption = () => {
   console.log("RiskCaption 렌더링됨 - 이 로그가 보이면 캡션이 화면에 표시되고 있는 것입니다.");
   return (
