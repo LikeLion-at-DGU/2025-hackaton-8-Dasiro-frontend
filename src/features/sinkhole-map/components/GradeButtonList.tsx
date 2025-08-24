@@ -12,10 +12,14 @@ export const GradeBottomInner = () => {
     setSelectedGrade,
     setSelectedGradeData,
     isBadgeActive,
+    setSearchedDistrict,
   } = useSelectGrade();
 
   // 등급별 구 데이터 조회
   const handleGradeClick = async (grade: number) => {
+    // 등급 버튼 클릭 시 검색 결과 비활성화
+    setSearchedDistrict(null);
+    
     setSelectedGrade(grade);
     console.log(`${grade}등급 클릭됨`);
     

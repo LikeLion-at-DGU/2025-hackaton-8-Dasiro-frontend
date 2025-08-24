@@ -36,7 +36,8 @@ export const SafezoneInfo = () => {
   const isSafezone = searchedDistrict?.is_safezone ?? true;
 
   // badge 모드가 아니고 안심존이 아닌 경우 렌더링하지 않음
-  if (!isBadgeActive && !isSafezone) {
+  if (isBadgeActive || !isSafezone) {
+    console.log(searchedDistrict);
     return null;
   }
 

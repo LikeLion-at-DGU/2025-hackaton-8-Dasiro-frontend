@@ -54,5 +54,6 @@ export const searchDistricts = async (params: DistrictSearchParams): Promise<Dis
   if (params.limit) searchParams.append('limit', params.limit.toString());
   
   const url = `/api/v1/districts/search?${searchParams.toString()}`;
+  console.log(url);
   return await getResponse<DistrictSearchResponse>(url);
 };

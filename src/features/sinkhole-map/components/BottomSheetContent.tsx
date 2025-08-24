@@ -12,7 +12,7 @@ const StyledButton = style(BasicElement.Button)`
   color: ${({ theme }) => theme.colors.orange06};
   background-color: ${({ theme }) => theme.colors.orange01};
   position: fixed;
-  bottom: 15vh;
+  bottom: 13vh;
   left: 50%;
   transform: translateX(-50%);
   z-index: 15;
@@ -116,7 +116,7 @@ export const BottomSheetContent = () => {
   return (
     <BasicElement.Container $gap={40} $columnDirection={true}>
       <Banner />
-      <GradeInfo />
+      <GradeInfo/>
       <SafetyDescription />
       <SafezoneInfo />
       <StyledButton

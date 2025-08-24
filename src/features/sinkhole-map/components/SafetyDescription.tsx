@@ -48,7 +48,7 @@ const StyledContainer = styled(BasicElement.Container).attrs(({ $gap }) => ({
 `;
 
 export const SafetyDescription = () => {
-  const { isBadgeActive, selectedGradeData, selectedGrade } = useSelectGrade();
+  const { isBadgeActive, selectedGradeData, selectedGrade, searchedDistrict } = useSelectGrade();
   const [safezoneDistrictNames, setSafezoneDistrictNames] =
     useState<string>("염창동, 신길동, 마포동");
   const [gradeDistrictInfo, setGradeDistrictInfo] = useState<{
@@ -134,10 +134,25 @@ export const SafetyDescription = () => {
     }
   }, [isGradeSelected, selectedGrade]);
 
-  // 디버깅용 로그
-  // console.log("SafetyDescription - isBadgeActive:", isBadgeActive);
-  // console.log("SafetyDescription - viewMode:", viewMode);
-  // console.log("SafetyDescription - safezoneData:", safezoneData);
+  // 검색 결과가 있을 때 검색 결과 표시
+  if (searchedDistrict) {
+    return (
+      <StyledContainer $gap={15}>
+        <div className="title">
+          <img src={ddang} alt="땅땅이" className="ddang" />
+          검색 결과입니다
+        </div>
+        <div className="content">
+          <span>{searchedDistrict.dong}</span>의 싱크홀 안전 정보를 확인하세요.
+          <br />
+          <br />
+          주소: {searchedDistrict.sido} {searchedDistrict.sigungu} {searchedDistrict.dong}
+          <br />
+          안심존 여부: {searchedDistrict.is_safezone ? "안심존" : "일반 지역"}
+        </div>
+      </StyledContainer>
+    );
+  }
 
   // badge 모드일 때와 등급 선택 시 지도 표시
   if (isBadgeActive) {
@@ -165,7 +180,6 @@ export const SafetyDescription = () => {
             조금 더 안심하고 부동산을 거래하실 수 있어요!
             <br />
             <br />
-            싱크홀
           </div>
         </div>
       </StyledContainer>
@@ -178,7 +192,7 @@ export const SafetyDescription = () => {
       <StyledContainer $gap={60}>
         {/* 선택된 등급 행정구에만 색상 표시하는 지도 */}
         <MapSection id="bottomsheet-grade-map" colorMode="risk" />
-        <div>
+        <div style={{gap: "15px"}}>
           <div className="title">
             <img src={ddang} alt="땅땅이" className="ddang" />
             {GradeSubtitle(displayGrade, gradeDistrictInfo.names, gradeDistrictInfo.count).subtitle}

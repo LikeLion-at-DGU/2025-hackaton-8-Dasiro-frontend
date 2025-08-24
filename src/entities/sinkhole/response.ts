@@ -60,6 +60,11 @@ export interface DistrictSearchItem {
   center_lat: number;
   center_lng: number;
   is_safezone: boolean;
+  ground_stability: string;
+  groundwater_impact: string;
+  underground_densityj: string;
+  old_building_dist: string;
+  incident_history: string;
 }
 
 // searchDistricts API response

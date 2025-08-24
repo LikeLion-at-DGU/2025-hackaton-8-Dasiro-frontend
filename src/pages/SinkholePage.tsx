@@ -10,13 +10,22 @@ import FloatAction from "@shared/ui/FloatAction";
 
 // SinkholePage 내부 컴포넌트
 const SinkholePageContent = () => {
-  const { setSearchedDistrict, isBadgeActive } = useSelectGrade();
+  const { 
+    setSearchedDistrict, 
+    isBadgeActive, 
+    setSelectedGradeData, 
+    setSelectedGrade 
+  } = useSelectGrade();
 
   const handleSearch = async (query: string) => {
     if (!query.trim()) {
       setSearchedDistrict(null);
       return;
     }
+
+    // 검색 시 등급 필터 비활성화
+    setSelectedGradeData(null);
+    setSelectedGrade(null);
 
     try {
       const response = await searchDistricts({ q: query, limit: 1 });

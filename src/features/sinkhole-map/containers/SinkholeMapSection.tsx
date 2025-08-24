@@ -102,26 +102,27 @@ export const SinkholeMapSection = ({
 
 
     // 선택된 등급 데이터가 있는 경우 (특정 등급 버튼 클릭)
-    if (
-      viewMode === "grade" &&
-      selectedGradeData &&
-      selectedGradeData.items.length > 0
-    ) {
-      const isSelectedDistrict = selectedGradeData.items.some(
-        (item) => item.sigungu === name
-      );
-      if (isSelectedDistrict) {
-        // 선택된 등급의 구만 색칠 - initialDistrictData에서 해당 구의 등급 확인
-        if (initialDistrictData.length > 0) {
-          const districtData = initialDistrictData.find(item => item.sigungu === name);
-          if (districtData) {
-            return getRiskColorByGrade(districtData.final_grade);
+    if (viewMode === "grade" && selectedGradeData !== null) {
+      if (selectedGradeData.items.length > 0) {
+        const isSelectedDistrict = selectedGradeData.items.some(
+          (item) => item.sigungu === name
+        );
+        if (isSelectedDistrict) {
+          // 선택된 등급의 구만 색칠 - initialDistrictData에서 해당 구의 등급 확인
+          if (initialDistrictData.length > 0) {
+            const districtData = initialDistrictData.find(item => item.sigungu === name);
+            if (districtData) {
+              return getRiskColorByGrade(districtData.final_grade);
+            }
           }
+          // fallback
+          return getRiskColorByDistrict(name, districtsData);
+        } else {
+          // 선택되지 않은 구는 회색으로 비활성화
+          return "rgba(224, 224, 224, 0.7)";
         }
-        // fallback
-        return getRiskColorByDistrict(name, districtsData);
       } else {
-        // 선택되지 않은 구는 회색으로 비활성화
+        // 선택된 등급에 해당하는 데이터가 없으면 모든 구를 회색으로 표시
         return "rgba(224, 224, 224, 0.7)";
       }
     }
