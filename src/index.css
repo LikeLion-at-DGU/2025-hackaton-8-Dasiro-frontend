@@ -11,8 +11,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 body {
@@ -21,23 +19,6 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  height: 100%;
-}
-
-@supports (height: 100dvh) {
-  body {
-    min-height: 100dvh;
-  } /* 사파리 동적툴바 반영 */
-}
-
-/* 구형 iOS Safari 폴백 */
-@supports (-webkit-touch-callout: none) {
-  html {
-    height: -webkit-fill-available;
-  }
-  body {
-    min-height: -webkit-fill-available;
-  }
 }
 
 h1 {
@@ -62,12 +43,4 @@ button {
     color: #213547;
     background-color: #fff6f0;
   }
-}
-
-.footer,
-.inputBar {
-  position: sticky; /* or fixed */
-  bottom: 0;
-  padding-bottom: calc(var(--safe-bottom) + 12px);
-  background: #fff;
 }
