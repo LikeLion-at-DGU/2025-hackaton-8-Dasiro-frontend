@@ -53,13 +53,12 @@ export const BottomInner = style(BasicElement.FlexBoxModel).attrs(() => ({
 `;
 
 export const BottomButtonList = style(BasicElement.FlexBoxModel).attrs<{
-    $isSinkholeMap?: boolean;
     $isSearch?: boolean;
-}>(({ $isSinkholeMap }) => ({
-    $gap: $isSinkholeMap ? 15 : 13,
+}>({
+    $gap: 13,
     $columnDirection: false,
-    $justifyContent: $isSinkholeMap ? "space-between" : "flex-start"
-}))`display: ${({ $isSearch }) => $isSearch ? "none" : "flex"};`;
+    $justifyContent: "flex-start"
+})`display: ${({ $isSearch }) => $isSearch ? "none" : "flex"};`;
 
 export const BottomCardList = style(BasicElement.FlexBoxModel).attrs(() => ({
     $gap: 18,
