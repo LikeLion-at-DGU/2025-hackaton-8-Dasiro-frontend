@@ -37,9 +37,9 @@ export default function CitizenLayout({ onClose, children, footer }: Props) {
 const CitizenLayoutWrapper = styled.div`
   display: flex;
   flex: 1;
-  min-height: 0;
   flex-direction: column;
   padding: 0 1rem;
+  padding-bottom: 4em;
   overflow-y: auto;
 `;
 
