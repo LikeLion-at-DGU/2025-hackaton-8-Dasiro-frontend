@@ -1,28 +1,18 @@
-import { getResponse } from "@shared/lib/instance";
+// Recovery Entity API - delegates to feature APIs
+import * as RecoveryZoneAPI from "@features/recovery-zone/api";
+import type { GetIncidentsParams } from "./model";
+import type { RecoveryStatusResponse, IncidentsResponse } from "./response";
 
-export interface RecoveryCounts {
-  RECOVERING: number;
-  TEMP_REPAIRED: number;
-  RECOVERED: number;
-}
+// Re-export types for backward compatibility
+export type { RecoveryStatusResponse, IncidentsResponse } from "./response";
+export type { IncidentItem } from "./response";
 
-export interface RecoveryDistrictItem {
-  gu_code: number;
-  sido: string;
-  sigungu: string;
-  center_lat: number;
-  center_lng: number;
-  recovery_counts: RecoveryCounts;
-}
-
-export interface RecoveryStatusResponse {
-  status: string;
-  message: string;
-  code: number;
-  data: RecoveryDistrictItem[];
-}
-
+// Recovery status API
 export const getRecoveryStatus = async (): Promise<RecoveryStatusResponse | null> => {
-  const url = `/api/v1/districts/gu/recovery-status`;
-  return await getResponse<RecoveryStatusResponse>(url);
+  return await RecoveryZoneAPI.getRecoveryStatus();
+};
+
+// Incidents API
+export const getIncidents = async (params?: GetIncidentsParams): Promise<IncidentsResponse | null> => {
+  return await RecoveryZoneAPI.getIncidents(params);
 };

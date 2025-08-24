@@ -1,17 +1,18 @@
-import { useState } from "react";
-import { BottomSheetElement } from "@features/recovery-zone";
-import { BottomSheetGradeButton } from "@features/sinkhole-map/ui/BottomSheetElement";
+import { SinkholeBottomSheetElement as BottomSheetElement } from "@features/sinkhole-map";
 
 import { BottomSheetContent } from "@features/sinkhole-map/components/BottomSheetContent";
-import { getDistrictsByGrade } from "@entities/sinkhole/api";
+import { getDistrictsGuByGrade } from "@entities/sinkhole/api";
 import { useSelectGrade } from "@entities/sinkhole/context";
 import type { Grade } from "@entities/sinkhole/selectgrade";
 
 export const GradeBottomInner = () => {
-  // 선택된 싱크홀 등급
-  const [selectedGrade, setSelectedGrade] = useState<number>();
   // Context에서 상태 관리
-  const { setSelectedGradeData, isBadgeActive } = useSelectGrade();
+  const {
+    selectedGrade,
+    setSelectedGrade,
+    setSelectedGradeData,
+    isBadgeActive,
+  } = useSelectGrade();
 
   // 등급별 구 데이터 조회
   const handleGradeClick = async (grade: number) => {
@@ -19,7 +20,7 @@ export const GradeBottomInner = () => {
     console.log(`${grade}등급 클릭됨`);
     
     try {
-      const response = await getDistrictsByGrade(`G${grade}` as Grade);
+      const response = await getDistrictsGuByGrade(`G${grade}` as Grade);
       if (response && response.status === "success") {
         setSelectedGradeData(response.data);
         console.log(`${grade}등급 데이터:`, response.data);
@@ -39,17 +40,16 @@ export const GradeBottomInner = () => {
       {!isBadgeActive && (
         <BottomSheetElement.BottomButtonList
           id="bottomButtonList"
-          $isSinkholeMap={true}
           $isSearch={false}
         >
           {[1, 2, 3, 4, 5].map((grade) => (
-            <BottomSheetGradeButton
+            <BottomSheetElement.BottomSheetGradeButton
               key={grade}
               $isActive={selectedGrade === grade}
               onClick={() => handleGradeClick(grade)}
             >
               {grade}등급
-            </BottomSheetGradeButton>
+            </BottomSheetElement.BottomSheetGradeButton>
           ))}
         </BottomSheetElement.BottomButtonList>
       )}
@@ -62,8 +62,7 @@ export const GradeBottomInner = () => {
           msOverflowStyle: "none",
         }}
       >
-        
-        <BottomSheetContent selectedGrade={selectedGrade} />
+        <BottomSheetContent />
       </BottomSheetElement.BottomCardList>
     </>
   );

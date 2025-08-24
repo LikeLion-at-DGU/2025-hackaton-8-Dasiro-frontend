@@ -7,7 +7,7 @@ import { ToastingBox } from "@features/recovery-zone/components/ToastingBox";
 import logo from "/images/logo.png";
 import { SinkholeMainElement } from "@features/sinkhole-map";
 import { useSelectGrade } from "@entities/sinkhole/context";
-import { getSafezones } from "@entities/sinkhole/api";
+import { getSafezoneGu } from "@entities/sinkhole/api";
 import { useCoupon } from "@shared/contexts/CouponContext";
 import { useRecovery } from "@features/recovery-zone/context/RecoveryContext";
 import { Barcode } from "./Barcode";
@@ -152,7 +152,7 @@ export const PageHeader = ({
       // badge 버튼 클릭 시 안심존 데이터 조회
       sinkholeContext.setIsBadgeActive(true);
       try {
-        const response = await getSafezones();
+        const response = await getSafezoneGu();
         if (response && response.status === "success") {
           sinkholeContext.setSafezoneData(response.data);
           sinkholeContext.setViewMode("safezone");

@@ -44,19 +44,21 @@ export const BottomBar = style(BasicElement.FlexBoxModel).attrs(() => ({
 export const BottomInner = style(BasicElement.FlexBoxModel).attrs(() => ({
     $gap: 20,
     $columnDirection: true,
-    $alignItems: "flex-start"
+    $justifyContent: "flex-start"
 }))`
     position: relative;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
 `;
 
 export const BottomButtonList = style(BasicElement.FlexBoxModel).attrs<{
-    $isSinkholeMap?: boolean;
     $isSearch?: boolean;
-}>(({ $isSinkholeMap }) => ({
-    $gap: $isSinkholeMap ? 15 : 13,
+}>({
+    $gap: 13,
     $columnDirection: false,
-    $justifyContent: $isSinkholeMap ? "space-between" : "flex-start"
-}))`display: ${({ $isSearch }) => $isSearch ? "none" : "flex"};`;
+    $justifyContent: "flex-start"
+})`display: ${({ $isSearch }) => $isSearch ? "none" : "flex"};`;
 
 export const BottomCardList = style(BasicElement.FlexBoxModel).attrs(() => ({
     $gap: 18,
@@ -64,6 +66,9 @@ export const BottomCardList = style(BasicElement.FlexBoxModel).attrs(() => ({
     $alignItems: "flex-start",
     $justifyContent: "flex-start",
 }))`
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     &::-webkit-scrollbar {
         display: none;
     }
