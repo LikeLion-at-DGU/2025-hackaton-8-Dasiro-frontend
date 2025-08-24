@@ -54,6 +54,19 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     startHeightRef.current = height;
   };
 
+  // wheel 이벤트 리스너 등록
+  useEffect(() => {
+    const bottomInnerElement = document.getElementById('bottomInner');
+    if (bottomInnerElement) {
+      bottomInnerElement.addEventListener('wheel', handleInnerWheel, { passive: false });
+    }
+    return () => {
+      if (bottomInnerElement) {
+        bottomInnerElement.removeEventListener('wheel', handleInnerWheel);
+      }
+    };
+  }, [height]);
+
   // 드래그 중 이벤트 처리를 위한 useEffect
   useEffect(() => {
     // 마우스 이동 시 시트 높이 계산 및 업데이트
@@ -111,7 +124,36 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
 
   const clampHeight = (value: number) => Math.max(minHeight, Math.min(100, value));
 
-  const handleInnerWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+  const handleInnerWheel = (e: WheelEvent) => {
+    const bottomCardList = document.querySelector('.bottom-card-list') as HTMLElement;
+    
+    if (height >= 100 && e.deltaY > 0 && bottomCardList) {
+      // 100vh에서 아래로 스크롤할 때: 내부 스크롤 우선
+      const { scrollTop, scrollHeight, clientHeight } = bottomCardList;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+      
+      if (!isAtBottom) {
+        // 내부 스크롤이 끝에 닿지 않았으면 내부 스크롤 우선
+        return;
+      }
+    }
+    
+    if (height >= 100 && e.deltaY < 0 && bottomCardList) {
+      // 100vh에서 위로 스크롤할 때: 내부 스크롤 우선
+      const { scrollTop } = bottomCardList;
+      
+      if (scrollTop > 0) {
+        // 내부 스크롤이 끝에 닿지 않았으면 내부 스크롤 우선
+        return;
+      } else {
+        // 내부 스크롤이 맨 위에 닿았으면 시트 높이 조절
+        e.preventDefault();
+        const deltaVh = (e.deltaY / window.innerHeight) * 100;
+        setHeight((prev) => clampHeight(prev + deltaVh));
+        return;
+      }
+    }
+    
     if (height < 100 || (height > minHeight && e.deltaY < 0)) {
       e.preventDefault();
       const deltaVh = (e.deltaY / window.innerHeight) * 100;
@@ -165,11 +207,11 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
         <BottomSheetElement.BottomInner
           style={{
             '--bottom-sheet-height': `${height}vh`,
+            '--scroll-enabled': height >= 100 ? 'auto' : 'hidden',
             height: `calc(var(--bottom-sheet-height) - 15.5vh)`
           } as React.CSSProperties}
           id="bottomInner"
           onTouchStart={(e) => e.stopPropagation()}
-          onWheel={handleInnerWheel}
           onTouchMove={handleInnerTouchMove}
           onTouchEnd={handleInnerTouchEnd}
         >
