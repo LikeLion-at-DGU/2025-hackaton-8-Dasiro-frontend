@@ -154,7 +154,12 @@ export const FilterButtonList = () => {
           selectedRecoveryStatus === "임시복구"
             ? "TEMP_REPAIRED"
             : "UNDER_REPAIR";
-        getIncidents({ statuses: [status] })
+        getIncidents({ 
+          statuses: [status],
+          lat: selectedLocation.lat,
+          lng: selectedLocation.lng,
+          radius: 3000
+        })
           .then((response) => {
             console.log("불러온 사고 데이터:", response);
             if (
@@ -255,7 +260,7 @@ export const FilterButtonList = () => {
     showCouponModal(place);
   };
 
-  const shouldShowButton = bottomSheetHeight >= 90;
+  const shouldShowButton = bottomSheetHeight >= 45;
 
   // 렌더링 디버깅
   console.log("FilterButtonList 렌더링:", {

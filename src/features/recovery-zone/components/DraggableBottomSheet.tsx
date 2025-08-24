@@ -7,7 +7,7 @@ interface DraggableBottomSheetProps {
   onSetHeight?: (height: number) => void;
 }
 
-const minHeight:number = 45;
+const minHeight:number = 40;
 
 export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) => {
   // 하단 시트의 높이 상태 (vh 단위, 최소 42.3vh에서 최대 100vh)

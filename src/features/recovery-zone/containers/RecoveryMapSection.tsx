@@ -54,7 +54,12 @@ export const RecoveryMapSection = () => {
             status = "RECOVERED";
           }
 
-          const response = await getIncidents({ statuses: [status] });
+          const response = await getIncidents({ 
+            statuses: [status],
+            lat: selectedLocation?.lat,
+            lng: selectedLocation?.lng,
+            radius: 3000
+          });
           if (response?.data?.items && response.data.items.length > 0) {
             setIncidents(response.data.items);
           } else {

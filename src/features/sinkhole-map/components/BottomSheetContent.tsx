@@ -111,10 +111,10 @@ export const BottomSheetContent = () => {
     }
   };
   
-  const shouldShowButton = bottomSheetHeight >= 90;
+  const shouldShowButton = bottomSheetHeight >= 45;
 
   return (
-    <BasicElement.Container $gap={35} $columnDirection={true}>
+    <BasicElement.Container $gap={40} $columnDirection={true}>
       <Banner />
       <GradeInfo />
       <SafetyDescription />
