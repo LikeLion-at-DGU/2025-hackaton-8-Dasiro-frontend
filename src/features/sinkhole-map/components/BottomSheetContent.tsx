@@ -2,10 +2,11 @@ import style from "styled-components";
 import * as BasicElement from "@shared/ui/BasicElement";
 import whitemarker from "/images/icons/whitemarker.png";
 import { Banner } from "@features/sinkhole-map/containers/Banner";
-import { GradeInfo } from "./GradeInfo";
-import { SafetyDescription } from "./SafetyDescription";
-import { SafezoneInfo } from "./SafezoneInfo";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type FC } from "react";
+import { useSelectGrade } from "@entities/sinkhole/context";
+import { GradeFilterContent } from "./GradeFilterContent";
+import { SafezoneFilterContent } from "./SafezoneFilterContent";
+import { SearchResultContent } from "./SearchResultContent";
 
 const StyledButton = style(BasicElement.Button)`
   ${({ theme }) => theme.fonts.bodySemiB14}
@@ -30,6 +31,7 @@ const StyledButton = style(BasicElement.Button)`
 export const BottomSheetContent = () => {
   const [bottomSheetHeight, setBottomSheetHeight] = useState(36);
   const lastHeightRef = useRef(36);
+  const { searchedDistrict, isBadgeActive } = useSelectGrade();
   
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -112,13 +114,19 @@ export const BottomSheetContent = () => {
   };
   
   const shouldShowButton = bottomSheetHeight >= 45;
+  let Content: FC;
+  if (searchedDistrict) {
+    Content = SearchResultContent;
+  } else if (isBadgeActive) {
+    Content = SafezoneFilterContent;
+  } else {
+    Content = GradeFilterContent;
+  }
 
   return (
     <BasicElement.Container $gap={40} $columnDirection={true}>
       <Banner />
-      <GradeInfo/>
-      <SafetyDescription />
-      <SafezoneInfo />
+      <Content />
       <StyledButton
         $width={"fit-content"}
         $gap={10}
