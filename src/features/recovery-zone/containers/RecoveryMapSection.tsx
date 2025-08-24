@@ -12,7 +12,6 @@ import {
   TEMP_REPAIRED_TEST_DATA,
   UNDER_REPAIR_TEST_DATA,
 } from "../constants/testData";
-import marker from "/images/icons/marker.png";
 
 const RecoveryCaption = () => {
   return (
@@ -139,17 +138,11 @@ export const RecoveryMapSection = () => {
   // 마커 추가 및 업데이트
   useEffect(() => {
     if (!mapData || !mapData.mapInstance || !mapData.mapInstance.container) return;
-    
+
     const { mapInstance } = mapData;
     const svg = mapInstance.svg;
-    const containerRect = mapInstance.container.getBoundingClientRect();
-    const containerWidth = containerRect.width || 800;
-    const containerHeight = 241;
 
-    // 기존 마커들 제거
     svg.selectAll(".current-location-dot").remove();
-    svg.selectAll(".immediate-marker").remove();
-    svg.selectAll(".immediate-place-marker").remove();
 
     // 아무 필터도 선택하지 않았을 때 (전체) 현재 위치 표시
     if (selectedRecoveryStatus === "전체" && selectedLocation) {
@@ -173,52 +166,34 @@ export const RecoveryMapSection = () => {
       console.log(`현재 위치 점 추가됨: x=${x}, y=${y}`);
     }
 
-    // incidents 마커 추가
+    const markers: Array<{ lat: number; lng: number; id: string | number; data?: any }> = [];
+
     if (incidents.length > 0) {
-      console.log("마커 추가:", incidents);
       incidents.forEach((incident) => {
-        const [x, y] = mapInstance.projection([incident.lng, incident.lat]) || [0, 0];
-        
-        const testX = x > 0 && x < containerWidth ? x : containerWidth / 2;
-        const testY = y > 0 && y < containerHeight ? y : containerHeight / 2;
-
-        svg
-          .append("image")
-          .attr("class", "immediate-marker")
-          .attr("x", testX - 6.4)
-          .attr("y", testY - 16)
-          .attr("width", 12.8)
-          .attr("height", 16)
-          .attr("href", marker)
-          .style("opacity", "1")
-          .style("cursor", "pointer");
-
-        console.log(`마커 추가됨: x=${testX}, y=${testY}`);
+        markers.push({
+          lat: incident.lat,
+          lng: incident.lng,
+          id: `incident-${incident.id}`,
+          data: incident,
+        });
       });
     }
 
-    // places 마커 추가 (복구완료 필터만)
     if (places.length > 0 && selectedRecoveryStatus === "복구완료") {
-      console.log("places 마커 추가:", places);
-      places.forEach((place) => {
-        const [x, y] = mapInstance.projection([place.lng, place.lat]) || [0, 0];
-        
-        const testX = x > 0 && x < containerWidth ? x : containerWidth / 2;
-        const testY = y > 0 && y < containerHeight ? y : containerHeight / 2;
-
-        svg
-          .append("image")
-          .attr("class", "immediate-place-marker")
-          .attr("x", testX - 6.4)
-          .attr("y", testY - 16)
-          .attr("width", 12.8)
-          .attr("height", 16)
-          .attr("href", marker)
-          .style("opacity", "1")
-          .style("cursor", "pointer");
-
-        console.log(`places 마커 추가됨: x=${testX}, y=${testY}`);
+      places.forEach((place, index) => {
+        markers.push({
+          lat: place.lat,
+          lng: place.lng,
+          id: `place-${index}`,
+          data: place,
+        });
       });
+    }
+
+    if (markers.length > 0) {
+      mapInstance.addMarkers(markers);
+    } else {
+      mapInstance.removeMarkers();
     }
   }, [mapData, incidents, places, selectedLocation, selectedRecoveryStatus]);
 
