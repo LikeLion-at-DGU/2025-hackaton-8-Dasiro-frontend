@@ -40,6 +40,13 @@ export const SinkholeMapSection = ({
   
   // 초기 위험등급 데이터 상태
   const [initialDistrictData, setInitialDistrictData] = useState<DistrictColorItem[]>([]);
+  
+  // 지도 인스턴스 저장을 위한 상태
+  const [mapData, setMapData] = useState<{
+    mapInstance: any;
+    geoJsonData: any;
+    districtsData: any;
+  } | null>(null);
 
   // 초기 위험등급 데이터 로드
   useEffect(() => {
@@ -57,6 +64,21 @@ export const SinkholeMapSection = ({
 
     loadInitialData();
   }, []);
+
+  // 지도 준비 완료 핸들러
+  const handleMapReady = (mapInstance: any, geoJsonData: any, districtsData: any) => {
+    setMapData({ mapInstance, geoJsonData, districtsData });
+  };
+
+  // initialDistrictData가 로드되면 지도 색상 업데이트
+  useEffect(() => {
+    if (mapData && initialDistrictData.length > 0) {
+      console.log("지도 색상 업데이트 실행:", initialDistrictData.length);
+      mapData.mapInstance.setFillColor((feature: any) =>
+        getDistrictColor(feature, mapData.districtsData)
+      );
+    }
+  }, [initialDistrictData, mapData]);
 
   // 필터 선택 여부에 따라 캡션 표시 제어
   useEffect(() => {
@@ -79,40 +101,7 @@ export const SinkholeMapSection = ({
     }
 
 
-    // 초기 위험등급 데이터가 있고, 특별한 viewMode가 아닌 경우 우선 적용
-    if (initialDistrictData.length > 0 && viewMode !== "safezone" && (!selectedGradeData || selectedGradeData.items.length === 0)) {
-      const districtData = initialDistrictData.find(item => item.sigungu === name);
-      if (districtData) {
-        return getRiskColorByGrade(districtData.total_grade);
-      } else {
-        // API 데이터에 없는 구역은 회색으로 표시
-        return "rgba(224, 224, 224, 0.7)";
-      }
-    }
-
-    // 안심존 데이터가 있는 경우
-    if (viewMode === "safezone") {
-      if (safezoneData && safezoneData.items.length > 0) {
-        const safezoneItem = safezoneData.items.find(
-          (item) => item.sigungu === name
-        );
-        if (safezoneItem) {
-          // 안심존 구는 final_grade에 따른 색상 표시 (opacity 0.7 적용)
-          if (safezoneItem.final_grade === "G1") {
-            return "rgba(76, 175, 80, 0.7)"; // 1등급 - 초록색 (매우 안전)
-          } else if (safezoneItem.final_grade === "G2") {
-            return "rgba(139, 195, 74, 0.7)"; // 2등급 - 연한 초록색 (안전)
-          }
-          // 정의되지 않은 등급은 회색으로 표시
-          return "rgba(224, 224, 224, 0.7)";
-        } else {
-          // 안심존이 아닌 구는 회색으로 비활성화 (opacity 0.7 적용)
-          return "rgba(224, 224, 224, 0.7)";
-        }
-      }
-    }
-
-    // 선택된 등급 데이터가 있는 경우
+    // 선택된 등급 데이터가 있는 경우 (특정 등급 버튼 클릭)
     if (
       viewMode === "grade" &&
       selectedGradeData &&
@@ -122,15 +111,46 @@ export const SinkholeMapSection = ({
         (item) => item.sigungu === name
       );
       if (isSelectedDistrict) {
-        // 선택된 구는 위험도에 맞는 색상 표시
+        // 선택된 등급의 구만 색칠 - initialDistrictData에서 해당 구의 등급 확인
+        if (initialDistrictData.length > 0) {
+          const districtData = initialDistrictData.find(item => item.sigungu === name);
+          if (districtData) {
+            return getRiskColorByGrade(districtData.final_grade);
+          }
+        }
+        // fallback
         return getRiskColorByDistrict(name, districtsData);
       } else {
-        // 선택되지 않은 구는 회색으로 비활성화 (opacity 0.7 적용)
+        // 선택되지 않은 구는 회색으로 비활성화
         return "rgba(224, 224, 224, 0.7)";
       }
     }
 
-    // 초기 데이터가 로드되지 않았거나 조건에 맞지 않으면 기본 색상
+    // 안심존 데이터가 있는 경우 (안심존 버튼 클릭)
+    if (viewMode === "safezone") {
+      if (safezoneData && safezoneData.items.length > 0) {
+        const safezoneItem = safezoneData.items.find(
+          (item) => item.sigungu === name
+        );
+        if (safezoneItem) {
+          // 안심존 구는 final_grade에 따른 색상 표시
+          return getRiskColorByGrade(safezoneItem.final_grade);
+        } else {
+          // 안심존이 아닌 구는 회색으로 비활성화
+          return "rgba(224, 224, 224, 0.7)";
+        }
+      }
+    }
+
+    // 기본: initialDistrictData로 모든 구 색칠 (초기 로드 시)
+    if (initialDistrictData.length > 0) {
+      const districtData = initialDistrictData.find(item => item.sigungu === name);
+      if (districtData) {
+        return getRiskColorByGrade(districtData.final_grade);
+      }
+    }
+
+    // 데이터에 없는 구역은 회색으로 표시
     return "rgba(224, 224, 224, 0.7)";
   };
 
@@ -147,6 +167,7 @@ export const SinkholeMapSection = ({
       id={id}
       showCaption={isCaptionVisible}
       captionContent={<RiskCaption />}
+      onMapReady={handleMapReady}
       getDistrictColor={getDistrictColor}
       onDistrictClick={handleDistrictClick}
       onMarkerClick={handleMarkerClick}

@@ -80,7 +80,7 @@ export interface DistrictColorItem {
   sigungu: string;
   center_lat: number;
   center_lng: number;
-  total_grade: "G1" | "G2" | "G3" | "G4" | "G5";
+  final_grade: "G1" | "G2" | "G3" | "G4" | "G5";
 }
 
 // District color data
