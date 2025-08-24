@@ -15,6 +15,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
   const bottomSheetRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(minHeight);
+  const lastTouchYRef = useRef<number | null>(null);
 
   const setHeightFromExternal = (newHeight: number) => {
     setHeight(newHeight);
@@ -79,19 +80,32 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     };
   }, [isDragging, height]);
 
+  const clampHeight = (value: number) => Math.max(minHeight, Math.min(100, value));
+
   const handleInnerWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (height < 100) {
+    if (height < 100 || (height > minHeight && e.deltaY < 0)) {
       e.preventDefault();
-      setHeight(100);
+      const deltaVh = (e.deltaY / window.innerHeight) * 100;
+      setHeight((prev) => clampHeight(prev + deltaVh));
     }
   };
 
   const handleInnerTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (height < 100) {
-      e.preventDefault();
-      e.stopPropagation();
-      setHeight(100);
+    const currentY = e.touches[0].clientY;
+    if (lastTouchYRef.current !== null) {
+      const deltaY = lastTouchYRef.current - currentY;
+      if (height < 100 || (height > minHeight && deltaY < 0)) {
+        e.preventDefault();
+        e.stopPropagation();
+        const deltaVh = (deltaY / window.innerHeight) * 100;
+        setHeight((prev) => clampHeight(prev + deltaVh));
+      }
     }
+    lastTouchYRef.current = currentY;
+  };
+
+  const handleInnerTouchEnd = () => {
+    lastTouchYRef.current = null;
   };
 
   return (
@@ -121,6 +135,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
           onTouchStart={(e) => e.stopPropagation()}
           onWheel={handleInnerWheel}
           onTouchMove={handleInnerTouchMove}
+          onTouchEnd={handleInnerTouchEnd}
         >
           {children}
         </BottomSheetElement.BottomInner>
