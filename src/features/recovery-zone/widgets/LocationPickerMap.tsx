@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { loadKakaoMaps } from "@shared/lib/loadKakaoMaps";
 import { createDasiroPin } from "@shared/components/LocationPin";
-import { isInSeoul, SEOUL_CITY_HALL } from "@shared/utils/locationUtils";
+import { SEOUL_CITY_HALL } from "@shared/utils/locationUtils";
 import styled from "styled-components";
 
 // Geolocation API를 Promise로 래핑
