@@ -32,6 +32,7 @@ color: ${({ theme }) => theme.colors.black03};
 
 export const NoticeBar = style(BasicElement.Container).attrs(() => ({
   $alignItems: "center",
+  $justifyContent: "flex-start",
   $gap: 10,
   $padding: [9, 13],
   $borderRadius: 10

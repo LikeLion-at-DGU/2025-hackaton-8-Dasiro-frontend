@@ -71,7 +71,7 @@ export const FilterButtonList = () => {
           selectedRecoveryStatus === "임시복구"
             ? "TEMP_REPAIRED"
             : "UNDER_REPAIR";
-        getIncidents([status])
+        getIncidents({ statuses: [status] })
           .then((response) => {
             console.log("불러온 사고 데이터:", response);
             if (
@@ -238,7 +238,6 @@ export const FilterButtonList = () => {
       {/* 필터 버튼 목록 - 복구현황, 업종별 필터링 */}
       <BottomSheetElement.BottomButtonList
         id="bottomButtonList"
-        $isSinkholeMap={false}
       >
         {FILTER_BUTTONS.map((button, index) => {
           const getSelectedOption = () => {

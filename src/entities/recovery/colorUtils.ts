@@ -1,4 +1,4 @@
-import type { RecoveryCounts } from "./api";
+import type { RecoveryCounts } from "./response";
 
 // 복구 상태별 색상 정의 (theme 색상 사용)
 export const RECOVERY_COLORS = {
@@ -47,10 +47,10 @@ export const getRegionColor = (
 ): string => {
   const dominantStatus = getDominantRecoveryStatus(counts);
   const dominantCount = counts[dominantStatus];
-  const maxCount = maxCounts[dominantStatus];
+  const maxCount = maxCounts[dominantStatus as keyof typeof maxCounts];
   
   const opacity = calculateOpacity(dominantCount, maxCount);
-  const colorKey = RECOVERY_COLORS[dominantStatus];
+  const colorKey = RECOVERY_COLORS[dominantStatus as keyof typeof RECOVERY_COLORS];
   const hexColor = theme.colors[colorKey];
   
   // hex to rgba 변환
