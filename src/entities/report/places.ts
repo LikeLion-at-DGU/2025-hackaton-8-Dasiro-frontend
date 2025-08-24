@@ -27,6 +27,9 @@ export interface PlacesResponse {
 export interface GetPlacesParams {
   category?: PlaceCategory;
   sigungu?: string;
+  lat?: number;
+  lng?: number;
+  radius?: number;
   page?: number;
   page_size?: number;
 }
@@ -36,6 +39,9 @@ export const getPlaces = (params?: GetPlacesParams) => {
   
   if (params?.category) searchParams.append('category', params.category);
   if (params?.sigungu) searchParams.append('sigungu', params.sigungu);
+  if (params?.lat !== undefined) searchParams.append('lat', params.lat.toString());
+  if (params?.lng !== undefined) searchParams.append('lng', params.lng.toString());
+  if (params?.radius) searchParams.append('radius', params.radius.toString());
   if (params?.page) searchParams.append('page', params.page.toString());
   if (params?.page_size) searchParams.append('page_size', params.page_size.toString());
   

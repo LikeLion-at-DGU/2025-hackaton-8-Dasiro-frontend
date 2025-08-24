@@ -22,7 +22,7 @@ export const getDistrictsByGrade = async (params: GetDistrictsByGradeParams): Pr
 
 // 안심존 구 조회 API
 export const getSafezones = async (): Promise<SafezoneResponse | null> => {
-  const url = `/api/v1/districts/safezones/gu`;
+  const url = `/api/v1/safezones/districts/gu`;
   return await getResponse<SafezoneResponse>(url);
 };
 

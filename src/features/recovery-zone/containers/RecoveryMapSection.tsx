@@ -8,10 +8,6 @@ import {
 } from "../utils/recoveryColorResolver";
 import { useRecovery } from "../context/RecoveryContext";
 import { getIncidents, type IncidentItem } from "@entities/recovery/incidents";
-import {
-  TEMP_REPAIRED_TEST_DATA,
-  UNDER_REPAIR_TEST_DATA,
-} from "../constants/testData";
 
 const RecoveryCaption = () => {
   return (
@@ -48,77 +44,25 @@ export const RecoveryMapSection = () => {
       const fetchIncidents = async () => {
         try {
           let status: "TEMP_REPAIRED" | "UNDER_REPAIR" | "RECOVERED";
-          let testData: any[];
 
           if (selectedRecoveryStatus === "임시복구") {
             status = "TEMP_REPAIRED";
-            testData = TEMP_REPAIRED_TEST_DATA;
           } else if (selectedRecoveryStatus === "복구중") {
             status = "UNDER_REPAIR";
-            testData = UNDER_REPAIR_TEST_DATA;
           } else {
             // 복구완료
             status = "RECOVERED";
-            testData = [
-              {
-                id: 6,
-                occurred_at: "2024-07-01",
-                address: "서울특별시 종로구 종로 111",
-                lat: 37.5703,
-                lng: 126.977,
-                cause: "지하수 누수",
-                method: "완전 복구",
-                status: "RECOVERED" as const,
-                images_count: 2,
-                distance_m: 50,
-              },
-              {
-                id: 7,
-                occurred_at: "2024-06-20",
-                address: "서울특별시 영등포구 여의도동 222",
-                lat: 37.5219,
-                lng: 126.9245,
-                cause: "도로 침하",
-                method: "완전 복구",
-                status: "RECOVERED" as const,
-                images_count: 1,
-                distance_m: 80,
-              },
-            ];
           }
 
           const response = await getIncidents({ statuses: [status] });
           if (response?.data?.items && response.data.items.length > 0) {
             setIncidents(response.data.items);
           } else {
-            // API 데이터가 없으면 테스트 데이터 사용
-            setIncidents(testData);
+            setIncidents([]);
           }
         } catch (error) {
-          console.error("Incidents 데이터 로드 실패, 테스트 데이터 사용:", error);
-          // API 호출 실패시 테스트 데이터 사용
-          let testData: any[];
-          if (selectedRecoveryStatus === "임시복구") {
-            testData = TEMP_REPAIRED_TEST_DATA;
-          } else if (selectedRecoveryStatus === "복구중") {
-            testData = UNDER_REPAIR_TEST_DATA;
-          } else {
-            testData = [
-              {
-                id: 6,
-                occurred_at: "2024-07-01",
-                address: "서울특별시 종로구 종로 111",
-                lat: 37.5703,
-                lng: 126.977,
-                cause: "지하수 누수",
-                method: "완전 복구",
-                status: "RECOVERED" as const,
-                images_count: 2,
-                distance_m: 50,
-              },
-            ];
-          }
-          setIncidents(testData);
+          console.error("Incidents 데이터 로드 실패:", error);
+          setIncidents([]);
         }
       };
       fetchIncidents();

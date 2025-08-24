@@ -1,9 +1,20 @@
 // Recovery Zone 위치 선택 지도 - 모달 내에서 현재 위치를 표시하고 위치 정보를 반환
 import { useEffect, useRef, useState } from "react";
 import { loadKakaoMaps } from "@shared/lib/loadKakaoMaps";
-import { getNowLocation } from "@features/safe-route/lib/getLocation";
 import { createDasiroPin } from "@shared/components/LocationPin";
+import { isInSeoul, SEOUL_CITY_HALL } from "@shared/utils/locationUtils";
 import styled from "styled-components";
+
+// Geolocation API를 Promise로 래핑
+const getCurrentPosition = (options?: PositionOptions): Promise<GeolocationPosition> => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Geolocation is not supported by this browser"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+  });
+};
 
 // 지도 컨테이너 스타일 - 모달 내 지도 영역 정의
 const MapContainer = styled.div`
@@ -77,25 +88,27 @@ export const LocationPickerMap = ({ onLocationSelect, isVisible = true }: Props)
         }
         console.log("containerRef 확인 완료");
 
-        // 기본 위치는 서울시청으로 설정
-        let lat = 37.5665;
-        let lng = 126.9780;
+        // 현재 위치 가져오기 (지도 표시용 - 서울 밖이더라도 실제 위치 표시)
+        console.log("위치 요청 중...");
+        let lat = SEOUL_CITY_HALL.lat;
+        let lng = SEOUL_CITY_HALL.lng;
         let isCurrentLocation = false;
+        let actualAddress = SEOUL_CITY_HALL.address;
 
         try {
-          // 사용자의 현재 위치 가져오기 시도 (GPS 또는 네트워크 기반)
-          console.log("현재 위치 요청 중...");
-          const position = await getNowLocation({
-            enableHighAccuracy: true,  // 고정밀 위치 요청
-            timeout: 10000,           // 10초 타임아웃
-            maximumAge: 60000         // 1분 이내 캐시된 위치 허용
+          // 현재 위치 가져오기 시도
+          const position = await getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
           });
           lat = position.coords.latitude;
           lng = position.coords.longitude;
           isCurrentLocation = true;
+          actualAddress = ""; // 주소는 따로 조회
           console.log("현재 위치 가져오기 성공:", { lat, lng });
         } catch (locationError) {
-          console.warn("위치 정보를 가져올 수 없습니다. 기본 위치(서울시청)를 사용합니다:", locationError);
+          console.warn("위치 정보를 가져올 수 없습니다. 서울시청을 기본 위치로 사용합니다:", locationError);
         }
 
         // Kakao Map 인스턴스 생성
@@ -131,8 +144,8 @@ export const LocationPickerMap = ({ onLocationSelect, isVisible = true }: Props)
           if (status === kakao.maps.services.Status.OK && result[0]) {
             address = result[0].address?.address_name || result[0].road_address?.address_name || address;
           } else if (!isCurrentLocation) {
-            // 현재 위치가 아닌 기본 위치일 때 서울시청 주소 설정
-            address = "서울특별시 중구 태평로1가 31";
+            // 기본 위치(서울시청)일 때 미리 설정된 주소 사용
+            address = actualAddress || SEOUL_CITY_HALL.address;
           }
           
           // 부모 컴포넌트에 위치 정보 전달

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MainElement } from "@features/recovery-zone/ui";
 import { LocationPickerMap } from "@features/recovery-zone/widgets/LocationPickerMap";
 import { useRecovery } from "@features/recovery-zone/context/RecoveryContext";
+import { isInSeoul, SEOUL_CITY_HALL } from "@shared/utils/locationUtils";
 
 interface LocationSetWithModalProps {
   initialLocationText?: string;
@@ -41,7 +42,17 @@ export const LocationSetWithModal = ({
   const handleLocationAllow = () => {
     if (tempSelectedLocation) {
       console.log("위치 허용됨:", tempSelectedLocation);
-      setSelectedLocation(tempSelectedLocation); // Context에 위치 설정
+      
+      // 서울 범위 체크
+      if (!isInSeoul(tempSelectedLocation.lat, tempSelectedLocation.lng)) {
+        alert("서울 밖의 위치입니다. 서울시청을 기본 위치로 설정합니다.");
+        
+        // 서울시청으로 대체
+        setSelectedLocation(SEOUL_CITY_HALL);
+      } else {
+        // 서울 범위 내이면 그대로 사용
+        setSelectedLocation(tempSelectedLocation);
+      }
     }
     setIsModalOpen(false);
   };
