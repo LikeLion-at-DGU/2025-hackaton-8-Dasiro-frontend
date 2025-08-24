@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { BaseMapSection, CaptionContent } from "@shared/components/BaseMapSection";
 import { getRiskColorByDistrict } from "@features/sinkhole-map/utils/riskColorResolver";
-import { useSelectGrade } from "@entities/sinkhole/context";
+import { SAFEZONE_TEST_DATA } from "@features/sinkhole-map/constants";
 
 const RiskCaption = () => {
   console.log("RiskCaption 렌더링됨 - 이 로그가 보이면 캡션이 화면에 표시되고 있는 것입니다.");
@@ -58,15 +58,16 @@ export const SinkholeMapSection = ({
     // forceViewMode가 "safezone"인 경우 최우선으로 테스트 데이터 사용
     if (forceViewMode === "safezone") {
       console.log(`District ${name}: Using test data for safezone mode`);
-      // 테스트: 강남구와 서초구만 G1, G2로 색칠 (opacity 0.7 적용)
-      if (name === "강남구") {
-        return "rgba(76, 175, 80, 0.7)"; // 1등급 - 초록색 (매우 안전)
-      } else if (name === "서초구") {
-        return "rgba(139, 195, 74, 0.7)"; // 2등급 - 연한 초록색 (안전)
-      } else {
-        // 나머지는 회색으로 비활성화 (opacity 0.7 적용)
-        return "rgba(224, 224, 224, 0.7)";
+      const testItem = SAFEZONE_TEST_DATA.find((item) => item.sigungu === name);
+      if (testItem) {
+        if (testItem.final_grade === "G1") {
+          return "rgba(76, 175, 80, 0.7)"; // 1등급 - 초록색 (매우 안전)
+        } else if (testItem.final_grade === "G2") {
+          return "rgba(139, 195, 74, 0.7)"; // 2등급 - 연한 초록색 (안전)
+        }
       }
+      // 나머지는 회색으로 비활성화 (opacity 0.7 적용)
+      return "rgba(224, 224, 224, 0.7)";
     }
 
     // 안심존 데이터가 있는 경우
