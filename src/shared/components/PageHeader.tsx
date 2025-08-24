@@ -1,4 +1,5 @@
-import { useState, useEffect, type ReactNode } from "react";
+// PageHeader.tsx
+import { useState, useEffect, useRef, type ReactNode, useCallback } from "react";
 import style from "styled-components";
 import * as BasicElement from "@shared/ui/BasicElement";
 import { MainElement } from "@features/recovery-zone/ui";
@@ -34,17 +35,17 @@ const CouponContent = style(BasicElement.Container).attrs(() => ({
   max-width: 320px;
   box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.1);
   position: relative;
-  
+
   /* 마스크를 사용하여 양쪽 끝에 원형 클리핑 */
-  mask: 
+  mask:
     radial-gradient(circle 12px at -12px 175px, transparent 12px, black 12px),
     radial-gradient(circle 12px at calc(100% + 12px) 175px, transparent 12px, black 12px);
   mask-composite: intersect;
-  -webkit-mask: 
+  -webkit-mask:
     radial-gradient(circle 12px at -12px 175px, transparent 12px, black 12px),
     radial-gradient(circle 12px at calc(100% + 12px) 175px, transparent 12px, black 12px);
   -webkit-mask-composite: source-in;
-  
+
   #notice{
     text-align: center;
     color: ${({ theme }) => theme.colors.black01};
@@ -56,7 +57,7 @@ const CouponContent = style(BasicElement.Container).attrs(() => ({
     color: ${({ theme }) => theme.colors.black02};
     ${({ theme }) => theme.fonts.capSemi12};
   }
-  
+
   #coupon-wrapper{
     width: 260px;
     display: flex;
@@ -66,7 +67,7 @@ const CouponContent = style(BasicElement.Container).attrs(() => ({
     gap: 15px;
     border-bottom: 3px dashed #E1E1E1;
     padding-bottom: 20px;
-    
+
     .coupon-title{
       color: ${({ theme }) => theme.colors.black01};
       ${({ theme }) => theme.fonts.subExtra16};
@@ -86,70 +87,91 @@ export const PageHeader = ({
   showSinkholeButton = false,
   showToast = false,
 }: PageHeaderProps) => {
-  const [activeButton, setActiveButton] = useState<"badge" | "layer">("layer"); // 기본값은 layer
+  const [activeButton, setActiveButton] = useState<"badge" | "layer">("layer");
 
-  // 토스트 메시지 상태
+  // 토스트 상태
   const [showToastMessage, setShowToastMessage] = useState(false);
-  const [toastFilterType, setToastFilterType] = useState<"임시복구" | "복구중">(
-    "임시복구"
-  );
+  const [isToastExiting, setIsToastExiting] = useState(false);
+  const [toastFilterType, setToastFilterType] = useState<"임시복구" | "복구중">("임시복구");
+  const [lastShownStatus, setLastShownStatus] = useState<string | null>(null);
 
-  // CouponContext 안전하게 사용
-  let couponModalPlace = null;
-  let closeCouponModal = () => {};
+  // 타이머 ref (중복 실행/메모리 누수 방지)
+  const showTimerRef = useRef<number | null>(null);
+  const hideTimerRef = useRef<number | null>(null);
 
+  const clearTimers = useCallback(() => {
+    if (showTimerRef.current) {
+      clearTimeout(showTimerRef.current);
+      showTimerRef.current = null;
+    }
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  }, []);
+
+  // CouponContext 안전 사용
+  let couponModalPlace: any = null;
+  let closeCouponModal: () => void = () => {};
   try {
     const couponContext = useCoupon();
     couponModalPlace = couponContext.couponModalPlace;
     closeCouponModal = couponContext.closeCouponModal;
-  } catch {
-    // CouponProvider가 없는 경우 기본값 사용
-  }
+  } catch { /* Provider 미존재시 무시 */ }
 
-  // RecoveryContext 안전하게 사용 (토스트 표시를 위해)
-  let selectedRecoveryStatus = "전체";
+  // RecoveryContext (토스트용)
+  let selectedRecoveryStatus: string = "전체";
   try {
     if (showToast) {
       const recoveryContext = useRecovery();
       selectedRecoveryStatus = recoveryContext.selectedRecoveryStatus;
     }
-  } catch {
-    // RecoveryProvider가 없는 경우 기본값 사용
-  }
+  } catch { /* Provider 미존재시 무시 */ }
 
-  // 복구현황 변경 감지해서 토스트 표시
+  // 복구현황 변경 → 토스트 표시/종료 스케줄링
   useEffect(() => {
-    if (
-      showToast &&
-      (selectedRecoveryStatus === "임시복구" ||
-        selectedRecoveryStatus === "복구중")
-    ) {
-      setToastFilterType(selectedRecoveryStatus as "임시복구" | "복구중");
-      setShowToastMessage(true);
-      const timer = setTimeout(() => {
-        setShowToastMessage(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    } else {
-      setShowToastMessage(false);
-    }
-  }, [selectedRecoveryStatus, showToast]);
+    clearTimers();
 
-  // Sinkhole 컨텍스트 (showSinkholeButton이 true일 때만 사용)
+    const isToastTarget =
+      selectedRecoveryStatus === "임시복구" || selectedRecoveryStatus === "복구중";
+
+    if (showToast && isToastTarget && selectedRecoveryStatus !== lastShownStatus) {
+      // 기존 토스트 정리 후 새 토스트 준비
+      setShowToastMessage(false);
+      setIsToastExiting(false);
+
+      showTimerRef.current = window.setTimeout(() => {
+        setToastFilterType(selectedRecoveryStatus as "임시복구" | "복구중");
+        setShowToastMessage(true);
+        setIsToastExiting(false);
+        setLastShownStatus(selectedRecoveryStatus);
+
+        // 3초 뒤 퇴장 애니메이션
+        hideTimerRef.current = window.setTimeout(() => {
+          setIsToastExiting(true);
+        }, 3000);
+      }, 100);
+    } else if (!showToast || !isToastTarget) {
+      // 대상 상태가 아니면 토스트 숨김 (lastShownStatus는 유지하여 재등장 방지)
+      setShowToastMessage(false);
+      setIsToastExiting(false);
+    }
+
+    return () => {
+      clearTimers();
+    };
+  }, [selectedRecoveryStatus, showToast, clearTimers]);
+
+  // Sinkhole 컨텍스트
   let sinkholeContext: any = null;
   try {
-    if (showSinkholeButton) {
-      sinkholeContext = useSelectGrade();
-    }
-  } catch {
-    // Context가 없는 경우 무시
-  }
+    if (showSinkholeButton) sinkholeContext = useSelectGrade();
+  } catch { /* Provider 미존재시 무시 */ }
 
   const handleButtonClick = async (type: "badge" | "layer") => {
     setActiveButton(type);
 
     if (type === "badge" && sinkholeContext) {
-      // badge 버튼 클릭 시 안심존 데이터 조회
       sinkholeContext.setIsBadgeActive(true);
       try {
         const response = await getSafezoneGu();
@@ -164,17 +186,14 @@ export const PageHeader = ({
         console.error("안심존 API 호출 실패:", error);
       }
     } else if (type === "layer" && sinkholeContext) {
-      // layer 버튼 클릭 시 등급 모드로 복귀
       sinkholeContext.setIsBadgeActive(false);
       sinkholeContext.setViewMode("grade");
     }
   };
 
-  // 쿠폰 모달 관련 핸들러
+  // 쿠폰 모달 close
   const handleCouponModalClose = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      closeCouponModal();
-    }
+    if (e.target === e.currentTarget) closeCouponModal();
   };
 
   return (
@@ -184,10 +203,10 @@ export const PageHeader = ({
           <img
             src={logo}
             alt="로고"
-            style={{ 
-              width: "60px", 
+            style={{
+              width: "60px",
               height: "27.961px",
-              display: showToastMessage ? "none" : "block"
+              display: showToastMessage ? "none" : "block",
             }}
           />
           {showLocationSet && (
@@ -195,23 +214,37 @@ export const PageHeader = ({
               <LocationSetWithModal initialLocationText={locationSetText} />
             </div>
           )}
+
           {/* 토스트 메시지 - TopBar 안에 표시 */}
-          {showToastMessage && <ToastingBox filterType={toastFilterType} />}
+          {showToastMessage && (
+            <ToastingBox
+              filterType={toastFilterType}
+              isExiting={isToastExiting}
+              onAnimationEnd={() => {
+                if (isToastExiting) {
+                  setShowToastMessage(false);
+                  setIsToastExiting(false);
+                  // 🔸 lastShownStatus는 유지해, 동일 상태에서 재등장 방지
+                }
+              }}
+            />
+          )}
         </MainElement.TopBar>
 
-        {searchBar && searchBar}
-        {noticeBar && noticeBar}
+        {searchBar}
+        {noticeBar}
+
         {showSinkholeButton && (
           <div id="sinkhole-button">
             {SinkholeMainElement.SinkholeButton(
               "layer",
               activeButton === "layer",
-              () => handleButtonClick("layer")
+              () => handleButtonClick("layer"),
             )}
             {SinkholeMainElement.SinkholeButton(
               "badge",
               activeButton === "badge",
-              () => handleButtonClick("badge")
+              () => handleButtonClick("badge"),
             )}
           </div>
         )}
@@ -241,39 +274,28 @@ export const PageHeader = ({
                 onClick={handleCouponModalClose}
               />
             </div>
-            <div
-              style={{ display: "flex", gap: "30px", flexDirection: "column" }}
-            >
+
+            <div style={{ display: "flex", gap: "30px", flexDirection: "column" }}>
               <div id="notice">
-                <img
-                  src={logo}
-                  alt="로고"
-                  style={{ width: "77.25px", height: "36px" }}
-                />
+                <img src={logo} alt="로고" style={{ width: "77.25px", height: "36px" }} />
               </div>
+
               <div id="coupon-wrapper">
                 <div className="coupon-title">카페 미묘 10% 할인쿠폰</div>
-                <p className="content">
-                  쿠폰 발급 및 사용 기간 : 2025.07.01 ~ 07.31
-                </p>
+                <p className="content">쿠폰 발급 및 사용 기간 : 2025.07.01 ~ 07.31</p>
               </div>
+
               <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  paddingBottom: "25px",
-                }}
+                style={{ display: "flex", justifyContent: "center", paddingBottom: "25px" }}
               >
                 <Barcode
-                  data={`COUPON-${
-                    couponModalPlace?.name || "DEFAULT"
-                  }-${Date.now()}`}
+                  data={`COUPON-${couponModalPlace?.name || "DEFAULT"}-${Date.now()}`}
                   width={200}
                   height={60}
                   showText={true}
-                  text={`${String(
-                    couponModalPlace?.name?.slice(0, 3) || "001"
-                  )}-${String(Date.now()).slice(-6)}`}
+                  text={`${String(couponModalPlace?.name?.slice(0, 3) || "001")}-${String(
+                    Date.now(),
+                  ).slice(-6)}`}
                   barColor="#333"
                   backgroundColor="transparent"
                 />

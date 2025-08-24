@@ -97,6 +97,15 @@ export const BottomSheetContent = () => {
   }, []);
   
   const handleMinimizeSheet = () => {
+    // BottomCardList 스크롤을 맨 위로 이동
+    const bottomCardList = document.querySelector('.bottom-card-list') as HTMLElement;
+    if (bottomCardList) {
+      bottomCardList.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+    
     if ((window as any).setBottomSheetHeight) {
       (window as any).setBottomSheetHeight(36);
     }
