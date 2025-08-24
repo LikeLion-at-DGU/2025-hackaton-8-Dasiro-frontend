@@ -23,8 +23,12 @@ export default function CitizenLayout({ onClose, children, footer }: Props) {
         </button>
         <p className="title">땅땅이</p>
       </Header>
-      <DateBadge />
-      <CitizenLayoutWrapper>{children}</CitizenLayoutWrapper>
+
+      <CitizenLayoutWrapper>
+        {" "}
+        <DateBadge />
+        {children}
+      </CitizenLayoutWrapper>
       {footer && <Dock>{footer}</Dock>}
     </>
   );
@@ -36,6 +40,7 @@ const CitizenLayoutWrapper = styled.div`
   min-height: 0;
   flex-direction: column;
   padding: 0 1rem;
+  overflow-y: auto;
 `;
 
 const Header = styled.div`

@@ -4,7 +4,7 @@ import { getNowLocation } from "@features/safe-route/lib/getLocation";
 import { fitToCoords } from "../lib/fitBounds";
 import type { Loc } from "@shared/types/location";
 import { reverseGeocode } from "../lib/reverseGeocode";
-import markerIcon from "@shared/assets/icons/marker.png";
+import markerIcon from "/images/icons/marker.png";
 import FloatAction from "@shared/ui/FloatAction";
 
 type Props = {
@@ -56,7 +56,7 @@ export default function SafeRouteMap({
 
       markerImageRef.current = new kakao.maps.MarkerImage(
         markerIcon,
-        new kakao.maps.Size(20, 27),
+        new kakao.maps.Size(33, 33),
         { offset: new kakao.maps.Point(10, 27) }
       );
       setMapReady(true);

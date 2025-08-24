@@ -36,7 +36,7 @@ export const getAnalysisCopy = (rawScore: number) => {
       analysis: `해당 장소는 위험도 ${s}%로 ${riskLabel(
         s
       )}예요. 큰 위험은 아니지만, 작은 균열의 가능성이 있어요.`,
-      action: `안전을 위해 다시로가 즉시 해당 구청에 자동 신고했어요. 지금 바로 가까운 안전 경로로 이동해 주세요!`,
+      action: `안전을 위해 다시로가 즉시 해당 시청에 자동 신고했어요. 지금 바로 가까운 안전 경로로 이동해 주세요!`,
     };
   }
   return {
@@ -45,6 +45,6 @@ export const getAnalysisCopy = (rawScore: number) => {
     analysis: `해당 장소는 위험도 ${s}%로 ${riskLabel(
       s
     )}예요. 지반 침하 징후가 강하게 나타나고 있어요.`,
-    action: `안전을 위해 다시로가 즉시 해당 구청에 자동 신고했어요. 지금 바로 가까운 안전 경로로 이동해 주세요!`,
+    action: `안전을 위해 다시로가 즉시 해당 시청에 자동 신고했어요. 지금 바로 가까운 안전 경로로 이동해 주세요!`,
   };
 };
