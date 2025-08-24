@@ -150,7 +150,7 @@ export const SafetyDescription = ({
     return (
       <StyledContainer $gap={60}>
         {/* G1, G2 등급 행정구에만 색상 표시하는 지도 */}
-        <MapSection colorMode="risk" forceViewMode="safezone" />
+        <MapSection id="bottomsheet-map" colorMode="risk" forceViewMode="safezone" />
         <div>
           <div className="title">
             <img src={badge} alt="뱃지" className="ddang" />
@@ -183,7 +183,7 @@ export const SafetyDescription = ({
     return (
       <StyledContainer $gap={60}>
         {/* 선택된 등급 행정구에만 색상 표시하는 지도 */}
-        <MapSection colorMode="risk" />
+        <MapSection id="bottomsheet-grade-map" colorMode="risk" />
         <div>
           <div className="title">
             <img src={ddang} alt="땅땅이" className="ddang" />

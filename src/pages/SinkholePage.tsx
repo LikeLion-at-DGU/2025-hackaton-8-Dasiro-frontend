@@ -55,6 +55,7 @@ const SinkholePageContent = () => {
         <MainElement.MainContent />
         {/* 서울 지역 싱크홀 위험도 지도 - 구별 색상 표시 */}
         <MapSection 
+          id="main-map"
           colorMode="risk" 
           forceViewMode={isBadgeActive ? "safezone" : undefined}
         />

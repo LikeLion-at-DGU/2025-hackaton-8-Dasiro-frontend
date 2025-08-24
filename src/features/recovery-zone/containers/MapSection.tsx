@@ -1,5 +1,7 @@
 // Recovery Zone 지도 섹션 - 서울 구별 복구 현황을 색상으로 표시하는 지도
 import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
+import * as BasicElement from "@shared/ui/BasicElement";
 import { createD3SeoulMap } from "@shared/lib/SeoulMap/d3SeoulMap";
 import {
   getRecoveryColor,
@@ -18,6 +20,20 @@ import {
 } from "../constants/testData";
 import marker from "/images/icons/marker.png";
 
+// 지도 캡션을 위한 styled component
+interface MapCaptionProps {
+  $isVisible: boolean;
+}
+
+const MapCaption = styled(BasicElement.Overlay)<MapCaptionProps>`
+  display: ${({ $isVisible }) => ($isVisible ? "flex" : "none !important")};
+  gap: 10px;
+  padding: 4px 8px;
+  font-size: 10px;
+  color: #666;
+  font-weight: 500;
+`;
+
 const CaptionContent = ({ color, title }: { color: string; title: string }) => {
   return (
     <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
@@ -32,6 +48,9 @@ const CaptionContent = ({ color, title }: { color: string; title: string }) => {
 };
 
 const RiskCaption = () => {
+  console.log(
+    "RiskCaption 렌더링됨 - 이 로그가 보이면 캡션이 화면에 표시되고 있는 것입니다."
+  );
   return (
     <>
       <CaptionContent color="green01" title="1등급" />
@@ -58,11 +77,13 @@ interface MapSectionProps {
   forceViewMode?: "grade" | "safezone"; // 강제로 viewMode 지정
   showIncidents?: boolean; // incidents 마커 표시 여부
   incidentStatuses?: ("UNDER_REPAIR" | "TEMP_REPAIRED" | "RECOVERED")[]; // 표시할 incident 상태
+  id?: string; // 디버깅용 지도 식별자
 }
 
 export const MapSection = ({
   colorMode = "recovery",
   forceViewMode,
+  id = "unknown",
 }: MapSectionProps) => {
   // Recovery용 Context (colorMode가 recovery일 때만 사용)
   let selectedLocation = null;
@@ -86,18 +107,21 @@ export const MapSection = ({
   let selectedGradeData = null;
   let safezoneData = null;
   let viewMode = "grade";
+  let isBadgeActive = false;
   try {
     if (colorMode === "risk") {
       const sinkholeContext = useSelectGrade();
       selectedGradeData = sinkholeContext.selectedGradeData;
       safezoneData = sinkholeContext.safezoneData;
       viewMode = forceViewMode || sinkholeContext.viewMode;
+      isBadgeActive = sinkholeContext.isBadgeActive;
     }
   } catch {
     // SinkholeContext가 없는 경우
     selectedGradeData = null;
     safezoneData = null;
     viewMode = "grade";
+    isBadgeActive = false;
   }
 
   // D3 Map 인스턴스를 저장하는 ref
@@ -106,6 +130,14 @@ export const MapSection = ({
   const containerRef = useRef<HTMLDivElement>(null);
   // incidents 데이터 상태
   const [incidents, setIncidents] = useState<IncidentItem[]>([]);
+  // 캡션 표시 여부 상태
+  const [isCaptionVisible, setIsCaptionVisible] = useState(true);
+
+  // 필터 선택 여부에 따라 캡션 표시 제어
+  useEffect(() => {
+    // 뱃지 모드(안심존)일 때만 캡션 숨김
+    setIsCaptionVisible(false);
+  }, [isBadgeActive]);
 
   // incidents 데이터 로드 - 복구 현황 필터에 따라 자동으로 마커 표시
   useEffect(() => {
@@ -539,23 +571,25 @@ export const MapSection = ({
         {/* 서울 25개 구의 복구 현황을 색상으로 표시하는 정적 지도 컨테이너 */}
       </div>
 
-      {/* 지도 캡션 - 오른쪽 아래 (safezone 모드일 때는 숨김) */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "-30px",
-          right: "0px",
-          backgroundColor: "transparent",
-          padding: "4px 8px",
-          fontSize: "10px",
-          color: "#666",
-          fontWeight: "500",
-          display: viewMode === "safezone" || forceViewMode === "safezone" ? "none" : "flex",
-          gap: "10px",
-        }}
+      {/* 지도 캡션 - 오른쪽 아래 (필터 선택 시 숨김) */}
+      <MapCaption
+        $position="absolute"
+        $bottom={-30}
+        $right={0}
+        $backgroundColor="transparent"
+        $isVisible={isCaptionVisible}
       >
+        {(() => {
+          console.log(`[${id}] 캡션 표시:`, {
+            isBadgeActive,
+            selectedGradeData: selectedGradeData?.items?.length,
+            forceViewMode,
+            isVisible: isCaptionVisible,
+          });
+          return null;
+        })()}
         {colorMode === "recovery" ? <RecoveryCaption /> : <RiskCaption />}
-      </div>
+      </MapCaption>
     </div>
   );
 };
