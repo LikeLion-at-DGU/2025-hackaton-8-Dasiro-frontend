@@ -172,6 +172,11 @@ export const PageHeader = ({
     setActiveButton(type);
 
     if (type === "badge" && sinkholeContext) {
+      // 부동산 안심존 필터 선택 시 등급 필터와 검색 비활성화
+      sinkholeContext.setSelectedGradeData(null);
+      sinkholeContext.setSelectedGrade(null);
+      sinkholeContext.setSearchedDistrict(null);
+      
       sinkholeContext.setIsBadgeActive(true);
       try {
         const response = await getSafezoneGu();

@@ -24,6 +24,7 @@ interface SearchBarProps {
   onSearch?: (query: string) => void;
   onInputChange?: (value: string) => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export const SearchBar = ({
@@ -31,16 +32,19 @@ export const SearchBar = ({
   onSearch,
   onInputChange,
   className = "",
+  disabled = false,
 }: SearchBarProps) => {
   const [searchValue, setSearchValue] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const value = e.target.value;
     setSearchValue(value);
     onInputChange?.(value);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (disabled) return;
     if (e.key === "Enter") {
       onSearch?.(searchValue);
     }
@@ -56,17 +60,22 @@ export const SearchBar = ({
       $gap={10}
     >
       <BasicElement.Button
-        onClick={() => onSearch?.(searchValue)}
+        onClick={() => !disabled && onSearch?.(searchValue)}
         $padding={4}
         $backgroundColor="transparent"
         $border="none"
-        $hover={true}
+        $hover={!disabled}
         $width="fit-content"
+        style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
       >
         <img
           src={search}
           alt="검색 돋보기"
-          style={{ width: "15px", aspectRatio: "1/1" }}
+          style={{ 
+            width: "15px", 
+            aspectRatio: "1/1",
+            opacity: disabled ? 0.5 : 1
+          }}
         />
       </BasicElement.Button>
       <input
@@ -75,6 +84,8 @@ export const SearchBar = ({
         onChange={handleInputChange}
         onKeyPress={handleKeyPress}
         placeholder={placeholder}
+        disabled={disabled}
+        style={{ opacity: disabled ? 0.5 : 1 }}
       />
     </StyledContainer>
   );

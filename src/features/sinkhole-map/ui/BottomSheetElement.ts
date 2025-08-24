@@ -25,7 +25,7 @@ export const BottomWrapper = style(BasicElement.Container).attrs(() => ({
   $boxShadow: "4px 0 12px 0 rgba(0, 0, 0, 0.05)",
 }))`
   background: ${({ theme }) => theme.colors.black08};
-  min-height: 36vh;
+  min-height: 45vh;
   position: relative;
   z-index: 10;
   user-select: none;

@@ -7,7 +7,7 @@ interface DraggableBottomSheetProps {
   onSetHeight?: (height: number) => void;
 }
 
-const minHeight: number = 36;
+const minHeight: number = 35;
 
 export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) => {
   const [height, setHeight] = useState(minHeight);

@@ -1,6 +1,7 @@
 import * as BasicElement from "@shared/ui/BasicElement";
 import style from "styled-components";
 import ddang from "/images/icons/ddang.png";
+import { useSelectGrade } from "@entities/sinkhole/context";
 
 const BannerWrapper = style(BasicElement.Container).attrs(() => ({
   $padding: [16, 22],
@@ -25,11 +26,21 @@ const BannerWrapper = style(BasicElement.Container).attrs(() => ({
 `;
 
 const Banner = () => {
+  const {isBadgeActive} = useSelectGrade();
   return (
     <BannerWrapper id="Banner">
       <div>
-        <div>한 눈에 보는 우리 동네 땅 건강검진 결과 🩺</div>
-        <div>땅땅이가 알려주는 싱크홀맵 안전등급</div>
+        {!isBadgeActive ? (
+          <>
+            <div>한 눈에 보는 우리 동네 땅 건강검진 결과 🩺</div>
+            <div>땅땅이가 알려주는 싱크홀맵 안전등급</div>
+          </>
+        ) : (
+          <>
+            <div>우리 동네, 안심하고 거래할 수 있을까? 🏡</div>
+            <div>땅땅이가 알려주는 ‘부동산 안심존’</div>
+          </>
+        )}
       </div>
       <img src={ddang} alt="땅땅이" />
     </BannerWrapper>
