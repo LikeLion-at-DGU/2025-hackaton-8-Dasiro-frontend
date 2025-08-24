@@ -32,7 +32,7 @@ export default function MessageList({ messages, autoScroll = true }: Props) {
 
 const Scroll = styled.div`
   flex: 1;
-  min-height: 0;
+  /* min-height: 0; */
 `;
 
 const Inner = styled.ul`

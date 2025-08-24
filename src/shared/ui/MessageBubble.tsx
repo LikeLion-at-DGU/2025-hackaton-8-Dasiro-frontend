@@ -97,8 +97,6 @@ const Row = styled.div<{
   justify-content: ${({ $side }) =>
     $side === "right" ? "flex-end" : "flex-start"};
   align-items: flex-start;
-
-  padding-bottom: ${({ $padBottom }) => ($padBottom ? "3rem" : "0")};
 `;
 
 const AvatarWrapper = styled.div`
