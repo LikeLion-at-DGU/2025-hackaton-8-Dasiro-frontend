@@ -1,12 +1,8 @@
 // Recovery Zone 페이지 - 복구 상권 현황을 보여주는 메인 페이지
 import * as S from "@widget/MapWithOverlay/MapWithOverlay.styles";
-import {
-  MainElement,
-  BottomSheet,
-  BackgroundCircles,
-} from "@features/recovery-zone";
+import { MainElement, BottomSheet } from "@features/recovery-zone";
 import { RecoveryMapSection } from "@features/recovery-zone/containers/RecoveryMapSection";
-import { PageHeader, NoticeBar } from "@shared/components";
+import { PageHeader, NoticeBar, BackgroundCircles } from "@shared/components";
 import { RecoveryProvider } from "@features/recovery-zone/context/RecoveryContext";
 import { CouponProvider } from "@shared/contexts/CouponContext";
 import FloatAction from "@shared/ui/FloatAction";

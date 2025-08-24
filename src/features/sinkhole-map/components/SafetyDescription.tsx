@@ -47,14 +47,8 @@ const StyledContainer = styled(BasicElement.Container).attrs(({ $gap }) => ({
   }
 `;
 
-interface SafetyDescriptionProps {
-  selectedGrade?: number;
-}
-
-export const SafetyDescription = ({
-  selectedGrade = 1,
-}: SafetyDescriptionProps) => {
-  const { isBadgeActive, selectedGradeData } = useSelectGrade();
+export const SafetyDescription = () => {
+  const { isBadgeActive, selectedGradeData, selectedGrade } = useSelectGrade();
   const [safezoneDistrictNames, setSafezoneDistrictNames] =
     useState<string>("염창동, 신길동, 마포동");
   const [gradeDistrictInfo, setGradeDistrictInfo] = useState<{
@@ -62,7 +56,7 @@ export const SafetyDescription = ({
     count: number;
   }>({ names: "", count: 0 });
 
-  const displayGrade = selectedGrade;
+  const displayGrade = selectedGrade ?? 1;
 
   // 등급이 선택되었는지 확인 (selectedGradeData가 있고 items가 있으면 등급 선택됨)
   const isGradeSelected =
@@ -187,10 +181,10 @@ export const SafetyDescription = ({
         <div>
           <div className="title">
             <img src={ddang} alt="땅땅이" className="ddang" />
-            {GradeSubtitle(selectedGrade, gradeDistrictInfo.names, gradeDistrictInfo.count).subtitle}
+            {GradeSubtitle(displayGrade, gradeDistrictInfo.names, gradeDistrictInfo.count).subtitle}
           </div>
           <div className="content" id="filter-description">
-            {generateDynamicContent(selectedGrade, gradeDistrictInfo.names, gradeDistrictInfo.count)
+            {generateDynamicContent(displayGrade, gradeDistrictInfo.names, gradeDistrictInfo.count)
               .split(/(\S+?동(?:, \S+?동)*|총 \d+개 동)/)
               .map((part: any, index: any) => {
                 if (part.match(/\S+?동(?:, \S+?동)*/)) {

@@ -1,7 +1,7 @@
 // Sinkhole Map 섹션 - 서울 구별 싱크홀 위험도를 색상으로 표시하는 지도
 import { useEffect, useState } from "react";
 import { BaseMapSection, CaptionContent } from "@shared/components/BaseMapSection";
-import { getRiskColorByDistrict } from "@features/recovery-zone/utils/riskColorResolver";
+import { getRiskColorByDistrict } from "@features/sinkhole-map/utils/riskColorResolver";
 import { useSelectGrade } from "@entities/sinkhole/context";
 
 const RiskCaption = () => {
