@@ -44,7 +44,7 @@ export const BottomBar = style(BasicElement.FlexBoxModel).attrs(() => ({
 export const BottomInner = style(BasicElement.FlexBoxModel).attrs(() => ({
     $gap: 20,
     $columnDirection: true,
-    $alignItems: "flex-start"
+    $justifyContent: "flex-start"
 }))`
     position: relative;
     overflow-y: auto;
