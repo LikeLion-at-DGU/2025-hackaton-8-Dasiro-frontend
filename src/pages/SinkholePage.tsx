@@ -23,7 +23,7 @@ const SinkholePageContent = () => {
       return;
     }
 
-    // 검색 시 등급 필터 비활성화
+    // 검색 시 등급 필터와 badge 비활성화
     setSelectedGradeData(null);
     setSelectedGrade(null);
 
@@ -52,6 +52,7 @@ const SinkholePageContent = () => {
             <SearchBar
               placeholder="안전지역 동 단위로 검색하기"
               onSearch={handleSearch}
+              disabled={isBadgeActive}
             />
           }
           showSinkholeButton={true}

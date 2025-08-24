@@ -60,9 +60,10 @@ export interface DistrictSearchItem {
   center_lat: number;
   center_lng: number;
   is_safezone: boolean;
+  total_grade: string;
   ground_stability: string;
   groundwater_impact: string;
-  underground_densityj: string;
+  underground_density: string;
   old_building_dist: string;
   incident_history: string;
 }
@@ -110,6 +111,14 @@ export interface SafezoneDistrictItem {
   center_lat: number;
   center_lng: number;
   is_safezone: boolean;
+  total_grade?: string; // G1|G2
+}
+
+// Safezone district data
+export interface SafezoneDistrictData {
+  items: SafezoneDistrictItem[];
+  as_of_date: string;
+  count: number;
 }
 
 // getSafezoneDistricts API response
@@ -117,8 +126,5 @@ export interface SafezoneDistrictsResponse {
   status: string;
   message: string;
   code: number;
-  data: {
-    items: SafezoneDistrictItem[];
-    count: number;
-  };
+  data: SafezoneDistrictData;
 }

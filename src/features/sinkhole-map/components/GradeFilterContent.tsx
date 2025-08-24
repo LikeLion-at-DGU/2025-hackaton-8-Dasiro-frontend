@@ -15,6 +15,7 @@ const StyledContainer = styled(BasicElement.Container).attrs(({ $gap }) => ({
   $justifyContent: "center",
   $gap: $gap,
 }))`
+
   ${({ theme }) => theme.fonts.subBold16};
   .title {
     display: flex;
@@ -90,7 +91,7 @@ export const GradeFilterContent = () => {
         <GradeInfo />
         <StyledContainer $gap={60}>
           <MapSection id="bottomsheet-grade-map" colorMode="risk" />
-          <div style={{ gap: "15px" }}>
+          <div style={{ gap: "15px", display: "flex", flexDirection: "column" }}>
             <div className="title">
               <img src={ddang} alt="땅땅이" className="ddang" />
               {GradeSubtitle(displayGrade, gradeDistrictInfo.names, gradeDistrictInfo.count).subtitle}
@@ -118,8 +119,8 @@ export const GradeFilterContent = () => {
 
   return (
     <>
-      <GradeInfo />
-      <StyledContainer $gap={15}>
+      <GradeInfo/>
+      <StyledContainer id="filter-description">
         <div className="title">
           <img src={ddang} alt="땅땅이" className="ddang" />
           {defaultGradeInfo.subtitle}

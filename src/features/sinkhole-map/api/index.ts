@@ -41,7 +41,7 @@ export const getSafezoneGu = async (): Promise<SafezoneResponse | null> => {
 
 // 안심존 행정동 조회 API (동별)
 export const getSafezoneDistricts = async (): Promise<SafezoneDistrictsResponse | null> => {
-  const url = `/api/v1/districts/safezones`;
+  const url = `/api/v1/districts/safezones/districts`;
   return await getResponse<SafezoneDistrictsResponse>(url);
 };
 

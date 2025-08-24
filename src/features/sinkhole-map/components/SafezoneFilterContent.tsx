@@ -61,7 +61,7 @@ export const SafezoneFilterContent = () => {
   return (
     <StyledContainer $gap={60}>
       <MapSection id="bottomsheet-map" colorMode="risk" forceViewMode="safezone" />
-      <div>
+      <div style={{ gap: "15px", display: "flex", flexDirection: "column" }}>
         <div className="title">
           <img src={badge} alt="뱃지" className="ddang" />
           안전 복구 완료! '부동산 안심존'이에요.
