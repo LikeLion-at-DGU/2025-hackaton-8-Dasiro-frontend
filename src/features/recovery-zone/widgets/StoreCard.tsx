@@ -4,7 +4,7 @@ import coupon from "/images/icons/coupon.png";
 import move from "/images/icons/move.png";
 
 interface StoreCardProps {
-  place: Place;
+  place: Place & { has_active_coupons?: boolean };
   cardClickHandler?: (place: Place) => void;
   couponClickHandler?: (place: Place) => void;
 }
@@ -64,10 +64,12 @@ export const StoreCard = ({
           <div className="cardPos">{place.address}</div>
         </div>
       </BottomSheetElement.CardContent>
-      <div className="couponBox" onClick={handleCouponClick}>
-        <img src={coupon} alt="" className="coupon" />
-        <span>쿠폰</span>
-      </div>
+      {place.has_active_coupons && (
+        <div className="couponBox" onClick={handleCouponClick}>
+          <img src={coupon} alt="" className="coupon" />
+          <span>쿠폰</span>
+        </div>
+      )}
     </BottomSheetElement.BottomCard>
   );
 };
