@@ -320,6 +320,7 @@ export const FilterButtonList = () => {
       </BottomSheetElement.BottomButtonList>
       {/* 복구 완료 상점 카드 목록 - 스크롤 가능한 세로 목록 */}
       <BottomSheetElement.BottomCardList
+        id="bottom-card-list"
         style={{
           overflowY: "auto",
           paddingBottom: "20px",
