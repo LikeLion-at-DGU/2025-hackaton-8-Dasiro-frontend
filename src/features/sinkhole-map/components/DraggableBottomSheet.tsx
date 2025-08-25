@@ -58,19 +58,47 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
       e.preventDefault();
+      
+      // 드래그 방향에 따라 즉시 최대/최소 높이로 설정
       const deltaY = startYRef.current - e.clientY;
-      const deltaVh = (deltaY / window.innerHeight) * 100;
-      const newHeight = Math.max(minHeight, Math.min(100, startHeightRef.current + deltaVh));
-      setHeight(newHeight);
+      if (deltaY > 0) {
+        // 위로 드래그 시 100vh
+        if ((window as any).setBottomSheetHeight) {
+          (window as any).setBottomSheetHeight(100);
+        } else {
+          setHeight(100);
+        }
+      } else if (deltaY < 0) {
+        // 아래로 드래그 시 35vh
+        if ((window as any).setBottomSheetHeight) {
+          (window as any).setBottomSheetHeight(35);
+        } else {
+          setHeight(minHeight);
+        }
+      }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging) return;
       e.preventDefault();
+      
+      // 드래그 방향에 따라 즉시 최대/최소 높이로 설정
       const deltaY = startYRef.current - e.touches[0].clientY;
-      const deltaVh = (deltaY / window.innerHeight) * 100;
-      const newHeight = Math.max(minHeight, Math.min(100, startHeightRef.current + deltaVh));
-      setHeight(newHeight);
+      if (deltaY > 0) {
+        // 위로 드래그 시 100vh
+        if ((window as any).setBottomSheetHeight) {
+          (window as any).setBottomSheetHeight(100);
+        } else {
+          setHeight(100);
+        }
+      } else if (deltaY < 0) {
+        // 아래로 드래그 시 35vh
+        if ((window as any).setBottomSheetHeight) {
+          (window as any).setBottomSheetHeight(35);
+        } else {
+          setHeight(minHeight);
+        }
+      }
     };
 
     const handleEnd = () => {
@@ -126,8 +154,21 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     
     if (height < 100 || (height > minHeight && e.deltaY < 0)) {
       e.preventDefault();
-      const deltaVh = (e.deltaY / window.innerHeight) * 100;
-      setHeight((prev) => clampHeight(prev + deltaVh));
+      // 위로 스크롤할 때는 바로 35vh로 설정 (바텀시트 축소)
+      if (e.deltaY < 0) {
+        if ((window as any).setBottomSheetHeight) {
+          (window as any).setBottomSheetHeight(35);
+        } else {
+          setHeight(minHeight);
+        }
+      } else {
+        // 아래로 스크롤할 때는 바로 100vh로 설정 (바텀시트 확장)
+        if ((window as any).setBottomSheetHeight) {
+          (window as any).setBottomSheetHeight(100);
+        } else {
+          setHeight(100);
+        }
+      }
     }
   };
 
@@ -138,8 +179,21 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
       if (height < 100 || (height > minHeight && deltaY < 0)) {
         e.preventDefault();
         e.stopPropagation();
-        const deltaVh = (deltaY / window.innerHeight) * 100;
-        setHeight((prev) => clampHeight(prev + deltaVh));
+        // 위로 드래그할 때는 바로 35vh로 설정 (바텀시트 축소)
+        if (deltaY > 0) {
+          if ((window as any).setBottomSheetHeight) {
+            (window as any).setBottomSheetHeight(35);
+          } else {
+            setHeight(minHeight);
+          }
+        } else {
+          // 아래로 드래그할 때는 바로 100vh로 설정 (바텀시트 확장)
+          if ((window as any).setBottomSheetHeight) {
+            (window as any).setBottomSheetHeight(100);
+          } else {
+            setHeight(100);
+          }
+        }
       }
     }
     lastTouchYRef.current = currentY;
@@ -156,7 +210,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
       style={{
         height: `${height}vh`,
         minHeight: minHeight,
-        transition: isDragging ? "none" : "height 0.3s ease",
+        transition: isDragging ? "none" : "height 0.8s ease-out",
       }}
     >
       <BottomSheetElement.BottomBar className="bottomBar">
@@ -171,6 +225,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
           style={{
             "--bottom-sheet-height": `${height}vh`,
             maxHeight: `calc(var(--bottom-sheet-height) - 15.5vh)`,
+            overflow: height >= 100 ? 'auto' : 'hidden',
           } as React.CSSProperties}
           id="bottomInner"
           onTouchStart={(e) => e.stopPropagation()}

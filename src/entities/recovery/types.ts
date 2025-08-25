@@ -25,7 +25,7 @@ export type CardItem = {
   type: "place" | "incident";
   // Place 전용 필드 (type: "place"일 때만 사용)
   category?: "FOOD" | "CAFE" | "CONVENIENCE" | "OTHER";
-  main_image_url?: string | null;
+  main_image_url?: string;
   kakao_url?: string | null;
   has_active_coupons?: boolean;
   // Incident 전용 필드 (type: "incident"일 때만 사용)

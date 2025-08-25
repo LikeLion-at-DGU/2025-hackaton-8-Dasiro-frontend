@@ -14,13 +14,7 @@ export const getIncidents = async (params?: GetIncidentsParams): Promise<Inciden
   const statuses = params?.statuses || ["UNDER_REPAIR", "TEMP_REPAIRED"];
   const statusParam = statuses.join(',');
   
-  // 위치 기반 파라미터가 있으면 near 엔드포인트 사용
-  if (params?.lat && params?.lng && params?.radius) {
-    const url = `/api/v1/incidents/near?lat=${params.lat}&lng=${params.lng}&radius=${params.radius}&status=${statusParam}`;
-    return await getResponse<IncidentsResponse>(url);
-  }
-  
-  // 기본 incidents 엔드포인트
+  // 기본 incidents 엔드포인트 (위치 기반 파라미터 제거)
   const url = `/api/v1/incidents?status=${statusParam}`;
   return await getResponse<IncidentsResponse>(url);
 };

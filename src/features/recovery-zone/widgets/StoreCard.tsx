@@ -11,7 +11,7 @@ interface StoreCardProps {
 
 // Legacy props interface for backward compatibility (incident data)
 interface LegacyStoreCardProps {
-  image: string;
+  image: string | undefined;
   title: string;
   address: string;
   occurred_at: string;
@@ -89,7 +89,7 @@ export const LegacyStoreCard = ({
     >
       <BottomSheetElement.CardContent>
         <div style={{ borderRadius: "8px", overflow: "hidden" }}>
-          <img src={image} alt={title} />
+          <img src={image} alt={title}/>
         </div>
         <div className="cardInner" style={{ gap: "7px" }}>
           <div className="cardDate">{occurred_at}</div>
