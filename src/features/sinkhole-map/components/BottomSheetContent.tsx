@@ -139,6 +139,7 @@ export const BottomSheetContent = ({ height }: BottomSheetContentProps) => {
       $columnDirection={true}
       style={{
         overflow: height >= 100 ? "visible" : "hidden",
+        paddingBottom: "10vh"
       }}
       $justifyContent="flex-start"
       id="bottom-sheet-content"
