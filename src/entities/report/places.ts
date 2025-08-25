@@ -48,6 +48,12 @@ export const getPlaces = (params?: GetPlacesParams) => {
   const url = searchParams.toString() 
     ? `/api/v1/places?${searchParams.toString()}`
     : `/api/v1/places`;
+  
+  console.log('getPlaces API 요청:', {
+    url,
+    params,
+    searchParams: searchParams.toString()
+  });
     
   return getResponse(url) as Promise<PlacesResponse>;
 };
