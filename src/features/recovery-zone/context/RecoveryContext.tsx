@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { Place } from "@entities/report/places";
+import { getPlaces } from "@entities/report/places";
 import { SEOUL_CITY_HALL } from "@shared/utils/locationUtils";
 
 interface LocationData {
@@ -22,10 +23,10 @@ interface RecoveryContextType {
   setIsLoading: (loading: boolean) => void;
   
   // 필터 상태
-  selectedRecoveryStatus: string;
-  setSelectedRecoveryStatus: (status: string) => void;
-  selectedCategory: string;
-  setSelectedCategory: (category: string) => void;
+  selectedRecoveryStatus: string | null;
+  setSelectedRecoveryStatus: (status: string | null) => void;
+  selectedCategory: string | null;
+  setSelectedCategory: (category: string | null) => void;
 }
 
 const RecoveryContext = createContext<RecoveryContextType | undefined>(undefined);
@@ -44,9 +45,42 @@ export const RecoveryProvider = ({ children }: RecoveryProviderProps) => {
   const [places, setPlaces] = useState<Place[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
-  // 필터 상태 - 초기값은 undefined로 설정하여 버튼에 라벨이 표시되도록 함
-  const [selectedRecoveryStatus, setSelectedRecoveryStatus] = useState<string>("전체");
-  const [selectedCategory, setSelectedCategory] = useState<string>("전체");
+  // 필터 상태 - 초기값은 null로 설정하여 전체 데이터를 보여주도록 함
+  const [selectedRecoveryStatus, setSelectedRecoveryStatus] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const wrappedSetSelectedRecoveryStatus = (status: string | null) => {
+    console.log("setSelectedRecoveryStatus 호출됨:", status);
+    setSelectedRecoveryStatus(status);
+  };
+
+  const wrappedSetSelectedCategory = (category: string | null) => {
+    console.log("setSelectedCategory 호출됨:", category);
+    setSelectedCategory(category);
+  };
+  
+  console.log("RecoveryContext 상태:", { selectedRecoveryStatus, selectedCategory });
+
+  // 전체 상점 리스트를 초기 로드에서 가져오기
+  useEffect(() => {
+    const fetchAllPlaces = async () => {
+      try {
+        console.log("RecoveryContext에서 getPlaces 호출 시작");
+        setIsLoading(true);
+        const response = await getPlaces();
+        console.log("RecoveryContext에서 받은 응답:", response);
+        if (response?.data?.items) {
+          setPlaces(response.data.items);
+        }
+      } catch (error) {
+        console.error("전체 상점 리스트 로드 실패:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAllPlaces();
+  }, []);
 
   return (
     <RecoveryContext.Provider value={{
@@ -57,9 +91,9 @@ export const RecoveryProvider = ({ children }: RecoveryProviderProps) => {
       isLoading,
       setIsLoading,
       selectedRecoveryStatus,
-      setSelectedRecoveryStatus,
+      setSelectedRecoveryStatus: wrappedSetSelectedRecoveryStatus,
       selectedCategory,
-      setSelectedCategory,
+      setSelectedCategory: wrappedSetSelectedCategory,
     }}>
       {children}
     </RecoveryContext.Provider>

@@ -16,7 +16,7 @@ const RECOVERY_MESSAGES: Record<string, string> = {
 export const NoticeBar = ({ className = "" }: NoticeBarProps) => {
   let selectedStatus = "전체";
   try {
-    selectedStatus = useRecovery().selectedRecoveryStatus;
+    selectedStatus = useRecovery().selectedRecoveryStatus ?? "전체";
   } catch {
     // RecoveryProvider가 없는 경우 기본 메시지 사용
   }

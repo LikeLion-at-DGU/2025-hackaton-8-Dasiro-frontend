@@ -1,5 +1,11 @@
 // PageHeader.tsx
-import { useState, useEffect, useRef, type ReactNode, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  type ReactNode,
+  useCallback,
+} from "react";
 import style from "styled-components";
 import * as BasicElement from "@shared/ui/BasicElement";
 import { MainElement } from "@features/recovery-zone/ui";
@@ -62,7 +68,7 @@ const CouponContent = style(BasicElement.Container).attrs(() => ({
     width: 260px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     gap: 15px;
     border-bottom: 3px dashed #E1E1E1;
@@ -92,7 +98,9 @@ export const PageHeader = ({
   // 토스트 상태
   const [showToastMessage, setShowToastMessage] = useState(false);
   const [isToastExiting, setIsToastExiting] = useState(false);
-  const [toastFilterType, setToastFilterType] = useState<"임시복구" | "복구중">("임시복구");
+  const [toastFilterType, setToastFilterType] = useState<"임시복구" | "복구중">(
+    "임시복구"
+  );
   const [lastShownStatus, setLastShownStatus] = useState<string | null>(null);
 
   // 타이머 ref (중복 실행/메모리 누수 방지)
@@ -117,25 +125,34 @@ export const PageHeader = ({
     const couponContext = useCoupon();
     couponModalPlace = couponContext.couponModalPlace;
     closeCouponModal = couponContext.closeCouponModal;
-  } catch { /* Provider 미존재시 무시 */ }
+  } catch {
+    /* Provider 미존재시 무시 */
+  }
 
   // RecoveryContext (토스트용)
   let selectedRecoveryStatus: string = "전체";
   try {
     if (showToast) {
       const recoveryContext = useRecovery();
-      selectedRecoveryStatus = recoveryContext.selectedRecoveryStatus;
+      selectedRecoveryStatus = recoveryContext.selectedRecoveryStatus ?? "전체";
     }
-  } catch { /* Provider 미존재시 무시 */ }
+  } catch {
+    /* Provider 미존재시 무시 */
+  }
 
   // 복구현황 변경 → 토스트 표시/종료 스케줄링
   useEffect(() => {
     clearTimers();
 
     const isToastTarget =
-      selectedRecoveryStatus === "임시복구" || selectedRecoveryStatus === "복구중";
+      selectedRecoveryStatus === "임시복구" ||
+      selectedRecoveryStatus === "복구중";
 
-    if (showToast && isToastTarget && selectedRecoveryStatus !== lastShownStatus) {
+    if (
+      showToast &&
+      isToastTarget &&
+      selectedRecoveryStatus !== lastShownStatus
+    ) {
       // 기존 토스트 정리 후 새 토스트 준비
       setShowToastMessage(false);
       setIsToastExiting(false);
@@ -166,7 +183,9 @@ export const PageHeader = ({
   let sinkholeContext: any = null;
   try {
     if (showSinkholeButton) sinkholeContext = useSelectGrade();
-  } catch { /* Provider 미존재시 무시 */ }
+  } catch {
+    /* Provider 미존재시 무시 */
+  }
 
   const handleButtonClick = async (type: "badge" | "layer") => {
     setActiveButton(type);
@@ -176,7 +195,7 @@ export const PageHeader = ({
       sinkholeContext.setSelectedGradeData(null);
       sinkholeContext.setSelectedGrade(null);
       sinkholeContext.setSearchedDistrict(null);
-      
+
       sinkholeContext.setIsBadgeActive(true);
       try {
         const response = await getSafezoneGu();
@@ -244,12 +263,12 @@ export const PageHeader = ({
             {SinkholeMainElement.SinkholeButton(
               "layer",
               activeButton === "layer",
-              () => handleButtonClick("layer"),
+              () => handleButtonClick("layer")
             )}
             {SinkholeMainElement.SinkholeButton(
               "badge",
               activeButton === "badge",
-              () => handleButtonClick("badge"),
+              () => handleButtonClick("badge")
             )}
           </div>
         )}
@@ -280,27 +299,44 @@ export const PageHeader = ({
               />
             </div>
 
-            <div style={{ display: "flex", gap: "30px", flexDirection: "column" }}>
+            <div
+              style={{ display: "flex", gap: "30px", flexDirection: "column" }}
+            >
               <div id="notice">
-                <img src={logo} alt="로고" style={{ width: "77.25px", height: "36px" }} />
+                <img
+                  src={logo}
+                  alt="로고"
+                  style={{ width: "77.25px", height: "36px" }}
+                />
               </div>
 
               <div id="coupon-wrapper">
-                <div className="coupon-title">카페 미묘 10% 할인쿠폰</div>
-                <p className="content">쿠폰 발급 및 사용 기간 : 2025.07.01 ~ 07.31</p>
+                <div className="coupon-title">
+                  {couponModalPlace?.name || "카페 미묘"}{" "}
+                </div>
+                <div className="coupon-title">10% 할인쿠폰</div>
+                <p className="content">
+                  쿠폰 발급 및 사용 기간 : 2025.07.01 ~ 07.31
+                </p>
               </div>
 
               <div
-                style={{ display: "flex", justifyContent: "center", paddingBottom: "25px" }}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  paddingBottom: "25px",
+                }}
               >
                 <Barcode
-                  data={`COUPON-${couponModalPlace?.name || "DEFAULT"}-${Date.now()}`}
+                  data={`COUPON-${
+                    couponModalPlace?.name || "DEFAULT"
+                  }-${Date.now()}`}
                   width={200}
                   height={60}
                   showText={true}
-                  text={`${String(couponModalPlace?.name?.slice(0, 3) || "001")}-${String(
-                    Date.now(),
-                  ).slice(-6)}`}
+                  text={`${String(
+                    couponModalPlace?.name?.slice(0, 3) || "001"
+                  )}-${String(Date.now()).slice(-6)}`}
                   barColor="#333"
                   backgroundColor="transparent"
                 />
