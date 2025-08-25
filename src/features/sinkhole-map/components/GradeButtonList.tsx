@@ -34,15 +34,15 @@ export const GradeBottomInner = ({ height }: GradeBottomInnerProps) => {
     // 등급 버튼 클릭 시 검색 결과와 badge 비활성화
     setSearchedDistrict(null);
     setIsBadgeActive(false);
-    
+
     // 등급 선택시 바텀시트를 100vh로 확장
     if ((window as any).setBottomSheetHeight) {
       (window as any).setBottomSheetHeight(100);
     }
-    
+
     setSelectedGrade(grade);
     console.log(`${grade}등급 클릭됨`);
-    
+
     try {
       const response = await getDistrictsGuByGrade(`G${grade}` as Grade);
       if (response && response.status === "success") {
@@ -78,6 +78,7 @@ export const GradeBottomInner = ({ height }: GradeBottomInnerProps) => {
         </BottomSheetElement.BottomButtonList>
       )}
       <BottomSheetElement.BottomCardList
+        className="bottom-card-list"
         style={{
           gap: "40px",
           overflowY: height >= 100 ? "auto" : "hidden",

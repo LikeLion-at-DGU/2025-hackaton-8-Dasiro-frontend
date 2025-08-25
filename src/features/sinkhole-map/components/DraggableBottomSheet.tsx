@@ -9,8 +9,11 @@ interface DraggableBottomSheetProps {
 
 const minHeight: number = 35;
 
-export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) => {
+export const DraggableBottomSheet = ({
+  children,
+}: DraggableBottomSheetProps) => {
   const [height, setHeight] = useState(minHeight);
+  const isExpanded = height >= 100;
   const [isDragging, setIsDragging] = useState(false);
   const bottomSheetRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
@@ -43,13 +46,15 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
   };
 
   useEffect(() => {
-    const bottomInnerElement = document.getElementById('bottomInner');
+    const bottomInnerElement = document.getElementById("bottomInner");
     if (bottomInnerElement) {
-      bottomInnerElement.addEventListener('wheel', handleInnerWheel, { passive: false });
+      bottomInnerElement.addEventListener("wheel", handleInnerWheel, {
+        passive: false,
+      });
     }
     return () => {
       if (bottomInnerElement) {
-        bottomInnerElement.removeEventListener('wheel', handleInnerWheel);
+        bottomInnerElement.removeEventListener("wheel", handleInnerWheel);
       }
     };
   }, [height]);
@@ -58,7 +63,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
       e.preventDefault();
-      
+
       // 드래그 방향에 따라 즉시 최대/최소 높이로 설정
       const deltaY = startYRef.current - e.clientY;
       if (deltaY > 0) {
@@ -81,7 +86,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging) return;
       e.preventDefault();
-      
+
       // 드래그 방향에 따라 즉시 최대/최소 높이로 설정
       const deltaY = startYRef.current - e.touches[0].clientY;
       if (deltaY > 0) {
@@ -108,7 +113,9 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleEnd);
-      document.addEventListener("touchmove", handleTouchMove, { passive: false });
+      document.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
+      });
       document.addEventListener("touchend", handleEnd);
     }
 
@@ -120,26 +127,29 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     };
   }, [isDragging, height]);
 
-  const clampHeight = (value: number) => Math.max(minHeight, Math.min(100, value));
+  const clampHeight = (value: number) =>
+    Math.max(minHeight, Math.min(100, value));
 
   const handleInnerWheel = (e: WheelEvent) => {
-    const bottomCardList = document.querySelector('.bottom-card-list') as HTMLElement;
-    
+    const bottomCardList = document.querySelector(
+      ".bottom-card-list"
+    ) as HTMLElement;
+
     if (height >= 100 && e.deltaY > 0 && bottomCardList) {
       // 100vh에서 아래로 스크롤할 때: 내부 스크롤 우선
       const { scrollTop, scrollHeight, clientHeight } = bottomCardList;
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-      
+
       if (!isAtBottom) {
         // 내부 스크롤이 끝에 닿지 않았으면 내부 스크롤 우선
         return;
       }
     }
-    
+
     if (height >= 100 && e.deltaY < 0 && bottomCardList) {
       // 100vh에서 위로 스크롤할 때: 내부 스크롤 우선
       const { scrollTop } = bottomCardList;
-      
+
       if (scrollTop > 0) {
         // 내부 스크롤이 끝에 닿지 않았으면 내부 스크롤 우선
         return;
@@ -151,9 +161,9 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
         return;
       }
     }
-    
+
     if (height < 100 || (height > minHeight && e.deltaY < 0)) {
-      e.preventDefault();
+      // e.preventDefault();
       // 위로 스크롤할 때는 바로 35vh로 설정 (바텀시트 축소)
       if (e.deltaY < 0) {
         if ((window as any).setBottomSheetHeight) {
@@ -203,6 +213,22 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     lastTouchYRef.current = null;
   };
 
+  const handleWheelCapture = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (!isExpanded) {
+      // e.preventDefault();
+      e.stopPropagation();
+      handleInnerWheel(e.nativeEvent);
+    }
+  };
+
+  const handleTouchMoveCapture = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isExpanded) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleInnerTouchMove(e);
+    }
+  };
+
   return (
     <BottomSheetElement.BottomSheetWrapper
       id="bottomSheet"
@@ -211,6 +237,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
         height: `${height}vh`,
         minHeight: minHeight,
         transition: isDragging ? "none" : "height 0.8s ease-out",
+        overscrollBehaviorY: "none",
       }}
     >
       <BottomSheetElement.BottomBar className="bottomBar">
@@ -222,12 +249,18 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
           onTouchStart={handleTouchStart}
         />
         <BottomSheetElement.BottomInner
-          style={{
-            "--bottom-sheet-height": `${height}vh`,
-            maxHeight: `calc(var(--bottom-sheet-height) - 15.5vh)`,
-            overflow: height >= 100 ? 'auto' : 'hidden',
-          } as React.CSSProperties}
           id="bottomInner"
+          style={
+            {
+              "--bottom-sheet-height": `${height}vh`,
+              maxHeight: `calc(var(--bottom-sheet-height) - 15.5vh)`,
+              overflow: isExpanded ? "auto" : "hidden",
+              touchAction: isExpanded ? "auto" : "none",
+              overscrollBehavior: "contain",
+            } as React.CSSProperties
+          }
+          onWheelCapture={handleWheelCapture}
+          onTouchMoveCapture={handleTouchMoveCapture}
           onTouchStart={(e) => e.stopPropagation()}
           onTouchMove={handleInnerTouchMove}
           onTouchEnd={handleInnerTouchEnd}
@@ -238,4 +271,3 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
     </BottomSheetElement.BottomSheetWrapper>
   );
 };
-
