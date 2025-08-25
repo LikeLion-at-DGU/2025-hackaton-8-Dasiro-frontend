@@ -107,6 +107,12 @@ export const BottomCard = style(BasicElement.FlexBoxModel).attrs(() => ({
 }))`
     border-bottom: 1px dashed #E1E1E1;
     padding-bottom: 12px;
+    .legacy-store{
+        img{
+            height: 100px;
+            width: 100px;
+        }
+    }
     >img {
         height: 70px;
         aspect-ratio: 1:1;
@@ -171,7 +177,7 @@ export const CardContent = style(BasicElement.FlexBoxModel).attrs(() => ({
     }
     img{
         width: 70px;
-        height: 70px;
+        aspect-ratio: 1/1;
     }
 `;
 

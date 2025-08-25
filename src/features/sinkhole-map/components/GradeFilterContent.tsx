@@ -103,7 +103,7 @@ export const GradeFilterContent = () => {
     }
   }, [isGradeSelected, selectedGrade]);
 
-  if (isGradeSelected) {
+  if (isGradeSelected || selectedGrade !== null) {
     return (
       <>
         <GradeInfo />
@@ -152,7 +152,7 @@ export const GradeFilterContent = () => {
     15
   );
 
-  if (isGradeSelected) {
+  if (isGradeSelected || selectedGrade !== null) {
     return (
       <>
         <GradeInfo />

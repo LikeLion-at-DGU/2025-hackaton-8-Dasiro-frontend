@@ -1,16 +1,10 @@
 import { DraggableBottomSheet } from "@features/sinkhole-map/components/DraggableBottomSheet";
 import { GradeBottomInner } from "../components/GradeButtonList";
 
-interface SinkholeBottomSheetProps {
-  id?: string;
-}
-
-export const BottomSheet = ({ id = "sinkhole" }: SinkholeBottomSheetProps) => {
+export const BottomSheet = () => {
   return (
-    <div id={id}>
       <DraggableBottomSheet>
-        <GradeBottomInner />
+        {(height) => <GradeBottomInner height={height} />}
       </DraggableBottomSheet>
-    </div>
   );
 };

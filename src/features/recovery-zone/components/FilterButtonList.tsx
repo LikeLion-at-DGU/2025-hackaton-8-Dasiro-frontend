@@ -184,6 +184,7 @@ export const FilterButtonList = () => {
                   method: incident.method,
                   status: incident.status,
                   images_count: incident.images_count,
+                  main_image_url: incident.image_url,
                 })
               );
               setPlaces(convertedItems as any);
@@ -319,7 +320,7 @@ export const FilterButtonList = () => {
       <BottomSheetElement.BottomCardList
         id="bottom-card-list"
         style={{
-          overflowY: "auto",
+          overflowY: bottomSheetHeight >= 100 ? "auto" : "hidden",
           paddingBottom: "20px",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -339,7 +340,7 @@ export const FilterButtonList = () => {
               return (
                 <LegacyStoreCard
                   key={cardItem.id}
-                  image={cardItem.main_image_url} // incident는 이미지가 없으므로 기본 이미지
+                  image={cardItem.main_image_url}
                   title={cardItem.name}
                   address={cardItem.address}
                   occurred_at={cardItem.occurred_at || ""}

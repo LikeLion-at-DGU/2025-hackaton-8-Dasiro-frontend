@@ -3,7 +3,7 @@ import { SinkholeBottomSheetElement as BottomSheetElement } from "../ui";
 import sheetbar from "/images/icons/sheetbar.png";
 
 interface DraggableBottomSheetProps {
-  children: ReactNode;
+  children: (height: number) => ReactNode;
   onSetHeight?: (height: number) => void;
 }
 
@@ -232,7 +232,7 @@ export const DraggableBottomSheet = ({ children }: DraggableBottomSheetProps) =>
           onTouchMove={handleInnerTouchMove}
           onTouchEnd={handleInnerTouchEnd}
         >
-          {children}
+          {children(height)}
         </BottomSheetElement.BottomInner>
       </BottomSheetElement.BottomBar>
     </BottomSheetElement.BottomSheetWrapper>
