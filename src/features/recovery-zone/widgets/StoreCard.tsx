@@ -43,7 +43,7 @@ export const StoreCard = ({
   };
 
   return (
-    <BottomSheetElement.BottomCard onClick={handleCardClick} id="bottomCard">
+    <BottomSheetElement.BottomCard onClick={handleCardClick} className="store-card">
       <BottomSheetElement.CardContent>
         <div style={{ borderRadius: "8px", overflow: "hidden" }}>
           <img
@@ -87,7 +87,7 @@ export const LegacyStoreCard = ({
       onClick={cardClickHandler}
       className="LegacyBottomCard"
     >
-      <BottomSheetElement.CardContent>
+      <BottomSheetElement.CardContent className="legacy-store">
         <div style={{ borderRadius: "8px", overflow: "hidden" }}>
           <img src={image} alt={title}/>
         </div>

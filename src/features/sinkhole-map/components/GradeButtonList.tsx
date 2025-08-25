@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { SinkholeBottomSheetElement as BottomSheetElement } from "@features/sinkhole-map";
 
 import { BottomSheetContent } from "@features/sinkhole-map/components/BottomSheetContent";
@@ -5,16 +6,28 @@ import { getDistrictsGuByGrade } from "@entities/sinkhole/api";
 import { useSelectGrade } from "@entities/sinkhole/context";
 import type { Grade } from "@entities/sinkhole/selectgrade";
 
-export const GradeBottomInner = () => {
+interface GradeBottomInnerProps {
+  height: number;
+}
+
+export const GradeBottomInner = ({ height }: GradeBottomInnerProps) => {
   // Context에서 상태 관리
   const {
     selectedGrade,
     setSelectedGrade,
+    selectedGradeData,
     setSelectedGradeData,
     isBadgeActive,
     setSearchedDistrict,
     setIsBadgeActive,
   } = useSelectGrade();
+
+  // 초기 로드 시 1등급 데이터 자동 로드
+  useEffect(() => {
+    if (selectedGrade === 1 && !selectedGradeData) {
+      handleGradeClick(1);
+    }
+  }, []);
 
   // 등급별 구 데이터 조회
   const handleGradeClick = async (grade: number) => {
@@ -67,13 +80,13 @@ export const GradeBottomInner = () => {
       <BottomSheetElement.BottomCardList
         style={{
           gap: "40px",
-          overflowY: "auto",
+          overflowY: height >= 100 ? "auto" : "hidden",
           paddingBottom: "20px",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
         }}
       >
-        <BottomSheetContent />
+        <BottomSheetContent height={height} />
       </BottomSheetElement.BottomCardList>
     </>
   );

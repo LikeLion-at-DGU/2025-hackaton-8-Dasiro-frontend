@@ -28,37 +28,45 @@ const StyledButton = style(BasicElement.Button)`
   }
 `;
 
-export const BottomSheetContent = () => {
+interface BottomSheetContentProps {
+  height: number;
+}
+
+export const BottomSheetContent = ({ height }: BottomSheetContentProps) => {
   const [bottomSheetHeight, setBottomSheetHeight] = useState(36);
   const lastHeightRef = useRef(36);
   const { searchedDistrict, isBadgeActive } = useSelectGrade();
-  
+
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     let resizeObserver: ResizeObserver;
-    
+
     // 초기 높이 설정
     const initializeHeight = () => {
-      const bottomSheet = document.getElementById('bottomSheet');
+      const bottomSheet = document.getElementById("bottomSheet");
       if (bottomSheet) {
         const style = getComputedStyle(bottomSheet);
-        const heightValue = Math.round(parseFloat(style.height) / window.innerHeight * 100);
+        const heightValue = Math.round(
+          (parseFloat(style.height) / window.innerHeight) * 100
+        );
         lastHeightRef.current = heightValue;
         setBottomSheetHeight(heightValue);
       }
     };
-    
+
     // 지연 수행으로 DOM 준비 대기
     const initTimer = setTimeout(initializeHeight, 100);
-    
+
     const observer = new MutationObserver(() => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
-        const bottomSheet = document.getElementById('bottomSheet');
+        const bottomSheet = document.getElementById("bottomSheet");
         if (bottomSheet) {
           const style = getComputedStyle(bottomSheet);
-          const heightValue = Math.round(parseFloat(style.height) / window.innerHeight * 100);
-          
+          const heightValue = Math.round(
+            (parseFloat(style.height) / window.innerHeight) * 100
+          );
+
           // 실제로 높이가 변했을 때만 상태 업데이트
           if (Math.abs(heightValue - lastHeightRef.current) >= 1) {
             lastHeightRef.current = heightValue;
@@ -67,16 +75,16 @@ export const BottomSheetContent = () => {
         }
       }, 30); // 30ms debounce 로 감소
     });
-    
-    const bottomSheet = document.getElementById('bottomSheet');
+
+    const bottomSheet = document.getElementById("bottomSheet");
     if (bottomSheet) {
       observer.observe(bottomSheet, {
         attributes: true,
-        attributeFilter: ['style']
+        attributeFilter: ["style"],
       });
-      
+
       // ResizeObserver 추가 (브라우저 리사이징 대응)
-      if (typeof ResizeObserver !== 'undefined') {
+      if (typeof ResizeObserver !== "undefined") {
         resizeObserver = new ResizeObserver(() => {
           clearTimeout(timeoutId);
           timeoutId = setTimeout(() => {
@@ -85,11 +93,11 @@ export const BottomSheetContent = () => {
         });
         resizeObserver.observe(bottomSheet);
       }
-      
+
       // 즉시 초기화 시도
       initializeHeight();
     }
-    
+
     return () => {
       clearTimeout(timeoutId);
       clearTimeout(initTimer);
@@ -97,22 +105,24 @@ export const BottomSheetContent = () => {
       if (resizeObserver) resizeObserver.disconnect();
     };
   }, []);
-  
+
   const handleMinimizeSheet = () => {
     // BottomCardList 스크롤을 맨 위로 이동
-    const bottomCardList = document.querySelector('.bottom-card-list') as HTMLElement;
+    const bottomCardList = document.querySelector(
+      ".bottom-card-list"
+    ) as HTMLElement;
     if (bottomCardList) {
       bottomCardList.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
-    
+
     if ((window as any).setBottomSheetHeight) {
       (window as any).setBottomSheetHeight(36);
     }
   };
-  
+
   const shouldShowButton = bottomSheetHeight >= 45;
   let Content: FC;
   if (searchedDistrict) {
@@ -124,7 +134,15 @@ export const BottomSheetContent = () => {
   }
 
   return (
-    <BasicElement.Container $gap={40} $columnDirection={true}>
+    <BasicElement.Container
+      $gap={40}
+      $columnDirection={true}
+      style={{
+        overflow: height >= 100 ? "visible" : "hidden",
+      }}
+      $justifyContent="flex-start"
+      id="bottom-sheet-content"
+    >
       <Banner />
       <Content />
       <StyledButton
@@ -135,8 +153,10 @@ export const BottomSheetContent = () => {
         onClick={handleMinimizeSheet}
         style={{
           opacity: shouldShowButton ? 1 : 0,
-          transform: `translateX(-50%) translateY(${shouldShowButton ? '0px' : '20px'})`,
-          pointerEvents: shouldShowButton ? 'auto' : 'none'
+          transform: `translateX(-50%) translateY(${
+            shouldShowButton ? "0px" : "20px"
+          })`,
+          pointerEvents: shouldShowButton ? "auto" : "none",
         }}
       >
         <img src={whitemarker} alt="하얀색 핀" />

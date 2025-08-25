@@ -23,11 +23,13 @@ const RiskCaption = () => {
 interface SinkholeMapSectionProps {
   forceViewMode?: "grade" | "safezone"; // 강제로 viewMode 지정
   id?: string; // 디버깅용 지도 식별자
+  showAllGrades?: boolean; // 초기 로드시 모든 등급 표시 여부
 }
 
 export const SinkholeMapSection = ({
   forceViewMode,
   id = "sinkhole-map",
+  showAllGrades = false,
 }: SinkholeMapSectionProps) => {
   // Sinkhole Context
   const { selectedGradeData, safezoneData, viewMode: contextViewMode, isBadgeActive } = useSelectGrade();
@@ -102,7 +104,8 @@ export const SinkholeMapSection = ({
 
 
     // 선택된 등급 데이터가 있는 경우 (특정 등급 버튼 클릭)
-    if (viewMode === "grade" && selectedGradeData !== null) {
+    // showAllGrades가 true면 등급 필터 적용하지 않음
+    if (viewMode === "grade" && selectedGradeData !== null && !showAllGrades) {
       if (selectedGradeData.items.length > 0) {
         const isSelectedDistrict = selectedGradeData.items.some(
           (item) => item.sigungu === name
