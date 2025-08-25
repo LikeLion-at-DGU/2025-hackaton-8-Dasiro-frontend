@@ -3,8 +3,19 @@ import { fonts } from "@shared/styles/fonts";
 import AnalysisMessage from "@shared/ui/AnalysisMessage";
 import type { ChatMessage } from "@shared/types/chat";
 import InfoCard from "./Infocard";
+import Typewriter from "typewriter-effect";
 
 type BubbleVariant = "bot" | "user";
+
+type BotTextMsg = { id: string; type: "bot"; text: string; typing?: boolean };
+type UserTextMsg = { id: string; type: "user"; text: string };
+
+function isBotTextMessage(m: ChatMessage): m is BotTextMsg {
+  return m.type === "bot";
+}
+function isUserTextMessage(m: ChatMessage): m is UserTextMsg {
+  return m.type === "user";
+}
 
 export default function MessageBubble({ msg }: { msg: ChatMessage }) {
   if (msg.type === "image") {
@@ -66,9 +77,28 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
     );
   }
 
-  // 일반 bot/user
-  const side: "left" | "right" = msg.type === "user" ? "right" : "left";
-  const variant: BubbleVariant = msg.type === "user" ? "user" : "bot";
+  // ---- 일반 bot/user ----
+  const side: "left" | "right" = isUserTextMessage(msg) ? "right" : "left";
+  const variant: BubbleVariant = isUserTextMessage(msg) ? "user" : "bot";
+  const isTyping = isBotTextMessage(msg) && !!msg.typing;
+
+  let bubbleContent: React.ReactNode = null;
+
+  if (isTyping && isBotTextMessage(msg)) {
+    const html = (msg.text || "").replace(/\n/g, "<br/>");
+    bubbleContent = (
+      <Typewriter
+        options={{ delay: 40, cursor: "", loop: true }}
+        onInit={(tw) => {
+          tw.typeString(html).pauseFor(900).deleteAll().start();
+        }}
+      />
+    );
+  } else if (isUserTextMessage(msg) || isBotTextMessage(msg)) {
+    bubbleContent = msg.text;
+  } else {
+    bubbleContent = null;
+  }
 
   return (
     <Row $side={side}>
@@ -80,7 +110,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
           <p>땅땅이</p>
         </AvatarWrapper>
       )}
-      <Bubble $variant={variant}>{msg.text}</Bubble>
+      <Bubble $variant={variant}>{bubbleContent}</Bubble>
     </Row>
   );
 }
@@ -97,6 +127,7 @@ const Row = styled.div<{
   justify-content: ${({ $side }) =>
     $side === "right" ? "flex-end" : "flex-start"};
   align-items: flex-start;
+  padding-bottom: ${({ $padBottom }) => ($padBottom ? "0.5rem" : 0)};
 `;
 
 const AvatarWrapper = styled.div`
