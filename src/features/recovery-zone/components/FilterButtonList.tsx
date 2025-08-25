@@ -160,10 +160,7 @@ export const FilterButtonList = () => {
             ? "TEMP_REPAIRED"
             : "UNDER_REPAIR";
         getIncidents({ 
-          statuses: [status],
-          lat: selectedLocation.lat,
-          lng: selectedLocation.lng,
-          radius: 3000
+          statuses: [status]
         })
           .then((response) => {
             console.log("불러온 사고 데이터:", response);
@@ -342,7 +339,7 @@ export const FilterButtonList = () => {
               return (
                 <LegacyStoreCard
                   key={cardItem.id}
-                  image="/images/default-store.png" // incident는 이미지가 없으므로 기본 이미지
+                  image={cardItem.main_image_url} // incident는 이미지가 없으므로 기본 이미지
                   title={cardItem.name}
                   address={cardItem.address}
                   occurred_at={cardItem.occurred_at || ""}
