@@ -34,7 +34,7 @@ export const NoticeBar = style(BasicElement.Container).attrs(() => ({
   $alignItems: "center",
   $justifyContent: "flex-start",
   $gap: 10,
-  $padding: [9, 13],
+  $padding: [9, 10],
   $borderRadius: 10
 }))`
   background-color: ${({ theme }) => theme.colors.orange05};
