@@ -50,7 +50,7 @@ export const GradeInfo = () => {
   }
 
   // 등급 필터가 선택된 경우
-  if (isGradeSelected) {
+  if (isGradeSelected || selectedGrade !== null) {
     return (
       <StyledContainer $gap={50}>
         <div>

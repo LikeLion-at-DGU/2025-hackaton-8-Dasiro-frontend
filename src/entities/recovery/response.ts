@@ -30,6 +30,7 @@ export interface IncidentItem {
   id: number;
   occurred_at: string;
   address: string;
+  image_url: string;
   lat: number;
   lng: number;
   cause: string;

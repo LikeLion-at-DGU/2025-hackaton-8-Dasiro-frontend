@@ -30,7 +30,7 @@ export const SelectGradeProvider = ({ children }: SelectGradeProviderProps) => {
   const [viewMode, setViewMode] = useState<"grade" | "safezone">("grade");
   const [searchedDistrict, setSearchedDistrict] = useState<DistrictSearchItem | null>(null);
   const [isBadgeActive, setIsBadgeActive] = useState<boolean>(false);
-  const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
+  const [selectedGrade, setSelectedGrade] = useState<number | null>(1);
 
   return (
     <SelectGradeContext.Provider value={{ 
