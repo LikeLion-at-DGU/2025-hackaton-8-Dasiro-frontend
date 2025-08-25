@@ -59,7 +59,6 @@ const SinkholePageContent = () => {
         />
         
         {/* 메인 콘텐츠 컨테이너 (현재 빈 상태) */}
-        <MainElement.MainContent />
         {/* 서울 지역 싱크홀 위험도 지도 - 구별 색상 표시 */}
         <SinkholeMapSection 
           id="main-map"
