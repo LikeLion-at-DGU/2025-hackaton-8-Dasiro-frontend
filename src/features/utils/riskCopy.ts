@@ -9,7 +9,7 @@ export const riskBucket = (score: number): RiskBucket =>
   score <= 35 ? "low" : score <= 70 ? "mid" : "high";
 
 const riskLabel = (score: number) =>
-  score <= 35
+  score <= 30
     ? "낮은 편"
     : score <= 70
     ? "주의가 필요한 상태"
@@ -18,6 +18,15 @@ const riskLabel = (score: number) =>
 export const getAnalysisCopy = (rawScore: number) => {
   const s = clamp0to100(rawScore);
   const bucket = riskBucket(s);
+
+  if (s <= 10) {
+    return {
+      score: s,
+      bucket,
+      analysis: `해당 장소는 위험도 ${s}%로 안전한 편이에요. 지반 침하 징후가 거의 나타나지 않으니 안심하셔도 돼요!`,
+      action: `그래도 불안하시다면 해당 지역을 계속해서 지켜봐주세요! 여러분의 관심이 큰 재앙을 막을 수 있답니다 :)`,
+    };
+  }
 
   if (bucket === "low") {
     return {
