@@ -19,7 +19,7 @@ export type CautionsMeta = {
 };
 
 export type ChatMessage =
-  | { id: string; type: "bot" | "user"; text: string }
+  | { id: string; type: "bot" | "user"; text: string; typing?: boolean }
   | { id: string; type: "image"; images: string[] }
   | {
       id: string;

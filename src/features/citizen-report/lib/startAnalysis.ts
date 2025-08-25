@@ -89,7 +89,7 @@ export async function startAnalysisFlow({
         {
           id: uploadingId,
           type: "bot",
-          text: `이미지 ${Math.min(files.length, 3)}장 업로드 중…`,
+          text: `이미지 ${Math.min(files.length, 3)}장 업로드 중 ···`,
         },
       ]);
       const uploaded = await uploadReportImages(reportId, files);
@@ -97,12 +97,14 @@ export async function startAnalysisFlow({
     }
 
     // 5) 분석 요청
+    // 5) 분석 요청
     analyzingId = crypto.randomUUID();
     append([
       {
         id: analyzingId,
         type: "bot",
-        text: "AI가 위험도를 분석하는 중이에요…",
+        text: "AI가 위험도를 분석하는 중이에요 ···",
+        typing: true,
       },
     ]);
     const analysis = await analyzeReport(reportId, imageUrls);
