@@ -169,6 +169,10 @@ export const CardContent = style(BasicElement.FlexBoxModel).attrs(() => ({
         color: ${({ theme }) => theme.colors.black02};
         ${({ theme }) => theme.fonts.bodyBold14};
     }
+    img{
+        width: 70px;
+        height: 70px;
+    }
 `;
 
 // 드롭다운 관련 요소들
