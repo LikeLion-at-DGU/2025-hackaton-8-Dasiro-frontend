@@ -142,6 +142,11 @@ export const FilterButtonList = () => {
       places: places.length,
     });
 
+    // selectedRecoveryStatus가 null이면 API 호출하지 않고 context의 전체 데이터 사용
+    if (selectedRecoveryStatus === null) {
+      return;
+    }
+
     if (selectedLocation) {
       setIsLoading(true);
 
@@ -210,7 +215,7 @@ export const FilterButtonList = () => {
         getPlaces({
           lat: selectedLocation.lat,
           lng: selectedLocation.lng,
-          radius: 200, // 200미터 반경
+          radius: 500, // 500미터 반경
           category:
             selectedCategory && selectedCategory !== "전체"
               ? mapFilterToCategory(selectedCategory)
@@ -278,12 +283,12 @@ export const FilterButtonList = () => {
         {FILTER_BUTTONS.map((button, index) => {
           const getSelectedOption = () => {
             if (button.label === "복구현황") {
-              return selectedRecoveryStatus === "전체"
+              return selectedRecoveryStatus === null || selectedRecoveryStatus === "전체"
                 ? undefined
                 : selectedRecoveryStatus;
             }
             if (button.label === "업종") {
-              return selectedCategory === "전체" ? undefined : selectedCategory;
+              return selectedCategory === null || selectedCategory === "전체" ? undefined : selectedCategory;
             }
             return undefined;
           };
@@ -294,9 +299,11 @@ export const FilterButtonList = () => {
             return undefined;
           };
 
-          // 업종 버튼은 복구현황이 "복구완료"가 아닐 때 비활성화
+          // 업종 버튼은 selectedRecoveryStatus가 null이거나 "복구완료"가 아닐 때 비활성화
           const isDisabled =
-            button.label === "업종" && selectedRecoveryStatus !== "복구완료";
+            button.label === "업종" && 
+            (selectedRecoveryStatus === null || 
+             (selectedRecoveryStatus !== null && selectedRecoveryStatus !== "복구완료"));
 
           return (
             <FilterButton
@@ -313,6 +320,7 @@ export const FilterButtonList = () => {
       </BottomSheetElement.BottomButtonList>
       {/* 복구 완료 상점 카드 목록 - 스크롤 가능한 세로 목록 */}
       <BottomSheetElement.BottomCardList
+        id="bottom-card-list"
         style={{
           overflowY: "auto",
           paddingBottom: "20px",
@@ -326,8 +334,9 @@ export const FilterButtonList = () => {
           places.map((place) => {
             // 임시복구나 복구중일 때는 LegacyStoreCard 사용
             if (
-              selectedRecoveryStatus === "임시복구" ||
-              selectedRecoveryStatus === "복구중"
+              selectedRecoveryStatus !== null &&
+              (selectedRecoveryStatus === "임시복구" ||
+              selectedRecoveryStatus === "복구중")
             ) {
               const cardItem = place as any as CardItem; // 타입 캐스팅
               return (

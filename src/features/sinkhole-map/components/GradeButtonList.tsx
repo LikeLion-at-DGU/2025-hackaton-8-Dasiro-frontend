@@ -22,6 +22,11 @@ export const GradeBottomInner = () => {
     setSearchedDistrict(null);
     setIsBadgeActive(false);
     
+    // 등급 선택시 바텀시트를 100vh로 확장
+    if ((window as any).setBottomSheetHeight) {
+      (window as any).setBottomSheetHeight(100);
+    }
+    
     setSelectedGrade(grade);
     console.log(`${grade}등급 클릭됨`);
     
